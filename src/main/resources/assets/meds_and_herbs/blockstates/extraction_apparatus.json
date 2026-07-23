@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "meds_and_herbs:block/extraction_apparatus"
+    },
+    "facing=east": {
+      "model": "meds_and_herbs:block/extraction_apparatus",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "meds_and_herbs:block/extraction_apparatus",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "meds_and_herbs:block/extraction_apparatus",
+      "y": 270
+    }
+  }
+}

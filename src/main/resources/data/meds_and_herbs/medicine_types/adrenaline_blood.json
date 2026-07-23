@@ -1,0 +1,9 @@
+{
+  "name": "meds_type.adrenaline_blood",
+  "type": "internal",
+  "color": "#FF0000",
+  "function": "meds_and_herbs:medicine_effects/adrenaline_blood",
+  "cures": [
+    "meds_and_herbs:blood_loss"
+  ]
+}

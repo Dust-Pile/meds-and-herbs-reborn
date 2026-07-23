@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "G",
+    "Q"
+  ],
+  "key": {
+    "G": {
+      "item": "minecraft:glass"
+    },
+    "Q": {
+      "item": "minecraft:quartz_slab"
+    }
+  },
+  "result": {
+    "id": "meds_and_herbs:petri_dish_empty",
+    "count": 4
+  }
+}

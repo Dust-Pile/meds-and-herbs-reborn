@@ -1,0 +1,7 @@
+{
+  "name": "meds_type.methanol",
+  "type": "internal",
+  "color": "#D1C6B3",
+  "function": "meds_and_herbs:medicine_effects/methanol",
+  "cures": []
+}

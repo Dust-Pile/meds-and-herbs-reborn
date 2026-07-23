@@ -1,0 +1,7 @@
+{
+  "name": "meds_type.opium",
+  "type": "internal",
+  "color": "#80683E",
+  "function": "meds_and_herbs:medicine_effects/opium",
+  "cures": []
+}

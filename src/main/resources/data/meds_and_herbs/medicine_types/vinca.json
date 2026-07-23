@@ -1,0 +1,9 @@
+{
+  "name": "meds_type.vinca",
+  "type": "internal",
+  "color": "#91AA6E",
+  "function": "meds_and_herbs:medicine_effects/vinca",
+  "cures": [
+    "meds_and_herbs:internal_bleeding"
+  ]
+}

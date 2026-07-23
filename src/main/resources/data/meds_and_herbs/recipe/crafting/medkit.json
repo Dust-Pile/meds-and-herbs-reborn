@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "RWR",
+    "WBW",
+    "RWR"
+  ],
+  "key": {
+    "B": {
+      "item": "minecraft:bundle"
+    },
+    "R": {
+      "item": "minecraft:red_dye"
+    },
+    "W": {
+      "item": "minecraft:white_dye"
+    }
+  },
+  "result": {
+    "id": "meds_and_herbs:medkit",
+    "count": 1
+  }
+}

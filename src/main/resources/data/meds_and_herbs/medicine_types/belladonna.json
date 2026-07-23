@@ -1,0 +1,9 @@
+{
+  "name": "meds_type.belladonna",
+  "type": "internal",
+  "color": "#CECA66",
+  "function": "meds_and_herbs:medicine_effects/belladonna",
+  "cures": [
+    "meds_and_herbs:mushroom_poisoning"
+  ]
+}

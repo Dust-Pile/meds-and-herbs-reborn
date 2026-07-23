@@ -1,0 +1,46 @@
+{
+  "type": "meds_and_herbs:distilling",
+  "inputA": {
+    "ingredient": {
+      "type": "neoforge:components",
+      "items": "meds_and_herbs:medicine",
+      "components": {
+        "meds_and_herbs:medicine_data": {
+          "type": "meds_and_herbs:adrenaline_blood",
+          "uses": 3
+        }
+      },
+      "strict": false
+    },
+    "count": 1
+  },
+  "inputB": {
+    "ingredient": {
+      "type": "neoforge:components",
+      "items": "meds_and_herbs:medicine",
+      "components": {
+        "meds_and_herbs:medicine_data": {
+          "type": "meds_and_herbs:ethanol",
+          "uses": 3
+        }
+      },
+      "strict": false
+    },
+    "count": 1
+  },
+  "emptyBottle": {
+    "ingredient": {
+      "item": "meds_and_herbs:medicine_bottle"
+    },
+    "count": 1
+  },
+  "output": {
+    "id": "meds_and_herbs:medicine",
+    "components": {
+      "meds_and_herbs:medicine_data": {
+        "type": "meds_and_herbs:adrenaline",
+        "uses": 3
+      }
+    }
+  }
+}

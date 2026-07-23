@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "tag": "meds_and_herbs:raw_meat"
+    },
+    {
+      "tag": "meds_and_herbs:raw_meat"
+    },
+    {
+      "tag": "meds_and_herbs:raw_meat"
+    },
+    {
+      "tag": "meds_and_herbs:raw_meat"
+    }
+  ],
+  "result": {
+    "id": "meds_and_herbs:parasite_eggs",
+    "count": 1
+  }
+}

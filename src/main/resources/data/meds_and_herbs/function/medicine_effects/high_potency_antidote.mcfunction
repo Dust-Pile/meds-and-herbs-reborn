@@ -1,0 +1,1 @@
+effect give @s meds_and_herbs:high_potency_antidote 300 0

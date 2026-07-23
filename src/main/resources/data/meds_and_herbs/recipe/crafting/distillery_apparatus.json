@@ -1,0 +1,36 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "QTQ",
+    "DGF",
+    "LCL"
+  ],
+  "key": {
+    "Q": {
+      "item": "meds_and_herbs:quartz_flask"
+    },
+    "T": {
+      "item": "meds_and_herbs:glass_tube"
+    },
+    "D": {
+      "tag": "minecraft:candles"
+    },
+    "F": {
+      "item": "meds_and_herbs:cotton_filter"
+    },
+    "G": {
+      "item": "meds_and_herbs:grinder"
+    },
+    "C": {
+      "item": "minecraft:chest"
+    },
+    "L": {
+      "tag": "minecraft:logs"
+    }
+  },
+  "result": {
+    "id": "meds_and_herbs:distillery_apparatus",
+    "count": 1
+  }
+}

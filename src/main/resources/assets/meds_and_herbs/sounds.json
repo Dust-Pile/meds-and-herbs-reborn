@@ -1,0 +1,45 @@
+{
+  "grinder": {
+    "subtitle": "subtitles.grinder",
+    "sounds": [
+      {
+        "name": "meds_and_herbs:grinder",
+        "stream": false
+      }
+    ]
+  },
+  "extract_apparatus": {
+    "subtitle": "subtitles.meds_and_herbs.extract_apparatus",
+    "sounds": [
+      {
+        "name": "meds_and_herbs:boiling",
+        "stream": false
+      }
+    ]
+  },
+  "distillery_apparatus": {
+    "subtitle": "subtitles.meds_and_herbs.distillery_apparatus",
+    "sounds": [
+      {
+        "name": "meds_and_herbs:boiling",
+        "stream": false
+      }
+    ]
+  },
+  "villager_work_herbalist": {
+    "subtitle": "subtitles.meds_and_herbs.villager_work_herbalist",
+    "sounds": [
+      {
+        "name": "meds_and_herbs:boiling",
+        "stream": false
+      }
+    ]
+  },
+  "fermentation_barrel": {
+    "subtitle": "subtitles.meds_and_herbs.fermentation_barrel",
+    "sounds": [
+      "block/brewing_stand/brew1",
+      "block/brewing_stand/brew2"
+    ]
+  }
+}

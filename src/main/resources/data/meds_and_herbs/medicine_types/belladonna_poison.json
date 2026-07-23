@@ -1,0 +1,7 @@
+{
+  "name": "meds_type.belladonna_poison",
+  "type": "internal",
+  "color": "#782C7B",
+  "function": "meds_and_herbs:medicine_effects/belladonna_poison",
+  "cures": []
+}

@@ -1,0 +1,35 @@
+{
+  "type": "meds_and_herbs:distilling",
+  "inputA": {
+    "ingredient": {
+      "item": "meds_and_herbs:unfiltered_whiskey_bucket"
+    },
+    "count": 1
+  },
+  "inputB": {
+    "ingredient": {
+      "item": "minecraft:bucket"
+    },
+    "count": 1
+  },
+  "emptyBottle": {
+    "ingredient": {
+      "item": "meds_and_herbs:medicine_bottle"
+    },
+    "count": 1
+  },
+  "output": {
+    "id": "meds_and_herbs:medicine",
+    "count": 1,
+    "components": {
+      "meds_and_herbs:medicine_data": {
+        "type": "meds_and_herbs:methanol",
+        "uses": 3
+      }
+    }
+  },
+  "stillage": {
+    "id": "meds_and_herbs:whiskey_bucket",
+    "count": 1
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "name": "meds_type.adrenaline",
+  "type": "internal",
+  "color": "#846A00",
+  "function": "meds_and_herbs:medicine_effects/adrenaline",
+  "cures": []
+}

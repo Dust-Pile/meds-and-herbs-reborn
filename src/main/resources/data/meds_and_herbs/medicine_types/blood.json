@@ -1,0 +1,9 @@
+{
+  "name": "meds_type.blood",
+  "type": "internal",
+  "color": "#DD0000",
+  "function": "meds_and_herbs:medicine_effects/blood",
+  "cures": [
+    "meds_and_herbs:blood_loss"
+  ]
+}

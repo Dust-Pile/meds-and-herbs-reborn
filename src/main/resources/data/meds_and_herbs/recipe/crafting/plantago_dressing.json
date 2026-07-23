@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "meds_and_herbs:plantago_leaf"
+    },
+    {
+      "item": "meds_and_herbs:plantago_leaf"
+    },
+    {
+      "item": "meds_and_herbs:plantago_leaf"
+    }
+  ],
+  "result": {
+    "id": "meds_and_herbs:plantago_dressing",
+    "count": 1
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "name": "meds_type.penicillin",
+  "type": "internal",
+  "color": "#728A98",
+  "function": "meds_and_herbs:medicine_effects/penicillin",
+  "cures": [
+    "meds_and_herbs:bacterial_infection"
+  ]
+}

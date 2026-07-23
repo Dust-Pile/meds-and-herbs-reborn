@@ -1,0 +1,10 @@
+{
+  "name": "meds_type.high_potency_antidote",
+  "type": "internal",
+  "color": "#1F5137",
+  "function": "meds_and_herbs:medicine_effects/high_potency_antidote",
+  "cures": [
+    "meds_and_herbs:high_potency_poison",
+    "minecraft:wither"
+  ]
+}

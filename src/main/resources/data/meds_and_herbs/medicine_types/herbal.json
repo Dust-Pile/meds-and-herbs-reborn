@@ -1,0 +1,7 @@
+{
+  "name": "meds_type.herbal",
+  "type": "internal",
+  "color": "#808551",
+  "function": "meds_and_herbs:medicine_effects/herbal",
+  "cures": []
+}

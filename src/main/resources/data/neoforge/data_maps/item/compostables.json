@@ -1,0 +1,40 @@
+{
+  "values": {
+    "meds_and_herbs:belladonna": {
+      "chance": 0.65
+    },
+    "meds_and_herbs:vinca": {
+      "chance": 0.65
+    },
+    "meds_and_herbs:chamomile": {
+      "chance": 0.65
+    },
+    "meds_and_herbs:sweet_clover": {
+      "chance": 0.85
+    },
+    "meds_and_herbs:artemisia": {
+      "chance": 0.65
+    },
+    "meds_and_herbs:opium": {
+      "chance": 0.65
+    },
+    "meds_and_herbs:aloe": {
+      "chance": 0.65
+    },
+    "meds_and_herbs:cotton": {
+      "chance": 0.65
+    },
+    "meds_and_herbs:plantago": {
+      "chance": 0.5
+    },
+    "meds_and_herbs:distilled_leftovers": {
+      "chance": 0.65
+    },
+    "meds_and_herbs:bouquet": {
+      "chance": 1
+    },
+    "meds_and_herbs:belladonna_pie": {
+      "chance": 1
+    }
+  }
+}

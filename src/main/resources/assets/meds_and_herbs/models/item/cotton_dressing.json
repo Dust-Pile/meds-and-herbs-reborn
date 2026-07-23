@@ -1,0 +1,6 @@
+{
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "meds_and_herbs:item/cotton_dressing"
+  }
+}

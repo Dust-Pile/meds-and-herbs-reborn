@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "BBB",
+    "MEM",
+    "WWW"
+  ],
+  "key": {
+    "B": {
+      "item": "meds_and_herbs:belladonna"
+    },
+    "E": {
+      "item": "minecraft:egg"
+    },
+    "M": {
+      "item": "minecraft:milk_bucket"
+    },
+    "W": {
+      "item": "minecraft:wheat"
+    }
+  },
+  "result": {
+    "id": "meds_and_herbs:belladonna_pie",
+    "count": 1
+  }
+}

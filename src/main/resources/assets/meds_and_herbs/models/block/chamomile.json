@@ -1,0 +1,8 @@
+{
+  "parent": "block/cross",
+  "textures": {
+    "cross": "meds_and_herbs:block/chamomile",
+    "particle": "meds_and_herbs:block/chamomile"
+  },
+  "render_type": "cutout"
+}

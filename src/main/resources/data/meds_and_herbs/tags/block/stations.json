@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    "meds_and_herbs:extraction_apparatus",
+    "meds_and_herbs:incubator",
+    "meds_and_herbs:distillery_apparatus",
+    "meds_and_herbs:fermentation_barrel"
+  ]
+}

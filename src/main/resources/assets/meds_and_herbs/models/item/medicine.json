@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "meds_and_herbs:item/medicine_bottle",
+    "layer1": "meds_and_herbs:item/medicine_bottle_overlay_3"
+  },
+  "overrides": [
+    {"predicate": {"meds_and_herbs:uses": 1}, "model": "meds_and_herbs:item/medicine_uses_1"},
+    {"predicate": {"meds_and_herbs:uses": 2}, "model": "meds_and_herbs:item/medicine_uses_2"},
+    {"predicate": {"meds_and_herbs:uses": 3}, "model": "meds_and_herbs:item/medicine_uses_3"}
+  ]
+}

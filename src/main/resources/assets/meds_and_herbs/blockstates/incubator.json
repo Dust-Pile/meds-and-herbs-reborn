@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "meds_and_herbs:block/incubator"
+    },
+    "facing=east": {
+      "model": "meds_and_herbs:block/incubator",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "meds_and_herbs:block/incubator",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "meds_and_herbs:block/incubator",
+      "y": 270
+    }
+  }
+}

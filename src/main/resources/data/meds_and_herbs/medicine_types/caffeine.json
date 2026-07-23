@@ -1,0 +1,7 @@
+{
+  "name": "meds_type.caffeine",
+  "type": "internal",
+  "color": "#DE977B",
+  "function": "meds_and_herbs:medicine_effects/caffeine",
+  "cures": []
+}

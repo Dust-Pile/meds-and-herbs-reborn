@@ -1,0 +1,9 @@
+{
+  "name": "meds_type.sweet_clover",
+  "type": "internal",
+  "color": "#E8D292",
+  "function": "meds_and_herbs:medicine_effects/sweet_clover",
+  "cures": [
+    "meds_and_herbs:thrombosis"
+  ]
+}

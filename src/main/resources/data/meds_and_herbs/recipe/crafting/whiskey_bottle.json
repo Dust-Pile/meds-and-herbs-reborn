@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "meds_and_herbs:whiskey_bucket"
+    },
+    {
+      "item": "meds_and_herbs:medicine_bottle"
+    },
+    {
+      "item": "meds_and_herbs:medicine_bottle"
+    },
+    {
+      "item": "meds_and_herbs:medicine_bottle"
+    }
+  ],
+  "result": {
+    "id": "meds_and_herbs:whiskey_bottle",
+    "count": 3
+  }
+}

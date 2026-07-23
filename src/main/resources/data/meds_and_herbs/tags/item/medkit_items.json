@@ -1,0 +1,13 @@
+{
+  "replace": false,
+  "values": [
+    "meds_and_herbs:medicine",
+    "meds_and_herbs:dirty_medicine_bottle",
+    "meds_and_herbs:medicine_bottle",
+    "meds_and_herbs:sewing_kit",
+    "meds_and_herbs:syringe",
+    "meds_and_herbs:plaster",
+    "meds_and_herbs:splint",
+    "#meds_and_herbs:dressings"
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "minecraft:clay_ball"
+    },
+    {
+      "item": "minecraft:string"
+    },
+    {
+      "item": "minecraft:clay_ball"
+    },
+    {
+      "item": "meds_and_herbs:cotton_cloth"
+    },
+    {
+      "item": "meds_and_herbs:cotton_cloth"
+    },
+    {
+      "item": "meds_and_herbs:cotton_cloth"
+    }
+  ],
+  "result": {
+    "id": "meds_and_herbs:plaster",
+    "count": 1
+  }
+}

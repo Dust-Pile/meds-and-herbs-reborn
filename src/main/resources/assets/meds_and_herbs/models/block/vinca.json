@@ -1,0 +1,8 @@
+{
+  "parent": "block/cross",
+  "textures": {
+    "cross": "meds_and_herbs:block/vinca",
+    "particle": "meds_and_herbs:block/vinca"
+  },
+  "render_type": "cutout"
+}

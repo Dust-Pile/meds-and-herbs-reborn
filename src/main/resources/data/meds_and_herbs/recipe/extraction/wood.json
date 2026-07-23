@@ -1,0 +1,26 @@
+{
+  "type": "meds_and_herbs:extraction",
+  "powder": {
+    "ingredient": {
+      "item": "meds_and_herbs:powder_wood"
+    },
+    "count": 16
+  },
+  "solvent": {
+    "ingredient": {
+      "item": "meds_and_herbs:medicine_bottle"
+    }
+  },
+  "output": {
+    "id": "meds_and_herbs:medicine",
+    "components": {
+      "meds_and_herbs:medicine_data": {
+        "type": "meds_and_herbs:methanol",
+        "uses": 3
+      }
+    }
+  },
+  "stillage": {
+    "id": "meds_and_herbs:distilled_leftovers"
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "meds_and_herbs:aloe_leaf"
+    },
+    {
+      "item": "meds_and_herbs:aloe_fruit"
+    },
+    {
+      "item": "meds_and_herbs:aloe_leaf"
+    },
+    {
+      "item": "minecraft:glass_bottle"
+    }
+  ],
+  "result": {
+    "id": "meds_and_herbs:aloe_juice_bottle",
+    "count": 1
+  }
+}

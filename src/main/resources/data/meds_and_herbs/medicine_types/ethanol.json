@@ -1,0 +1,7 @@
+{
+  "name": "meds_type.ethanol",
+  "type": "external",
+  "color": "#C9D5EB",
+  "function": "meds_and_herbs:medicine_effects/ethanol",
+  "cures": []
+}

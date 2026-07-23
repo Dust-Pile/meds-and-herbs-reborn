@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "meds_and_herbs:cotton_fiber"
+    },
+    {
+      "item": "meds_and_herbs:cotton_fiber"
+    },
+    {
+      "item": "meds_and_herbs:cotton_fiber"
+    }
+  ],
+  "result": {
+    "id": "minecraft:string",
+    "count": 2
+  }
+}

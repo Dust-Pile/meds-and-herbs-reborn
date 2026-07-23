@@ -1,0 +1,17 @@
+{
+  "type": "meds_and_herbs:fermentation",
+  "ingredients": [
+    { "item": "minecraft:water_bucket" },
+    { "item": "minecraft:sugar" },
+    { "item": "minecraft:sugar" },
+    { "item": "minecraft:wheat" },
+    { "item": "minecraft:wheat" },
+    { "item": "minecraft:wheat" },
+    { "item": "minecraft:wheat" },
+    { "item": "minecraft:wheat" },
+    { "item": "minecraft:wheat" }
+  ],
+  "output": {
+    "id": "meds_and_herbs:unfiltered_whiskey_bucket"
+  }
+}

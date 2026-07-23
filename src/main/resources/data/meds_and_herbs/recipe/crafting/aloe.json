@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    { "item": "meds_and_herbs:aloe_leaf" },
+    { "item": "meds_and_herbs:aloe_leaf" },
+    { "item": "meds_and_herbs:aloe_leaf" },
+    { "item": "meds_and_herbs:medicine_bottle" }
+  ],
+  "result": {
+    "id": "meds_and_herbs:medicine",
+    "components": {
+      "meds_and_herbs:medicine_data": {
+        "type": "meds_and_herbs:aloe",
+        "uses": 3
+      }
+    }
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "type": "meds_and_herbs:grinder",
+  "input": {
+    "item": "minecraft:sugar_cane"
+  },
+  "output": {
+    "id": "meds_and_herbs:powder_sugarcane",
+    "count": 1
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "name": "meds_type.antidote",
+  "type": "internal",
+  "color": "#553918",
+  "function": "meds_and_herbs:medicine_effects/antidote",
+  "cures": [
+    "minecraft:poison", "meds_and_herbs:belladonna_poison"
+  ]
+}

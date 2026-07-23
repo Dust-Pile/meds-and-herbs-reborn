@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " B ",
+    "Q Q",
+    " Q "
+  ],
+  "key": {
+    "B": {
+      "tag": "minecraft:buttons"
+    },
+    "Q": {
+      "item": "minecraft:quartz"
+    }
+  },
+  "result": {
+    "id": "meds_and_herbs:quartz_flask",
+    "count": 1
+  }
+}

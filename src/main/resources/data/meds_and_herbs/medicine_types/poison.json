@@ -1,0 +1,7 @@
+{
+  "name": "meds_type.poison",
+  "type": "internal",
+  "color": "#5D6A18",
+  "function": "meds_and_herbs:medicine_effects/poison",
+  "cures": []
+}

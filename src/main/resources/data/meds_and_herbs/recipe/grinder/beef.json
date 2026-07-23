@@ -1,0 +1,10 @@
+{
+  "type": "meds_and_herbs:grinder",
+  "input": {
+    "item": "minecraft:cooked_beef"
+  },
+  "output": {
+    "id": "meds_and_herbs:powder_beef",
+    "count": 1
+  }
+}

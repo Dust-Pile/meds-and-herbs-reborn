@@ -1,0 +1,9 @@
+{
+  "name": "meds_type.artemisia",
+  "type": "internal",
+  "color": "#9BAF73",
+  "function": "meds_and_herbs:medicine_effects/artemisia",
+  "cures": [
+    "meds_and_herbs:parasites"
+  ]
+}

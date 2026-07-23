@@ -1,0 +1,26 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "meds_and_herbs:sweet_clover",
+          "conditions": [
+            {
+              "condition": "minecraft:block_state_property",
+              "block": "meds_and_herbs:sweet_clover",
+              "properties": {
+                "half": "lower"
+              }
+            },
+            {
+              "condition": "minecraft:survives_explosion"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

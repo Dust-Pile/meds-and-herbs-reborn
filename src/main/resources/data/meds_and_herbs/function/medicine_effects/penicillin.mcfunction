@@ -1,0 +1,1 @@
+effect give @s meds_and_herbs:immune 2400 0

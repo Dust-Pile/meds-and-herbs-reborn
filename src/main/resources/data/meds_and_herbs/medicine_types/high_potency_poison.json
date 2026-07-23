@@ -1,0 +1,7 @@
+{
+  "name": "meds_type.high_potency_poison",
+  "type": "internal",
+  "color": "#60BE95",
+  "function": "meds_and_herbs:medicine_effects/high_potency_poison",
+  "cures": []
+}

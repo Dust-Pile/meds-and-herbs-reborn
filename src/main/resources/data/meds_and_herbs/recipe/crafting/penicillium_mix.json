@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "meds_and_herbs:powder_charcoal"
+    },
+    {
+      "item": "meds_and_herbs:penicillium"
+    }
+  ],
+  "result": {
+    "id": "meds_and_herbs:penicillium_and_coal",
+    "count": 1
+  }
+}

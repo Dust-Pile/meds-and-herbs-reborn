@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "CC",
+    "CC"
+  ],
+  "key": {
+    "C": {
+      "item": "meds_and_herbs:cotton_fiber"
+    }
+  },
+  "result": {
+    "id": "meds_and_herbs:cotton_cloth",
+    "count": 1
+  }
+}

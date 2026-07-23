@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "meds_and_herbs:block/fermentation_barrel"
+    },
+    "facing=east": {
+      "model": "meds_and_herbs:block/fermentation_barrel",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "meds_and_herbs:block/fermentation_barrel",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "meds_and_herbs:block/fermentation_barrel",
+      "y": 270
+    }
+  }
+}

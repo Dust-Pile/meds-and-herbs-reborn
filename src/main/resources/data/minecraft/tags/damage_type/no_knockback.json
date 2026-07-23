@@ -1,0 +1,15 @@
+{
+  "replace": false,
+  "values": [
+    "meds_and_herbs:bleeding",
+    "meds_and_herbs:adrenaline",
+    "meds_and_herbs:parasites",
+    "meds_and_herbs:fracture",
+    "meds_and_herbs:belladonna_poison",
+    "meds_and_herbs:bacterial_infection",
+    "meds_and_herbs:high_potency_poison",
+    "meds_and_herbs:methanol",
+    "meds_and_herbs:mushroom",
+    "meds_and_herbs:thrombosis"
+  ]
+}

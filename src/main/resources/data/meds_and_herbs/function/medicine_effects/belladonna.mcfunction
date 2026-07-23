@@ -1,0 +1,1 @@
+execute unless predicate meds_and_herbs:has_mushroom_poisoning run effect give @s meds_and_herbs:belladonna_poison 60 2

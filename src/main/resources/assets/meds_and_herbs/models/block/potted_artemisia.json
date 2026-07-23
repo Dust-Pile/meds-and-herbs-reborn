@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/flower_pot_cross",
+  "textures": {
+    "plant": "meds_and_herbs:block/artemisia"
+  },
+  "render_type": "cutout"
+}

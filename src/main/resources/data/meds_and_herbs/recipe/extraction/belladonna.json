@@ -1,0 +1,53 @@
+{
+  "type": "meds_and_herbs:extraction",
+  "powder": {
+    "ingredient": {
+      "type": "neoforge:components",
+      "items": "meds_and_herbs:powder_herbal",
+      "components": {
+        "meds_and_herbs:bouquet_flowers": {
+          "flowers": [
+            "meds_and_herbs:belladonna",
+            "meds_and_herbs:belladonna",
+            "meds_and_herbs:belladonna",
+            "meds_and_herbs:belladonna"
+          ]
+        }
+      },
+      "strict": false
+    },
+    "count": 4
+  },
+  "solvent": {
+    "ingredient": {
+      "type": "neoforge:components",
+      "items": "meds_and_herbs:medicine",
+      "components": {
+        "meds_and_herbs:medicine_data": {
+          "type": "meds_and_herbs:ethanol",
+          "uses": 3
+        }
+      },
+      "strict": false
+    },
+    "count": 1
+  },
+  "emptyBottle": {
+    "ingredient": {
+      "item": "meds_and_herbs:medicine_bottle"
+    },
+    "count": 1
+  },
+  "output": {
+    "id": "meds_and_herbs:medicine",
+    "components": {
+      "meds_and_herbs:medicine_data": {
+        "type": "meds_and_herbs:belladonna",
+        "uses": 3
+      }
+    }
+  },
+  "stillage": {
+    "id": "meds_and_herbs:distilled_leftovers"
+  }
+}

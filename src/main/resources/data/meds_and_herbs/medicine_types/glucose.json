@@ -1,0 +1,7 @@
+{
+  "name": "meds_type.glucose",
+  "type": "internal",
+  "color": "#F2B29E",
+  "function": "meds_and_herbs:medicine_effects/glucose",
+  "cures": []
+}

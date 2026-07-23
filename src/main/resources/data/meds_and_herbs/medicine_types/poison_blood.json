@@ -1,0 +1,9 @@
+{
+  "name": "meds_type.poison_blood",
+  "type": "internal",
+  "color": "#BB0000",
+  "function": "meds_and_herbs:medicine_effects/poison_blood",
+  "cures": [
+    "meds_and_herbs:blood_loss"
+  ]
+}

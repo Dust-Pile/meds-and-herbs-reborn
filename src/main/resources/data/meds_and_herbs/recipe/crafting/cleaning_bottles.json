@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "type": "neoforge:components",
+      "items": "meds_and_herbs:medicine",
+      "components": {
+        "meds_and_herbs:medicine_data": {
+          "type": "meds_and_herbs:ethanol",
+          "uses": 3
+        }
+      },
+      "strict": false
+    },
+    { "item": "meds_and_herbs:dirty_medicine_bottle" },
+    { "item": "meds_and_herbs:dirty_medicine_bottle" },
+    { "item": "meds_and_herbs:dirty_medicine_bottle" },
+    { "item": "meds_and_herbs:dirty_medicine_bottle" },
+    { "item": "meds_and_herbs:dirty_medicine_bottle" },
+    { "item": "meds_and_herbs:dirty_medicine_bottle" }
+  ],
+  "result": {
+    "id": "meds_and_herbs:medicine_bottle",
+    "count": 6
+  }
+}

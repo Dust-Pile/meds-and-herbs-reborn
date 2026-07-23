@@ -1,0 +1,1 @@
+effect give @s meds_and_herbs:high_potency_poison 40 0

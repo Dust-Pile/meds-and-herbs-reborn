@@ -1,0 +1,12 @@
+{
+  "type": "meds_and_herbs:incubator",
+  "input": {
+    "id": "meds_and_herbs:petri_dish_agar",
+    "count": 1
+  },
+  "outputs": [
+    { "item": { "id": "meds_and_herbs:petri_dish_penicillium", "count": 1 }, "weight": 1 },
+    { "item": { "id": "meds_and_herbs:petri_dish_mold", "count": 1 }, "weight": 1 }
+  ],
+  "processingTime": 12000
+}

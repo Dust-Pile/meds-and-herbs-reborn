@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " G ",
+    "FCF",
+    "LLL"
+  ],
+  "key": {
+    "G": {
+      "item": "meds_and_herbs:glass_tube"
+    },
+    "F": {
+      "item": "meds_and_herbs:flask"
+    },
+    "C": {
+      "tag": "minecraft:candles"
+    },
+    "L": {
+      "tag": "minecraft:logs"
+    }
+  },
+  "result": {
+    "id": "meds_and_herbs:extraction_apparatus",
+    "count": 1
+  }
+}

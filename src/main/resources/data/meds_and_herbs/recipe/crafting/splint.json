@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "KRK",
+    "KRK"
+  ],
+  "key": {
+    "K": {
+      "item": "minecraft:stick"
+    },
+    "R": {
+      "item": "minecraft:string"
+    }
+  },
+  "result": {
+    "id": "meds_and_herbs:splint",
+    "count": 1
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "replace": false,
+  "values": [
+    "meds_and_herbs:vinca",
+    "meds_and_herbs:belladonna",
+    "meds_and_herbs:chamomile",
+    "meds_and_herbs:artemisia",
+    "meds_and_herbs:opium"
+  ]
+}

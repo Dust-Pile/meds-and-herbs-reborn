@@ -1,0 +1,11 @@
+{
+  "variants": {
+    "bites=0": { "model": "meds_and_herbs:block/belladonna_pie" },
+    "bites=1": { "model": "meds_and_herbs:block/belladonna_pie_bites1" },
+    "bites=2": { "model": "meds_and_herbs:block/belladonna_pie_bites2" },
+    "bites=3": { "model": "meds_and_herbs:block/belladonna_pie_bites3" },
+    "bites=4": { "model": "meds_and_herbs:block/belladonna_pie_bites4" },
+    "bites=5": { "model": "meds_and_herbs:block/belladonna_pie_bites5" },
+    "bites=6": { "model": "meds_and_herbs:block/belladonna_pie_bites6" }
+  }
+}

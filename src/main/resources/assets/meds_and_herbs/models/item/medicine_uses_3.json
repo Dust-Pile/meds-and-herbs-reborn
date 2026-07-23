@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "meds_and_herbs:item/medicine_bottle",
+    "layer1": "meds_and_herbs:item/medicine_bottle_overlay_3"
+  }
+}

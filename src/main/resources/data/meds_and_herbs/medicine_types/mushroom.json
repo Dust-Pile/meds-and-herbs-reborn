@@ -1,0 +1,7 @@
+{
+  "name": "meds_type.mushroom",
+  "type": "internal",
+  "color": "#FF7C60",
+  "function": "meds_and_herbs:medicine_effects/mushroom",
+  "cures": []
+}

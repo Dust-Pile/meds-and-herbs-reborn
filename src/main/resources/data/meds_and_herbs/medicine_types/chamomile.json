@@ -1,0 +1,18 @@
+{
+  "name": "meds_type.chamomile",
+  "type": "internal",
+  "color": "#FCE74E",
+  "function": "meds_and_herbs:medicine_effects/chamomile",
+  "cures": [
+    "minecraft:slowness",
+    "minecraft:mining_fatigue",
+    "minecraft:weakness",
+    "minecraft:instant_damage",
+    "minecraft:nausea",
+    "minecraft:blindness",
+    "minecraft:hunger",
+    "minecraft:infested",
+    "minecraft:oozing",
+    "minecraft:weaving"
+  ]
+}

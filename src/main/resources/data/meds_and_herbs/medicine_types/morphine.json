@@ -1,0 +1,7 @@
+{
+  "name": "meds_type.morphine",
+  "type": "internal",
+  "color": "#9A96F4",
+  "function": "meds_and_herbs:medicine_effects/morphine",
+  "cures": []
+}

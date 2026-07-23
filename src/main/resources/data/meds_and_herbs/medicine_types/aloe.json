@@ -1,0 +1,9 @@
+{
+  "name": "meds_type.aloe",
+  "type": "external",
+  "color": "#DFE995",
+  "function": "meds_and_herbs:medicine_effects/aloe",
+  "cures": [
+    "meds_and_herbs:burns"
+  ]
+}

@@ -1,0 +1,1 @@
+execute unless predicate meds_and_herbs:has_thrombosis run effect give @s meds_and_herbs:internal_bleeding 1200 0

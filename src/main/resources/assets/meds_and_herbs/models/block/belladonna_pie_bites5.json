@@ -1,0 +1,27 @@
+{
+	"format_version": "1.21.11",
+	"credit": "Made with Blockbench",
+	"textures": {
+		"1": "meds_and_herbs:block/belladonna_pie_top",
+		"2": "meds_and_herbs:block/belladonna_pie_side",
+		"3": "meds_and_herbs:block/belladonna_pie_bottom",
+		"4": "meds_and_herbs:block/belladonna_pie_berry",
+		"5": "meds_and_herbs:block/belladonna_pie_berry_leave",
+		"6": "meds_and_herbs:block/belladonna_pie_inner",
+		"particle": "meds_and_herbs:block/belladonna_pie_inner"
+	},
+	"elements": [
+		{
+			"from": [11, 0, 1],
+			"to": [15, 8, 15],
+			"faces": {
+				"north": {"uv": [1, 8, 5, 16], "texture": "#2"},
+				"east": {"uv": [1, 8, 15, 16], "texture": "#2"},
+				"south": {"uv": [11, 8, 15, 16], "texture": "#2"},
+				"west": {"uv": [1, 8, 15, 16], "texture": "#6"},
+				"up": {"uv": [11, 1, 15, 15], "texture": "#1"},
+				"down": {"uv": [11, 1, 15, 15], "texture": "#3"}
+			}
+		}
+	]
+}

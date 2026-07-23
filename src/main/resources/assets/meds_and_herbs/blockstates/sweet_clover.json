@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "half=upper": {
+      "model": "meds_and_herbs:block/sweet_clover_top"
+    },
+    "half=lower": {
+      "model": "meds_and_herbs:block/sweet_clover_bottom"
+    }
+  }
+}

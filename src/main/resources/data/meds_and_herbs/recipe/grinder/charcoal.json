@@ -1,0 +1,10 @@
+{
+  "type": "meds_and_herbs:grinder",
+  "input": {
+    "item": "minecraft:charcoal"
+  },
+  "output": {
+    "id": "meds_and_herbs:powder_charcoal",
+    "count": 1
+  }
+}

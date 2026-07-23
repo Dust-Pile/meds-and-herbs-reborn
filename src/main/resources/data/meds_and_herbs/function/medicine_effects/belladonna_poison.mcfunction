@@ -1,0 +1,1 @@
+effect give @s meds_and_herbs:belladonna_poison 90 4

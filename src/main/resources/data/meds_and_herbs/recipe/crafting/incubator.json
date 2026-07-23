@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "QQ",
+    "II",
+    "QQ"
+  ],
+  "key": {
+    "Q": {
+      "item": "minecraft:quartz_slab"
+    },
+    "I": {
+      "item": "minecraft:iron_bars"
+    }
+  },
+  "result": {
+    "id": "meds_and_herbs:incubator",
+    "count": 1
+  }
+}
