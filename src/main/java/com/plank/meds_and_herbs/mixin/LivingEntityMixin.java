@@ -1,25 +1,18 @@
 package com.plank.meds_and_herbs.mixin;
 
-import com.plank.meds_and_herbs.effect.MedicalEffect;
 import com.plank.meds_and_herbs.init.Effects;
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
 import net.neoforged.neoforge.common.damagesource.DamageContainer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
-import org.spongepowered.asm.mixin.injection.Redirect;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import javax.annotation.Nullable;
-import java.util.Objects;
 import java.util.Stack;
 
 @Mixin(LivingEntity.class)
@@ -29,88 +22,53 @@ public class LivingEntityMixin {
     @Nullable
     protected Stack<DamageContainer> damageContainers;
 
-    // 存储原始伤害（用于增伤计算）
-    @Unique
-    private static final ThreadLocal<Float> ORIGINAL_DAMAGE = ThreadLocal.withInitial(() -> 0.0F);
-
-    // ========== 增伤逻辑 ==========
-
-    // 1. 捕获原始伤害
-    @ModifyVariable(
-            method = "getDamageAfterMagicAbsorb",
-            at = @At("HEAD"),
-            argsOnly = true,
-            remap = false
-    )
-    private float captureOriginalDamage(float damageAmount) {
-        ORIGINAL_DAMAGE.set(damageAmount);
-        return damageAmount;
-    }
-
-    // 2. 有抗性时降低抗性等级（允许负数）
-    @Redirect(
-            method = "getDamageAfterMagicAbsorb",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/world/effect/MobEffectInstance;getAmplifier()I"
-            ),
-            remap = false
-    )
-    private int reduceResistanceAmplifier(MobEffectInstance instance) {
-        if (instance.getEffect() == MobEffects.DAMAGE_RESISTANCE) {
-            LivingEntity self = (LivingEntity) (Object) this;
-            if (self.hasEffect(Effects.INTERNAL_BLEEDING)) {
-                int original = instance.getAmplifier();
-                int reduction = Objects.requireNonNull(self.getEffect(Effects.INTERNAL_BLEEDING)).getAmplifier();
-                return original - reduction; // 允许负数，实现减抗
-            }
-        }
-        return instance.getAmplifier();
-    }
-
-    // 3. 计算增伤后的最终伤害，并更新 damageContainers
+    /**
+     * 完全重写魔法伤害减免，实现抗性等级与内出血等级相减的效果。
+     * 内出血可以抵消抗性，使伤害增加（当 effectiveLevel 为负时）。
+     */
     @Inject(
             method = "getDamageAfterMagicAbsorb",
-            at = @At("RETURN"),
+            at = @At("HEAD"),
             cancellable = true,
             remap = false
     )
-    private void applyFinalDamage(DamageSource damageSource, float damageAmount,
-                                  CallbackInfoReturnable<Float> cir) {
+    private void customMagicDamageReduction(DamageSource source, float amount,
+                                            CallbackInfoReturnable<Float> cir) {
         LivingEntity self = (LivingEntity) (Object) this;
-        float original = ORIGINAL_DAMAGE.get();
-        ORIGINAL_DAMAGE.remove(); // 清理
 
-        if (self.hasEffect(Effects.INTERNAL_BLEEDING)
-                && !damageSource.is(DamageTypeTags.BYPASSES_EFFECTS)
-                && original > 0.0F) {
-            int amp = Objects.requireNonNull(self.getEffect(Effects.INTERNAL_BLEEDING)).getAmplifier();
-            float bonus = original * 0.20F * (amp + 1);
-            float finalDamage = cir.getReturnValueF() + bonus;
-            cir.setReturnValue(finalDamage);
-
-            // 更新容器，确保 actuallyHurt 使用增伤后的值
-            if (this.damageContainers != null && !this.damageContainers.isEmpty()) {
-                this.damageContainers.peek().setNewDamage(finalDamage);
-            }
+        // 如果伤害无视效果，直接返回原伤害
+        if (source.is(DamageTypeTags.BYPASSES_EFFECTS)) {
+            cir.setReturnValue(amount);
+            return;
         }
-    }
 
-    // ========== 效果移除回调 ==========
-
-    /**
-     * 拦截所有效果移除（包括手动移除和自然到期），
-     * 若移除的效果是 MedicalEffect 的子类，则调用其 onEffectRemoved 方法。
-     */
-    @Inject(
-            method = "onEffectRemoved",
-            at = @At("HEAD"),
-            remap = false
-    )
-    private void onEffectRemovedCallback(MobEffectInstance effectInstance, CallbackInfo ci) {
-        LivingEntity self = (LivingEntity) (Object) this;
-        if (!self.getPersistentData().contains("meds_and_herbs:curing") && effectInstance.getEffect().value() instanceof MedicalEffect medicalEffect) {
-            medicalEffect.onEffectRemoved(self, effectInstance.getAmplifier());
+        // 获取抗性等级（放大器从0开始，等级=放大器+1）
+        int resistLevel = 0;
+        if (self.hasEffect(MobEffects.DAMAGE_RESISTANCE)) {
+            resistLevel = self.getEffect(MobEffects.DAMAGE_RESISTANCE).getAmplifier() + 1;
         }
+
+        // 获取内出血等级
+        int bleedLevel = 0;
+        if (self.hasEffect(Effects.INTERNAL_BLEEDING)) {
+            bleedLevel = self.getEffect(Effects.INTERNAL_BLEEDING).getAmplifier() + 1;
+        }
+
+        // 有效等级 = 抗性 - 内出血（可为负）
+        int effectiveLevel = resistLevel - bleedLevel;
+
+        // 每级影响20%，允许伤害倍率 > 1（增伤），但禁止负伤害
+        float multiplier = 1.0F - 0.2F * effectiveLevel;
+        if (multiplier < 0.0F) multiplier = 0.0F; // 防止回血
+
+        float finalDamage = amount * multiplier;
+
+        // ===== 关键：更新 damageContainers，使 actuallyHurt 使用新伤害 =====
+        if (this.damageContainers != null && !this.damageContainers.isEmpty()) {
+            this.damageContainers.peek().setNewDamage(finalDamage);
+        }
+
+        // 返回最终伤害（虽然原版不用，但为兼容其他调用）
+        cir.setReturnValue(finalDamage);
     }
 }
