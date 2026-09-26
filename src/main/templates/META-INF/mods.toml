@@ -1,0 +1,57 @@
+modLoader="javafml"
+loaderVersion="${loader_version_range}"
+license="${mod_license}"
+
+# A URL to refer people to when problems occur with this mod
+#issueTrackerURL="https://change.me.to.your.issue.tracker.example.invalid/"
+
+[[mods]]
+modId="${mod_id}"
+version="${mod_version}"
+displayName="Meds and Herbs Reborn"
+# A URL to query for updates for this mod. See the JSON update specification https://docs.neoforged.net/docs/misc/updatechecker/
+#updateJSONURL="https://change.me.example.invalid/updates.json"
+# A URL for the "homepage" for this mod, displayed in the mod UI
+#displayURL="https://change.me.to.your.mods.homepage.example.invalid/"
+logoFile="assets/meds_and_herbs/textures/mod_logo.png"
+#credits=""
+authors="ChebyPattern, 木板, JuiceyBeans"
+
+# The description text for the mod (multi line!) ()
+description='''
+Adds a big variety of medicine, poison and new in-game mechanics to the game!
+'''
+
+[[mixins]]
+config="meds_and_herbs.mixins.json"
+
+#[[accessTransformers]]
+#file="META-INF/accesstransformer.cfg"
+
+[[dependencies.${mod_id}]]
+modId="forge"
+mandatory=true
+versionRange="${forge_version_range}"
+ordering="NONE"
+side="BOTH"
+
+[[dependencies.${mod_id}]]
+modId="minecraft"
+mandatory=true
+versionRange="${minecraft_version_range}"
+ordering="NONE"
+side="BOTH"
+
+[[dependencies.${mod_id}]]
+modId = "jade"
+mandatory = false
+versionRange = "[11.0,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.${mod_id}]]
+modId = "jei"
+mandatory = false
+versionRange = "[15.0,)"
+ordering = "NONE"
+side = "BOTH"
