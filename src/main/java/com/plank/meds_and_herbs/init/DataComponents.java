@@ -12,18 +12,18 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 
 // 2. 在注册类中注册 ComponentType
 public class DataComponents {
-    public static final DeferredRegister<DataComponentType<?>> REGISTRY =
-            DeferredRegister.create(Registries.DATA_COMPONENT_TYPE, MedsAndHerbs.MODID);
-
-    public static final DeferredHolder<DataComponentType<?>, DataComponentType<MedicineData>> MEDICINE_DATA =
-            REGISTRY.register("medicine_data", MedicineData::createComponentType);
-
-    public static final DeferredHolder<DataComponentType<?>, DataComponentType<MedkitContents>> MEDKIT_CONTENTS =
-            REGISTRY.register("medkit_contents", MedkitContents::createComponentType);
-
-    public static final DeferredHolder<DataComponentType<?>, DataComponentType<BouquetFlowers>> BOUQUET_FLOWERS =
-            REGISTRY.register("bouquet_flowers", BouquetFlowers::createComponentType);
-
-    public static final DeferredHolder<DataComponentType<?>, DataComponentType<PetriDishData>> PETRI_DISH_DATA =
-            REGISTRY.register("petri_dish_data", PetriDishData::createComponentType);
+//    public static final DeferredRegister<DataComponentType<?>> REGISTRY =
+//            DeferredRegister.create(Registries.DATA_COMPONENT_TYPE, MedsAndHerbs.MODID);
+//
+//    public static final DeferredHolder<DataComponentType<?>, DataComponentType<MedicineData>> MEDICINE_DATA =
+//            REGISTRY.register("medicine_data", MedicineData::createComponentType);
+//
+//    public static final DeferredHolder<DataComponentType<?>, DataComponentType<MedkitContents>> MEDKIT_CONTENTS =
+//            REGISTRY.register("medkit_contents", MedkitContents::createComponentType);
+//
+//    public static final DeferredHolder<DataComponentType<?>, DataComponentType<BouquetFlowers>> BOUQUET_FLOWERS =
+//            REGISTRY.register("bouquet_flowers", BouquetFlowers::createComponentType);
+//
+//    public static final DeferredHolder<DataComponentType<?>, DataComponentType<PetriDishData>> PETRI_DISH_DATA =
+//            REGISTRY.register("petri_dish_data", PetriDishData::createComponentType);
 }

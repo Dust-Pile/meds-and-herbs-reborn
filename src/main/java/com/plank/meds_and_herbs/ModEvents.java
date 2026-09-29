@@ -5,14 +5,13 @@ import com.plank.meds_and_herbs.block.entity.ExtractionApparatusBlockEntity;
 import com.plank.meds_and_herbs.command.HealCommand;
 import com.plank.meds_and_herbs.data.MedicineTypeLoader;
 import com.plank.meds_and_herbs.init.BlockEntities;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
-import net.neoforged.neoforge.event.AddReloadListenerEvent;
-import net.neoforged.neoforge.event.RegisterCommandsEvent;
+import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
+import net.minecraftforge.event.AddReloadListenerEvent;
+import net.minecraftforge.event.RegisterCommandsEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 
-@EventBusSubscriber(modid = MedsAndHerbs.MODID)
+@Mod.EventBusSubscriber(modid = MedsAndHerbs.MODID)
 public class ModEvents {
     @SubscribeEvent
     public static void addReloadListeners(AddReloadListenerEvent event) {

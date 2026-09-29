@@ -9,8 +9,8 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.MapColor;
-import net.neoforged.neoforge.registries.DeferredHolder;
-import net.neoforged.neoforge.registries.DeferredRegister;
+import net.minecraftforge.registries.DeferredRegister;
+import net.minecraftforge.registries.RegistryObject;
 
 import java.util.function.Supplier;
 
@@ -25,51 +25,47 @@ public class Blocks {
                     .sound(SoundType.GRASS)
                     .offsetType(BlockBehaviour.OffsetType.XZ);
 
-    // ─── 设备方块 ──────────────────────────────────────────────
-    public static final DeferredHolder<Block, Block> EXTRACTION_APPARATUS = register("extraction_apparatus", ExtractionApparatusBlock::new);
-    public static final DeferredHolder<Block, Block> DISTILLERY_APPARATUS = register("distillery_apparatus", DistilleryApparatusBlock::new);
-    public static final DeferredHolder<Block, Block> INCUBATOR = register("incubator", IncubatorBlock::new);
-    public static final DeferredHolder<Block, Block> FERMENTATION_BARREL = register("fermentation_barrel", FermentationBarrelBlock::new);
+    // Equipment
+    public static final RegistryObject<Block> EXTRACTION_APPARATUS = register("extraction_apparatus", ExtractionApparatusBlock::new);
+    public static final RegistryObject<Block> DISTILLERY_APPARATUS = register("distillery_apparatus", DistilleryApparatusBlock::new);
+    public static final RegistryObject<Block> INCUBATOR = register("incubator", IncubatorBlock::new);
+    public static final RegistryObject<Block> FERMENTATION_BARREL = register("fermentation_barrel", FermentationBarrelBlock::new);
 
-    // ─── 植物 ──────────────────────────────────────────────────
-    public static final DeferredHolder<Block, Block> VINCA = registerPlant("vinca", Effects.THROMBOSIS, 440);
-    public static final DeferredHolder<Block, Block> BELLADONNA = registerPlant("belladonna", Effects.BELLADONNA_BERRY, 220);
-    public static final DeferredHolder<Block, Block> SWEET_CLOVER = register("sweet_clover", () -> new TallFlowerBlock(flowerProperties));
-    public static final DeferredHolder<Block, Block> CHAMOMILE = registerPlant("chamomile", MobEffects.MOVEMENT_SLOWDOWN, 140);
-    public static final DeferredHolder<Block, Block> ARTEMISIA = registerPlant("artemisia", MobEffects.CONFUSION, 140);
-    public static final DeferredHolder<Block, Block> OPIUM = registerPlant("opium", Effects.OPIUM_ADDICTION, 220);
-    public static final DeferredHolder<Block, Block> ALOE = register("aloe", () -> new TallGrassBlock(flowerProperties));
-    public static final DeferredHolder<Block, Block> COTTON = register("cotton", () -> new TallGrassBlock(flowerProperties));
-    public static final DeferredHolder<Block, Block> PLANTAGO = register("plantago", () -> new TallGrassBlock(flowerProperties));
+    // Plants
+    public static final RegistryObject<Block> VINCA = registerPlant("vinca", Effects.THROMBOSIS.get(), 440);
+    public static final RegistryObject<Block> BELLADONNA = registerPlant("belladonna", Effects.BELLADONNA_BERRY.get(), 220);
+    public static final RegistryObject<Block> SWEET_CLOVER = register("sweet_clover", () -> new TallFlowerBlock(flowerProperties));
+    public static final RegistryObject<Block> CHAMOMILE = registerPlant("chamomile", MobEffects.MOVEMENT_SLOWDOWN, 140);
+    public static final RegistryObject<Block> ARTEMISIA = registerPlant("artemisia", MobEffects.CONFUSION, 140);
+    public static final RegistryObject<Block> OPIUM = registerPlant("opium", Effects.OPIUM_ADDICTION.get(), 220);
+    public static final RegistryObject<Block> ALOE = register("aloe", () -> new TallGrassBlock(flowerProperties));
+    public static final RegistryObject<Block> COTTON = register("cotton", () -> new TallGrassBlock(flowerProperties));
+    public static final RegistryObject<Block> PLANTAGO = register("plantago", () -> new TallGrassBlock(flowerProperties));
 
-    // ─── 花盆 ──────────────────────────────────────────────────
-    public static final DeferredHolder<Block, Block> POTTED_VINCA = registerPottedFlower("vinca", VINCA);
-    public static final DeferredHolder<Block, Block> POTTED_BELLADONNA = registerPottedFlower("belladonna", BELLADONNA);
-    public static final DeferredHolder<Block, Block> POTTED_CHAMOMILE  = registerPottedFlower("chamomile", CHAMOMILE );
-    public static final DeferredHolder<Block, Block> POTTED_ARTEMISIA = registerPottedFlower("artemisia", ARTEMISIA);
-    public static final DeferredHolder<Block, Block> POTTED_OPIUM = registerPottedFlower("opium", OPIUM);
+    // Potted Plants
+    public static final RegistryObject<Block> POTTED_VINCA = registerPottedFlower("vinca", VINCA);
+    public static final RegistryObject<Block> POTTED_BELLADONNA = registerPottedFlower("belladonna", BELLADONNA);
+    public static final RegistryObject<Block> POTTED_CHAMOMILE  = registerPottedFlower("chamomile", CHAMOMILE );
+    public static final RegistryObject<Block> POTTED_ARTEMISIA = registerPottedFlower("artemisia", ARTEMISIA);
+    public static final RegistryObject<Block> POTTED_OPIUM = registerPottedFlower("opium", OPIUM);
 
 
-    // ─── 派 ────────────────────────────────────────────────────
-    public static final DeferredHolder<Block, Block> BELLADONNA_PIE = register("belladonna_pie", BelladonnaPieBlock::new);
+    // Food
+    public static final RegistryObject<Block> BELLADONNA_PIE = register("belladonna_pie", BelladonnaPieBlock::new);
 
-    // ─── 辅助方法 ──────────────────────────────────────────────
-    private static DeferredHolder<Block, Block> register(String name, Supplier<Block> block) {
-        return REGISTRY.register(name, block);  // ✅ 返回 DeferredHolder，不调用 .get()
+    private static RegistryObject<Block> register(String name, Supplier<Block> block) {
+        return REGISTRY.register(name, block);
     }
 
-    private static DeferredHolder<Block, Block> registerPlant(String name, Holder<MobEffect> effect, int duration) {
+    private static RegistryObject<Block> registerPlant(String name, MobEffect effect, int duration) {
         return REGISTRY.register(name, () -> new FlowerBlock(effect, duration, flowerProperties));
     }
-    private static DeferredHolder<Block, Block> registerPottedFlower(String name, Supplier<Block> flower) {
+    private static RegistryObject<Block> registerPottedFlower(String name, Supplier<Block> flower) {
         return REGISTRY.register("potted_" + name,
                 () -> new FlowerPotBlock(
-                        // 1. 空花盆的Supplier
                         () -> (FlowerPotBlock) net.minecraft.world.level.block.Blocks.FLOWER_POT,
-                        // 2. 你的花朵的Supplier
                         flower,
-                        // 3. 方块属性，直接使用原版花盆的属性
-                        BlockBehaviour.Properties.ofFullCopy(net.minecraft.world.level.block.Blocks.FLOWER_POT)
+                        BlockBehaviour.Properties.copy(net.minecraft.world.level.block.Blocks.FLOWER_POT)
                 )
         );
     }
