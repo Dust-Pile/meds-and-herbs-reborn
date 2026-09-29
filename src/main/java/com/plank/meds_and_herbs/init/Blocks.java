@@ -38,9 +38,9 @@ public class Blocks {
     public static final RegistryObject<Block> CHAMOMILE = registerPlant("chamomile", MobEffects.MOVEMENT_SLOWDOWN, 140);
     public static final RegistryObject<Block> ARTEMISIA = registerPlant("artemisia", MobEffects.CONFUSION, 140);
     public static final RegistryObject<Block> OPIUM = registerPlant("opium", Effects.OPIUM_ADDICTION.get(), 220);
-    public static final RegistryObject<Block> ALOE = register("aloe", () -> new TallGrassBlock(flowerProperties));
-    public static final RegistryObject<Block> COTTON = register("cotton", () -> new TallGrassBlock(flowerProperties));
-    public static final RegistryObject<Block> PLANTAGO = register("plantago", () -> new TallGrassBlock(flowerProperties));
+    public static final RegistryObject<Block> ALOE = register("aloe", () -> new NonBonemealableTallGrassBlock(flowerProperties));
+    public static final RegistryObject<Block> COTTON = register("cotton", () -> new NonBonemealableTallGrassBlock(flowerProperties));
+    public static final RegistryObject<Block> PLANTAGO = register("plantago", () -> new NonBonemealableTallGrassBlock(flowerProperties));
 
     // Potted Plants
     public static final RegistryObject<Block> POTTED_VINCA = registerPottedFlower("vinca", VINCA);
