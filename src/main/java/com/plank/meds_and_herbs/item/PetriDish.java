@@ -72,6 +72,12 @@ public class PetriDish extends Item {
             if (maxProgress > 0) {
                 tooltipComponents.add(Component.translatable("tooltip.meds_and_herbs.progress",
                         progress, maxProgress).withStyle(ChatFormatting.GRAY));
+
+                /* todo make this a config option
+                tooltipComponents.add(Component.translatable("tooltip.meds_and_herbs.progress",
+                        progress * (100 / maxProgress), 100).withStyle(ChatFormatting.GRAY));
+
+                 */
             }
         }
         super.appendHoverText(stack, level, tooltipComponents, isAdvanced);
