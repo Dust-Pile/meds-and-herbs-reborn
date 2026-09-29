@@ -79,7 +79,7 @@ public class Items {
     public static final RegistryObject<Item> UNFILTERED_WHISKEY_BOTTLE = register("unfiltered_whiskey_bottle", UnfilteredWhiskeyBottle::new);
     public static final RegistryObject<Item> WHISKEY_BOTTLE = register("whiskey_bottle", WhiskeyBottle::new);
     public static final RegistryObject<Item> ALOE_JUICE_BOTTLE = register("aloe_juice_bottle", AloeJuiceBottle::new);
-    public static final RegistryObject<Item> PARASITE_EGGS = register("parasite_eggs", new Item.Properties().food(new FoodProperties.Builder().effect(() -> new MobEffectInstance(Effects.PARASITES, 6000, 0), 1.0f).alwaysEdible().build()));
+    public static final RegistryObject<Item> PARASITE_EGGS = register("parasite_eggs", new Item.Properties().food(new FoodProperties.Builder().effect(() -> new MobEffectInstance(Effects.PARASITES.get(), 6000, 0), 1.0f).alwaysEat().build()));
 
     public static final RegistryObject<Item> VINCA = blockItem(Blocks.VINCA);
     public static final RegistryObject<Item> BELLADONNA = blockItem(Blocks.BELLADONNA);
