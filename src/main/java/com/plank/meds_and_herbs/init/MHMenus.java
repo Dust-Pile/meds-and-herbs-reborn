@@ -10,7 +10,7 @@ import net.minecraft.world.inventory.MenuType;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.RegistryObject;
 
-public class Menus {
+public class MHMenus {
     public static final DeferredRegister<MenuType<?>> REGISTRY =
             DeferredRegister.create(Registries.MENU, MedsAndHerbs.MODID);
 

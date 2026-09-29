@@ -1,6 +1,6 @@
 package com.plank.meds_and_herbs.item;
 
-import com.plank.meds_and_herbs.init.Items;
+import com.plank.meds_and_herbs.init.MHItems;
 import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -14,7 +14,7 @@ import java.util.List;
 
 public class PetriDish extends Item {
     public PetriDish() {
-        super(new Properties().craftRemainder(Items.PETRI_DISH_EMPTY.get()));
+        super(new Properties().craftRemainder(MHItems.PETRI_DISH_EMPTY.get()));
     }
 
     @Override

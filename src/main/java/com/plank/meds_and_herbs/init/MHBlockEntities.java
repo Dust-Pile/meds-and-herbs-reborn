@@ -10,7 +10,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.RegistryObject;
 
-public class BlockEntities {
+public class MHBlockEntities {
     public static final DeferredRegister<BlockEntityType<?>> REGISTRY =
             DeferredRegister.create(Registries.BLOCK_ENTITY_TYPE, MedsAndHerbs.MODID);
 
@@ -18,7 +18,7 @@ public class BlockEntities {
             REGISTRY.register("distillery_apparatus",
                     () -> BlockEntityType.Builder.of(
                             DistilleryApparatusBlockEntity::new,
-                            Blocks.DISTILLERY_APPARATUS.get()
+                            MHBlocks.DISTILLERY_APPARATUS.get()
                     ).build(null)
             );
 
@@ -26,7 +26,7 @@ public class BlockEntities {
             REGISTRY.register("incubator",
                     () -> BlockEntityType.Builder.of(
                             IncubatorBlockEntity::new,
-                            Blocks.INCUBATOR.get()
+                            MHBlocks.INCUBATOR.get()
                     ).build(null)
             );
 
@@ -34,7 +34,7 @@ public class BlockEntities {
             REGISTRY.register("extraction_apparatus",
                     () -> BlockEntityType.Builder.of(
                             ExtractionApparatusBlockEntity::new,
-                            Blocks.EXTRACTION_APPARATUS.get()
+                            MHBlocks.EXTRACTION_APPARATUS.get()
                     ).build(null)
             );
 
@@ -42,7 +42,7 @@ public class BlockEntities {
             REGISTRY.register("fermentation_barrel",
                     () -> BlockEntityType.Builder.of(
                             FermentationBarrelBlockEntity::new,
-                            Blocks.FERMENTATION_BARREL.get()
+                            MHBlocks.FERMENTATION_BARREL.get()
                     ).build(null)
             );
 }

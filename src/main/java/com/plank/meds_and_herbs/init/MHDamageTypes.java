@@ -6,8 +6,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.damagesource.DamageType;
 
-public class DamageTypes {
-    // 不再有 DeferredRegister，只有 ResourceKey
+public class MHDamageTypes {
     public static final ResourceKey<DamageType> ADRENALINE = createKey("adrenaline");
     public static final ResourceKey<DamageType> BLEEDING = createKey("bleeding");
     public static final ResourceKey<DamageType> PARASITES = createKey("parasites");

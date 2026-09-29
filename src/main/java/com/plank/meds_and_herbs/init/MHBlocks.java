@@ -2,7 +2,6 @@ package com.plank.meds_and_herbs.init;
 
 import com.plank.meds_and_herbs.MedsAndHerbs;
 import com.plank.meds_and_herbs.block.*;
-import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffects;
@@ -14,7 +13,7 @@ import net.minecraftforge.registries.RegistryObject;
 
 import java.util.function.Supplier;
 
-public class Blocks {
+public class MHBlocks {
     public static final DeferredRegister<Block> REGISTRY = DeferredRegister.create(Registries.BLOCK, MedsAndHerbs.MODID);
 
     private static final BlockBehaviour.Properties flowerProperties =
@@ -32,12 +31,12 @@ public class Blocks {
     public static final RegistryObject<Block> FERMENTATION_BARREL = register("fermentation_barrel", FermentationBarrelBlock::new);
 
     // Plants
-    public static final RegistryObject<Block> VINCA = registerPlant("vinca", Effects.THROMBOSIS.get(), 440);
-    public static final RegistryObject<Block> BELLADONNA = registerPlant("belladonna", Effects.BELLADONNA_BERRY.get(), 220);
+    public static final RegistryObject<Block> VINCA = registerPlant("vinca", MHEffects.THROMBOSIS.get(), 440);
+    public static final RegistryObject<Block> BELLADONNA = registerPlant("belladonna", MHEffects.BELLADONNA_BERRY.get(), 220);
     public static final RegistryObject<Block> SWEET_CLOVER = register("sweet_clover", () -> new TallFlowerBlock(flowerProperties));
     public static final RegistryObject<Block> CHAMOMILE = registerPlant("chamomile", MobEffects.MOVEMENT_SLOWDOWN, 140);
     public static final RegistryObject<Block> ARTEMISIA = registerPlant("artemisia", MobEffects.CONFUSION, 140);
-    public static final RegistryObject<Block> OPIUM = registerPlant("opium", Effects.OPIUM_ADDICTION.get(), 220);
+    public static final RegistryObject<Block> OPIUM = registerPlant("opium", MHEffects.OPIUM_ADDICTION.get(), 220);
     public static final RegistryObject<Block> ALOE = register("aloe", () -> new NonBonemealableTallGrassBlock(flowerProperties));
     public static final RegistryObject<Block> COTTON = register("cotton", () -> new NonBonemealableTallGrassBlock(flowerProperties));
     public static final RegistryObject<Block> PLANTAGO = register("plantago", () -> new NonBonemealableTallGrassBlock(flowerProperties));

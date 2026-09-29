@@ -25,19 +25,19 @@ public class MedsAndHerbs {
     }
 
     public MedsAndHerbs(IEventBus bus) {
-        Sounds.REGISTRY.register(bus);
+        MHSounds.REGISTRY.register(bus);
 //        DataComponents.REGISTRY.register(bus);
-        Blocks.REGISTRY.register(bus);
-        BlockEntities.REGISTRY.register(bus);
-        Recipes.SERIALIZERS.register(bus);
-        Recipes.TYPES.register(bus);
-        Items.REGISTRY.register(bus);
-        Items.ITEMS.register(bus);
-        Effects.REGISTRY.register(bus);
-        VillagerProfessions.POI_TYPES.register(bus);
-        VillagerProfessions.PROFESSIONS.register(bus);
-        Menus.REGISTRY.register(bus);
-        CreativeTabs.REGISTRY.register(bus);
+        MHBlocks.REGISTRY.register(bus);
+        MHBlockEntities.REGISTRY.register(bus);
+        MHRecipeTypes.SERIALIZERS.register(bus);
+        MHRecipeTypes.TYPES.register(bus);
+        MHItems.REGISTRY.register(bus);
+        MHItems.ITEMS.register(bus);
+        MHEffects.REGISTRY.register(bus);
+        MHVillagerProfessions.POI_TYPES.register(bus);
+        MHVillagerProfessions.PROFESSIONS.register(bus);
+        MHMenus.REGISTRY.register(bus);
+        MHCreativeTabs.REGISTRY.register(bus);
         bus.register(this);
     }
 
@@ -45,9 +45,9 @@ public class MedsAndHerbs {
     private void clientSetup(FMLClientSetupEvent event) {
         event.enqueueWork(
                 () -> {
-                    MenuScreens.register(Menus.DISTILLERY_APPARATUS_GUI.get(), DistilleryApparatusGUIScreen::new);
-                    MenuScreens.register(Menus.EXTRACTION_APPARATUS_GUI.get(), ExtractApparatusGUIScreen::new);
-                    MenuScreens.register(Menus.INCUBATOR_GUI.get(), IncubatorGUIScreen::new);
+                    MenuScreens.register(MHMenus.DISTILLERY_APPARATUS_GUI.get(), DistilleryApparatusGUIScreen::new);
+                    MenuScreens.register(MHMenus.EXTRACTION_APPARATUS_GUI.get(), ExtractApparatusGUIScreen::new);
+                    MenuScreens.register(MHMenus.INCUBATOR_GUI.get(), IncubatorGUIScreen::new);
                 }
         );
     }
@@ -56,11 +56,11 @@ public class MedsAndHerbs {
     public void onCommonSetup(FMLCommonSetupEvent event) {
         event.enqueueWork(() -> {
             FlowerPotBlock flowerPot = (FlowerPotBlock) net.minecraft.world.level.block.Blocks.FLOWER_POT;
-            flowerPot.addPlant(Blocks.VINCA.getId(), Blocks.POTTED_VINCA);
-            flowerPot.addPlant(Blocks.BELLADONNA.getId(), Blocks.POTTED_BELLADONNA);
-            flowerPot.addPlant(Blocks.CHAMOMILE.getId(), Blocks.POTTED_CHAMOMILE);
-            flowerPot.addPlant(Blocks.ARTEMISIA.getId(), Blocks.POTTED_ARTEMISIA);
-            flowerPot.addPlant(Blocks.OPIUM.getId(), Blocks.POTTED_OPIUM);
+            flowerPot.addPlant(MHBlocks.VINCA.getId(), MHBlocks.POTTED_VINCA);
+            flowerPot.addPlant(MHBlocks.BELLADONNA.getId(), MHBlocks.POTTED_BELLADONNA);
+            flowerPot.addPlant(MHBlocks.CHAMOMILE.getId(), MHBlocks.POTTED_CHAMOMILE);
+            flowerPot.addPlant(MHBlocks.ARTEMISIA.getId(), MHBlocks.POTTED_ARTEMISIA);
+            flowerPot.addPlant(MHBlocks.OPIUM.getId(), MHBlocks.POTTED_OPIUM);
         });
     }
 }

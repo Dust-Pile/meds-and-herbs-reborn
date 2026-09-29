@@ -19,7 +19,7 @@ import java.util.function.Supplier;
 
 import static com.plank.meds_and_herbs.MedsAndHerbs.MODID;
 
-public class Items {
+public class MHItems {
     public static final DeferredRegister<Item> REGISTRY =
             DeferredRegister.create(Registries.ITEM, MODID);
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(Registries.ITEM, MODID);
@@ -37,10 +37,10 @@ public class Items {
     public static final RegistryObject<Item> MEDKIT = register("medkit", Medkit::new);
     public static final RegistryObject<Item> SEWING_KIT = register("sewing_kit", SewingKit::new);
 
-    public static final RegistryObject<Item> EXTRACTION_APPARATUS = blockItem(Blocks.EXTRACTION_APPARATUS);
-    public static final RegistryObject<Item> DISTILLERY_APPARATUS = blockItem(Blocks.DISTILLERY_APPARATUS);
-    public static final RegistryObject<Item> INCUBATOR = blockItem(Blocks.INCUBATOR);
-    public static final RegistryObject<Item> FERMENTATION_BARREL = blockItem(Blocks.FERMENTATION_BARREL);
+    public static final RegistryObject<Item> EXTRACTION_APPARATUS = blockItem(MHBlocks.EXTRACTION_APPARATUS);
+    public static final RegistryObject<Item> DISTILLERY_APPARATUS = blockItem(MHBlocks.DISTILLERY_APPARATUS);
+    public static final RegistryObject<Item> INCUBATOR = blockItem(MHBlocks.INCUBATOR);
+    public static final RegistryObject<Item> FERMENTATION_BARREL = blockItem(MHBlocks.FERMENTATION_BARREL);
 
     public static final RegistryObject<Item> GRINDER = register("grinder", Grinder::new);
     public static final RegistryObject<Item> UNFILTERED_WHISKEY_BUCKET = register("unfiltered_whiskey_bucket", new Item.Properties().stacksTo(1).craftRemainder(net.minecraft.world.item.Items.BUCKET));
@@ -75,21 +75,21 @@ public class Items {
     public static final RegistryObject<Item> ALOE_FRUIT = register("aloe_fruit");
 
     public static final RegistryObject<Item> BOUQUET = register("bouquet", Bouquet::new);
-    public static final RegistryObject<Item> BELLADONNA_PIE = blockItem(Blocks.BELLADONNA_PIE);
+    public static final RegistryObject<Item> BELLADONNA_PIE = blockItem(MHBlocks.BELLADONNA_PIE);
     public static final RegistryObject<Item> UNFILTERED_WHISKEY_BOTTLE = register("unfiltered_whiskey_bottle", UnfilteredWhiskeyBottle::new);
     public static final RegistryObject<Item> WHISKEY_BOTTLE = register("whiskey_bottle", WhiskeyBottle::new);
     public static final RegistryObject<Item> ALOE_JUICE_BOTTLE = register("aloe_juice_bottle", AloeJuiceBottle::new);
-    public static final RegistryObject<Item> PARASITE_EGGS = register("parasite_eggs", new Item.Properties().food(new FoodProperties.Builder().effect(() -> new MobEffectInstance(Effects.PARASITES.get(), 6000, 0), 1.0f).alwaysEat().build()));
+    public static final RegistryObject<Item> PARASITE_EGGS = register("parasite_eggs", new Item.Properties().food(new FoodProperties.Builder().effect(() -> new MobEffectInstance(MHEffects.PARASITES.get(), 6000, 0), 1.0f).alwaysEat().build()));
 
-    public static final RegistryObject<Item> VINCA = blockItem(Blocks.VINCA);
-    public static final RegistryObject<Item> BELLADONNA = blockItem(Blocks.BELLADONNA);
-    public static final RegistryObject<Item> SWEET_CLOVER = doubleBlockItem(Blocks.SWEET_CLOVER);
-    public static final RegistryObject<Item> CHAMOMILE = blockItem(Blocks.CHAMOMILE);
-    public static final RegistryObject<Item> ARTEMISIA = blockItem(Blocks.ARTEMISIA);
-    public static final RegistryObject<Item> OPIUM = blockItem(Blocks.OPIUM);
-    public static final RegistryObject<Item> PLANTAGO = blockItem(Blocks.PLANTAGO);
-    public static final RegistryObject<Item> ALOE = blockItem(Blocks.ALOE);
-    public static final RegistryObject<Item> COTTON = blockItem(Blocks.COTTON);
+    public static final RegistryObject<Item> VINCA = blockItem(MHBlocks.VINCA);
+    public static final RegistryObject<Item> BELLADONNA = blockItem(MHBlocks.BELLADONNA);
+    public static final RegistryObject<Item> SWEET_CLOVER = doubleBlockItem(MHBlocks.SWEET_CLOVER);
+    public static final RegistryObject<Item> CHAMOMILE = blockItem(MHBlocks.CHAMOMILE);
+    public static final RegistryObject<Item> ARTEMISIA = blockItem(MHBlocks.ARTEMISIA);
+    public static final RegistryObject<Item> OPIUM = blockItem(MHBlocks.OPIUM);
+    public static final RegistryObject<Item> PLANTAGO = blockItem(MHBlocks.PLANTAGO);
+    public static final RegistryObject<Item> ALOE = blockItem(MHBlocks.ALOE);
+    public static final RegistryObject<Item> COTTON = blockItem(MHBlocks.COTTON);
 
     private static RegistryObject<Item> register(String name) {
         return register(name, () -> new Item(new Item.Properties()));

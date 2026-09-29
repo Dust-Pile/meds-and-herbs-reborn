@@ -1,17 +1,11 @@
 package com.plank.meds_and_herbs.init;
 
-import com.plank.meds_and_herbs.MedsAndHerbs;
-import com.plank.meds_and_herbs.data.BouquetFlowers;
-import com.plank.meds_and_herbs.data.MedkitContents;
-import com.plank.meds_and_herbs.data.MedicineData;
-import com.plank.meds_and_herbs.data.PetriDishData;
 import net.minecraft.core.component.DataComponentType;
-import net.minecraft.core.registries.Registries;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
 // 2. 在注册类中注册 ComponentType
-public class DataComponents {
+public class MHDataComponents {
 //    public static final DeferredRegister<DataComponentType<?>> REGISTRY =
 //            DeferredRegister.create(Registries.DATA_COMPONENT_TYPE, MedsAndHerbs.MODID);
 //

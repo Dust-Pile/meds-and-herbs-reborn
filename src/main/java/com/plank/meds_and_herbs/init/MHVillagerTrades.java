@@ -11,48 +11,48 @@ import net.neoforged.neoforge.event.village.VillagerTradesEvent;
 
 import java.util.List;
 
-public class VillagerTrades {
+public class MHVillagerTrades {
     static Item EMERALD = net.minecraft.world.item.Items.EMERALD;
 
     @SubscribeEvent
     public static void registerTrades(VillagerTradesEvent event) {
-        if (event.getType() != VillagerProfessions.HERBALIST.get()) return;
+        if (event.getType() != MHVillagerProfessions.HERBALIST.get()) return;
         var trades = event.getTrades();
 
         // 等级1：花束、研钵
         trades.get(1).addAll(List.of(
-                new BasicItemListing(new ItemStack(Items.BOUQUET, 2), new ItemStack(EMERALD), 10, 5, 0.05f),
-                new BasicItemListing(new ItemStack(EMERALD, 10), new ItemStack(Items.GRINDER), 10, 5, 0.05f)
+                new BasicItemListing(new ItemStack(MHItems.BOUQUET, 2), new ItemStack(EMERALD), 10, 5, 0.05f),
+                new BasicItemListing(new ItemStack(EMERALD, 10), new ItemStack(MHItems.GRINDER), 10, 5, 0.05f)
         ));
 
         // 等级2：植物材料
         trades.get(2).addAll(List.of(
-                plantTrade(Items.VINCA.get()),
-                plantTrade(Items.BELLADONNA.get()),
-                plantTrade(Items.SWEET_CLOVER.get()),
-                plantTrade(Items.CHAMOMILE.get()),
-                plantTrade(Items.OPIUM.get()),
-                plantTrade(Items.PLANTAGO.get()),
-                plantTrade(Items.ARTEMISIA.get()),
-                plantTrade(Items.ALOE.get())
+                plantTrade(MHItems.VINCA.get()),
+                plantTrade(MHItems.BELLADONNA.get()),
+                plantTrade(MHItems.SWEET_CLOVER.get()),
+                plantTrade(MHItems.CHAMOMILE.get()),
+                plantTrade(MHItems.OPIUM.get()),
+                plantTrade(MHItems.PLANTAGO.get()),
+                plantTrade(MHItems.ARTEMISIA.get()),
+                plantTrade(MHItems.ALOE.get())
         ));
 
         // 等级3：提取物（药品）交易
         trades.get(3).addAll(List.of(
-                medicineTrade(16, MedsType.VINCA, Items.VINCA.get()),
-                medicineTrade(16, MedsType.BELLADONNA, Items.BELLADONNA.get()),
-                medicineTrade(16, MedsType.SWEET_CLOVER, Items.SWEET_CLOVER.get()),
-                medicineTrade(16, MedsType.CHAMOMILE, Items.CHAMOMILE.get()),
-                medicineTrade(16, MedsType.ARTEMISIA, Items.ARTEMISIA.get()),
-                medicineTrade(16, MedsType.OPIUM, Items.OPIUM.get()),
-                medicineTrade(16, MedsType.ALOE, Items.ALOE.get()),
-                medicineTrade(16, MedsType.HERBAL, Items.BOUQUET.get())
+                medicineTrade(16, MedsType.VINCA, MHItems.VINCA.get()),
+                medicineTrade(16, MedsType.BELLADONNA, MHItems.BELLADONNA.get()),
+                medicineTrade(16, MedsType.SWEET_CLOVER, MHItems.SWEET_CLOVER.get()),
+                medicineTrade(16, MedsType.CHAMOMILE, MHItems.CHAMOMILE.get()),
+                medicineTrade(16, MedsType.ARTEMISIA, MHItems.ARTEMISIA.get()),
+                medicineTrade(16, MedsType.OPIUM, MHItems.OPIUM.get()),
+                medicineTrade(16, MedsType.ALOE, MHItems.ALOE.get()),
+                medicineTrade(16, MedsType.HERBAL, MHItems.BOUQUET.get())
         ));
 
         // 等级4：特殊提取物（糖 -> 葡萄糖，树皮 -> 芦荟，蘑菇 -> 蘑菇）
         trades.get(4).addAll(List.of(
                 medicineTrade(32, MedsType.GLUCOSE, net.minecraft.world.item.Items.SUGAR),
-                medicineTrade(32, MedsType.ALOE, Items.BARK.get()),
+                medicineTrade(32, MedsType.ALOE, MHItems.BARK.get()),
                 medicineTrade(32, MedsType.MUSHROOM, net.minecraft.world.item.Items.BROWN_MUSHROOM),
                 medicineTrade(32, MedsType.CAFFEINE, net.minecraft.world.item.Items.COCOA_BEANS)
         ));

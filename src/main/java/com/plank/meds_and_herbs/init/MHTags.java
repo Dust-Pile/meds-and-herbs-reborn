@@ -8,7 +8,7 @@ import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 
-public class Tags {
+public class MHTags {
     public static final class Items {
         public static final TagKey<Item> RAW_MEAT = tag("raw_meat");
         public static final TagKey<Item> MUSHROOM_STEW = tag("mushroom_stew");

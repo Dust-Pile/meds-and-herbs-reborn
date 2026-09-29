@@ -16,13 +16,13 @@ import net.minecraftforge.registries.RegistryObject;
 import java.util.Set;
 import java.util.function.Predicate;
 
-public class VillagerProfessions {
+public class MHVillagerProfessions {
     public static final DeferredRegister<PoiType> POI_TYPES =
             DeferredRegister.create(Registries.POINT_OF_INTEREST_TYPE, MedsAndHerbs.MODID);
     public static final DeferredRegister<VillagerProfession> PROFESSIONS =
             DeferredRegister.create(Registries.VILLAGER_PROFESSION, MedsAndHerbs.MODID);
 
-    private static final RegistryObject<Block> WORK_BLOCK = Blocks.EXTRACTION_APPARATUS;
+    private static final RegistryObject<Block> WORK_BLOCK = MHBlocks.EXTRACTION_APPARATUS;
 
     public static final ResourceKey<PoiType> HERBALIST_POI_KEY =
             ResourceKey.create(Registries.POINT_OF_INTEREST_TYPE,
@@ -44,7 +44,7 @@ public class VillagerProfessions {
                         poiPredicate,
                         ImmutableSet.of(),
                         ImmutableSet.of(),
-                        Sounds.VILLAGER_WORK_HERBALIST.get()
+                        MHSounds.VILLAGER_WORK_HERBALIST.get()
                 );
             });
 }

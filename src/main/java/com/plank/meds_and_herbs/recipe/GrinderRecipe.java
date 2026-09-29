@@ -2,7 +2,7 @@ package com.plank.meds_and_herbs.recipe;
 
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import com.plank.meds_and_herbs.init.Recipes;
+import com.plank.meds_and_herbs.init.MHRecipeTypes;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -46,13 +46,13 @@ public record GrinderRecipe(Ingredient input, ItemStack output) implements Recip
     @Override
     @Nonnull
     public RecipeSerializer<?> getSerializer() {
-        return Recipes.GRINDER_SERIALIZER.get();
+        return MHRecipeTypes.GRINDER_SERIALIZER.get();
     }
 
     @Override
     @Nonnull
     public RecipeType<?> getType() {
-        return Recipes.GRINDER_TYPE.get();
+        return MHRecipeTypes.GRINDER_TYPE.get();
     }
 
     public static class Serializer implements RecipeSerializer<GrinderRecipe> {

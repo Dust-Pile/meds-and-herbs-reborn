@@ -9,7 +9,7 @@ import net.minecraftforge.registries.RegistryObject;
 
 import java.util.function.Supplier;
 
-public class Effects {
+public class MHEffects {
     public static final DeferredRegister<MobEffect> REGISTRY =
             DeferredRegister.create(Registries.MOB_EFFECT, MedsAndHerbs.MODID);
 

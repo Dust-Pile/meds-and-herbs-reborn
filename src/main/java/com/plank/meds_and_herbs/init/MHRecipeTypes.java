@@ -10,7 +10,7 @@ import net.minecraftforge.registries.DeferredRegister;
 
 import java.util.function.Supplier;
 
-public class Recipes {
+public class MHRecipes {
     public static final DeferredRegister<RecipeSerializer<?>> SERIALIZERS =
             DeferredRegister.create(Registries.RECIPE_SERIALIZER, MedsAndHerbs.MODID);
     public static final DeferredRegister<RecipeType<?>> TYPES =

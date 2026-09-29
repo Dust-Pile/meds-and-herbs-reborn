@@ -1,6 +1,6 @@
 package com.plank.meds_and_herbs.mixin;
 
-import com.plank.meds_and_herbs.init.Effects;
+import com.plank.meds_and_herbs.init.MHEffects;
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffects;
@@ -35,8 +35,8 @@ public class LivingEntityMixin {
         }
 
         int bleedLevel = 0;
-        if (self.hasEffect(Effects.INTERNAL_BLEEDING.get())) {
-            bleedLevel = self.getEffect(Effects.INTERNAL_BLEEDING.get()).getAmplifier() + 1;
+        if (self.hasEffect(MHEffects.INTERNAL_BLEEDING.get())) {
+            bleedLevel = self.getEffect(MHEffects.INTERNAL_BLEEDING.get()).getAmplifier() + 1;
         }
 
         int effectiveLevel = resistLevel - bleedLevel;
