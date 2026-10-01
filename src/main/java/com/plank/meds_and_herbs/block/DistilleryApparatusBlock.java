@@ -1,7 +1,7 @@
 package com.plank.meds_and_herbs.block;
 
 import com.plank.meds_and_herbs.block.entity.DistilleryApparatusBlockEntity;
-import com.plank.meds_and_herbs.init.Tags;
+import com.plank.meds_and_herbs.init.MHTags;
 import com.plank.meds_and_herbs.procedures.VoxelShapeHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -28,8 +28,8 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.neoforged.neoforge.items.IItemHandler;
-import net.neoforged.neoforge.items.ItemStackHandler;
+import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.ItemStackHandler;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -41,7 +41,6 @@ public class DistilleryApparatusBlock extends Block implements EntityBlock {
 
     public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
 
-    // 只需要定义朝北的基准碰撞箱
     private static final VoxelShape BASE_SHAPE = Shapes.or(
             Block.box(0, 0, 0, 16, 10, 16),
             Block.box(10, 10, 9, 15, 25, 14),
@@ -49,8 +48,6 @@ public class DistilleryApparatusBlock extends Block implements EntityBlock {
             Block.box(1, 10, 1, 6, 13, 6)
     );
 
-
-    // 无参构造（供注册使用）
     public DistilleryApparatusBlock() {
         super(Properties.of()
                 .mapColor(MapColor.GRASS)
@@ -105,22 +102,15 @@ public class DistilleryApparatusBlock extends Block implements EntityBlock {
     public boolean canSurvive(@Nonnull BlockState state, @Nonnull LevelReader level, @Nonnull BlockPos pos) {
         BlockPos above = pos.above();
         BlockPos below = pos.below();
-        // 要求上方为空气，下方不为空气，且下方方块不在标签 "meds_and_herbs:stations" 中
+
         return level.isEmptyBlock(above) &&
                 !level.isEmptyBlock(below) &&
-                !level.getBlockState(below).is(Tags.Blocks.STATIONS);
+                !level.getBlockState(below).is(MHTags.Blocks.STATIONS);
     }
     @Override
     @Nonnull
     public BlockState updateShape(BlockState state, @Nonnull Direction direction, @Nonnull BlockState neighborState, @Nonnull LevelAccessor level, @Nonnull BlockPos pos, @Nonnull BlockPos neighborPos) {
         return !state.canSurvive(level, pos) ? Blocks.AIR.defaultBlockState() : super.updateShape(state, direction, neighborState, level, pos, neighborPos);
-    }
-
-    @Override
-    @Nonnull
-    public List<ItemStack> getDrops(@Nonnull BlockState state, @Nonnull LootParams.Builder builder) {
-        List<ItemStack> dropsOriginal = super.getDrops(state, builder);
-        return dropsOriginal.isEmpty() ? Collections.singletonList(new ItemStack(this, 1)) : dropsOriginal;
     }
 
     @Override
@@ -142,22 +132,16 @@ public class DistilleryApparatusBlock extends Block implements EntityBlock {
     }
 
     @Override
-    @Nonnull
-    public ItemInteractionResult useItemOn(@Nonnull ItemStack stack, @Nonnull BlockState state, Level level, @Nonnull BlockPos pos, @Nonnull Player player, @Nonnull InteractionHand hand, @Nonnull BlockHitResult hit) {
+    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
         if (!level.isClientSide && player instanceof ServerPlayer serverPlayer) {
             BlockEntity be = level.getBlockEntity(pos);
             if (be instanceof MenuProvider menuProvider) {
-                serverPlayer.openMenu(menuProvider, pos);  // pos 会写入 buffer
+                serverPlayer.openMenu(menuProvider);
+                return InteractionResult.SUCCESS;
             }
         }
-        return ItemInteractionResult.SUCCESS;
-    }
 
-    @Override
-    @Nonnull
-    public InteractionResult useWithoutItem(@Nonnull BlockState state, @Nonnull Level level, @Nonnull BlockPos pos, @Nonnull Player player, @Nonnull BlockHitResult hit) {
-        // 空手时直接调用上面的方法（传入空物品栈即可）
-        return useItemOn(ItemStack.EMPTY, state, level, pos, player, InteractionHand.MAIN_HAND, hit).result();
+        return InteractionResult.PASS;
     }
 
     @Nullable
@@ -193,7 +177,6 @@ public class DistilleryApparatusBlock extends Block implements EntityBlock {
         BlockEntity be = level.getBlockEntity(pos);
         if (be instanceof DistilleryApparatusBlockEntity apparatus) {
             IItemHandler handler = apparatus.getItemHandler();
-            // 计算非空槽位比例，映射到 0-15
             long nonEmpty = IntStream.range(0, handler.getSlots())
                     .filter(i -> !handler.getStackInSlot(i).isEmpty())
                     .count();

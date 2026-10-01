@@ -197,6 +197,7 @@ public class DistilleryApparatusBlockEntity extends BlockEntity implements MenuP
             }
         } else if (progress != 0) {
             progress = 0;
+            setChanged();
         }
     }
 
