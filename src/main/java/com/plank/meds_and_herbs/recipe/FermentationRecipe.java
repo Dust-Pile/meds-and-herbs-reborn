@@ -1,14 +1,21 @@
 package com.plank.meds_and_herbs.recipe;
 
-import com.mojang.serialization.MapCodec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
-import com.plank.meds_and_herbs.init.Recipes;
-import net.minecraft.core.HolderLookup;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.plank.meds_and_herbs.init.MHRecipes;
 import net.minecraft.core.NonNullList;
-import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.GsonHelper;
+import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.*;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.item.crafting.ShapedRecipe;
 import net.minecraft.world.level.Level;
 
 import javax.annotation.Nonnull;
@@ -16,46 +23,52 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public record FermentationRecipe(NonNullList<Ingredient> ingredients, ItemStack output) implements Recipe<RecipeInput> {
+public class FermentationRecipe implements Recipe<Container> {
     public static final int DEFAULT_COOKING_TIME = 1200;
 
+    private final ResourceLocation id;
+    private final NonNullList<Ingredient> ingredients;
+    private final ItemStack output;
+
+    public FermentationRecipe(ResourceLocation id,
+                              NonNullList<Ingredient> ingredients,
+                              ItemStack output) {
+        this.id = id;
+        this.ingredients = ingredients;
+        this.output = output;
+    }
+
     @Override
-    public boolean matches(RecipeInput input, @Nonnull Level level) {
-        // 收集所有非空物品
+    public boolean matches(@Nonnull Container container, @Nonnull Level level) {
         List<ItemStack> items = new ArrayList<>();
-        for (int i = 0; i < input.size(); i++) {
-            ItemStack stack = input.getItem(i);
+        for (int i = 0; i < container.getContainerSize(); i++) {
+            ItemStack stack = container.getItem(i);
             if (!stack.isEmpty()) {
                 items.add(stack);
             }
         }
-        // 非空物品数量必须与 ingredients 数量一致
-        if (items.size() != ingredients.size()) {
-            return false;
-        }
-        // 复制 ingredients 列表
+
+        if (items.size() != ingredients.size()) return false;
+
         List<Ingredient> remaining = new ArrayList<>(ingredients);
         for (ItemStack stack : items) {
             boolean matched = false;
             Iterator<Ingredient> it = remaining.iterator();
             while (it.hasNext()) {
-                Ingredient ing = it.next();
-                if (ing.test(stack)) {
+                if (it.next().test(stack)) {
                     it.remove();
                     matched = true;
                     break;
                 }
             }
-            if (!matched) {
-                return false;
-            }
+            if (!matched) return false;
         }
         return remaining.isEmpty();
     }
 
     @Override
     @Nonnull
-    public ItemStack assemble(@Nonnull RecipeInput input, @Nonnull HolderLookup.Provider registries) {
+    public ItemStack assemble(@Nonnull Container container, @Nonnull RegistryAccess registries) {
         return output.copy();
     }
 
@@ -66,7 +79,7 @@ public record FermentationRecipe(NonNullList<Ingredient> ingredients, ItemStack 
 
     @Override
     @Nonnull
-    public ItemStack getResultItem(@Nonnull HolderLookup.Provider registries) {
+    public ItemStack getResultItem(@Nonnull RegistryAccess registries) {
         return output;
     }
 
@@ -78,54 +91,64 @@ public record FermentationRecipe(NonNullList<Ingredient> ingredients, ItemStack 
 
     @Override
     @Nonnull
+    public ResourceLocation getId() {
+        return id;
+    }
+
+    @Override
+    @Nonnull
     public RecipeSerializer<?> getSerializer() {
-        return Recipes.FERMENTATION_SERIALIZER.get();
+        return MHRecipes.FERMENTATION_SERIALIZER.get();
     }
 
     @Override
     @Nonnull
     public RecipeType<?> getType() {
-        return Recipes.FERMENTATION_TYPE.get();
+        return MHRecipes.FERMENTATION_TYPE.get();
     }
 
+    public ItemStack getOutput() {
+        return output;
+    }
+
+    // ----- Serializer -----
     public static class Serializer implements RecipeSerializer<FermentationRecipe> {
         public static final Serializer INSTANCE = new Serializer();
-        public static final MapCodec<FermentationRecipe> CODEC = RecordCodecBuilder.mapCodec(inst ->
-                inst.group(
-                        Ingredient.CODEC_NONEMPTY.listOf().fieldOf("ingredients")
-                                .xmap(NonNullList::copyOf, NonNullList::copyOf).forGetter(r -> r.ingredients),
-                        ItemStack.CODEC.fieldOf("output").forGetter(r -> r.output)
-                ).apply(inst, FermentationRecipe::new)
-        );
-        public static final StreamCodec<RegistryFriendlyByteBuf, FermentationRecipe> STREAM_CODEC = StreamCodec.of(
-                (buf, recipe) -> {
-                    buf.writeInt(recipe.ingredients.size());
-                    for (Ingredient ing : recipe.ingredients) {
-                        Ingredient.CONTENTS_STREAM_CODEC.encode(buf, ing);
-                    }
-                    ItemStack.STREAM_CODEC.encode(buf, recipe.output);
-                },
-                buf -> {
-                    int size = buf.readInt();
-                    NonNullList<Ingredient> ingredients = NonNullList.create();
-                    for (int i = 0; i < size; i++) {
-                        ingredients.add(Ingredient.CONTENTS_STREAM_CODEC.decode(buf));
-                    }
-                    ItemStack output = ItemStack.STREAM_CODEC.decode(buf);
-                    return new FermentationRecipe(ingredients, output);
-                }
-        );
 
         @Override
         @Nonnull
-        public MapCodec<FermentationRecipe> codec() {
-            return CODEC;
+        public FermentationRecipe fromJson(@Nonnull ResourceLocation recipeId, @Nonnull JsonObject json) {
+            JsonArray array = GsonHelper.getAsJsonArray(json, "ingredients");
+            NonNullList<Ingredient> ingredients = NonNullList.create();
+            for (JsonElement element : array) {
+                ingredients.add(Ingredient.fromJson(element));
+            }
+
+            ItemStack output = ShapedRecipe.itemStackFromJson(
+                    GsonHelper.getAsJsonObject(json, "output"));
+
+            return new FermentationRecipe(recipeId, ingredients, output);
         }
 
         @Override
         @Nonnull
-        public StreamCodec<RegistryFriendlyByteBuf, FermentationRecipe> streamCodec() {
-            return STREAM_CODEC;
+        public FermentationRecipe fromNetwork(@Nonnull ResourceLocation recipeId, @Nonnull FriendlyByteBuf buf) {
+            int size = buf.readVarInt();
+            NonNullList<Ingredient> ingredients = NonNullList.create();
+            for (int i = 0; i < size; i++) {
+                ingredients.add(Ingredient.fromNetwork(buf));
+            }
+            ItemStack output = buf.readItem();
+            return new FermentationRecipe(recipeId, ingredients, output);
+        }
+
+        @Override
+        public void toNetwork(@Nonnull FriendlyByteBuf buf, @Nonnull FermentationRecipe recipe) {
+            buf.writeVarInt(recipe.ingredients.size());
+            for (Ingredient ing : recipe.ingredients) {
+                ing.toNetwork(buf);
+            }
+            buf.writeItem(recipe.output);
         }
     }
 }
