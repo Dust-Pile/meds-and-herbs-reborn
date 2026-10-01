@@ -1,16 +1,11 @@
 package com.plank.meds_and_herbs.block.entity;
 
 import com.plank.meds_and_herbs.client.gui.menu.DistilleryApparatusGUIMenu;
-import com.plank.meds_and_herbs.init.BlockEntities;
-import com.plank.meds_and_herbs.init.Recipes;
-import com.plank.meds_and_herbs.init.Sounds;
-import com.plank.meds_and_herbs.init.Tags;
+import com.plank.meds_and_herbs.init.*;
 import com.plank.meds_and_herbs.procedures.LoadItemList;
 import com.plank.meds_and_herbs.recipe.DistillingRecipe;
-import com.plank.meds_and_herbs.recipe.DistillingRecipeInput;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
@@ -19,17 +14,17 @@ import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.Container;
 import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.items.IItemHandler;
-import net.neoforged.neoforge.items.ItemStackHandler;
+import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.ItemStackHandler;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -40,19 +35,19 @@ import java.util.function.Predicate;
 
 import static com.plank.meds_and_herbs.recipe.DistillingRecipe.MAX_PROGRESS;
 
-public class DistilleryApparatusBlockEntity extends BlockEntity implements MenuProvider {
+public class DistilleryApparatusBlockEntity extends BlockEntity implements MenuProvider, Container {
 
-    // 待提取记录：槽位 -> 物品
+    private static final int SOUND_INTERVAL = 40;
+
     private final Map<Integer, ItemStack> pendingSlots = new HashMap<>();
 
-    // 内部物品处理器
-    private final ItemStackHandler internalHandler = new ItemStackHandler(4) {
+    private final ItemStackHandler internalHandler = new ItemStackHandler(5) {
         @Override
         public boolean isItemValid(int slot, @Nonnull ItemStack stack) {
             return switch (slot) {
-                case 0, 1 -> true; // 输入槽
-                case 2 -> stack.is(Tags.Items.EMPTY_BOTTLE); // 空瓶槽
-                default -> false; // 副产物槽（槽3）不可手动放入
+                case 0, 1 -> true;
+                case 2 -> stack.is(MHTags.Items.EMPTY_BOTTLE);
+                default -> false;
             };
         }
 
@@ -63,32 +58,48 @@ public class DistilleryApparatusBlockEntity extends BlockEntity implements MenuP
                 level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
             }
 
-            // 槽位变化时，清理无效的待提取记录
-            if (pendingSlots.containsKey(slot)) {
-                ItemStack recorded = pendingSlots.get(slot);
-                ItemStack current = getStackInSlot(slot);
-                if (!ItemStack.isSameItemSameComponents(recorded, current)) {
-                    pendingSlots.remove(slot);
-                }
+            ItemStack recorded = pendingSlots.get(slot);
+            if (recorded != null && !ItemStack.isSameItemSameTags(recorded, getStackInSlot(slot))) {
+                pendingSlots.remove(slot);
             }
         }
 
         @Override
+        public int getSlotLimit(int slot) {
+            return slot == 2 ? 1 : 64; // allow ONLY 1 bottle
+        }
+    };
+
+    private final IItemHandler upHandler = new FilteredItemHandler(
+            internalHandler,
+            slot -> slot == 0 || slot == 1,
+            slot -> false
+    );
+
+    private final IItemHandler sideHandler = new FilteredItemHandler(
+            internalHandler,
+            slot -> slot == 2,
+            slot -> false
+    );
+
+    private final IItemHandler downHandler = new FilteredItemHandler(
+            internalHandler,
+            slot -> false,
+            slot -> true
+    ) {
+        @Override
         @Nonnull
         public ItemStack extractItem(int slot, int amount, boolean simulate) {
-            // 只允许提取有记录且匹配的物品
             ItemStack recorded = pendingSlots.get(slot);
-            if (recorded == null || recorded.isEmpty()) {
-                return ItemStack.EMPTY;
-            }
+            if (recorded == null || recorded.isEmpty()) return ItemStack.EMPTY;
 
-            ItemStack current = getStackInSlot(slot);
-            if (!ItemStack.isSameItemSameComponents(recorded, current)) {
+            ItemStack current = internalHandler.getStackInSlot(slot);
+            if (!ItemStack.isSameItemSameTags(recorded, current)) {
                 pendingSlots.remove(slot);
                 return ItemStack.EMPTY;
             }
 
-            ItemStack result = super.extractItem(slot, amount, simulate);
+            ItemStack result = internalHandler.extractItem(slot, amount, simulate);
             if (!simulate && !result.isEmpty()) {
                 pendingSlots.remove(slot);
             }
@@ -96,214 +107,190 @@ public class DistilleryApparatusBlockEntity extends BlockEntity implements MenuP
         }
     };
 
-    // 方向过滤器
-    private final IItemHandler upHandler = new FilteredItemHandler(
-            internalHandler,
-            slot -> slot == 0 || slot == 1, // 允许插入槽0和1
-            slot -> false // 禁止提取
-    );
-
-    private final IItemHandler sideHandler = new FilteredItemHandler(
-            internalHandler,
-            slot -> slot == 2, // 允许插入槽2（空瓶）
-            slot -> false
-    );
-
-    private final IItemHandler downHandler = new FilteredItemHandler(
-            internalHandler,
-            slot -> false, // 禁止插入
-            slot -> slot == 0 || slot == 1 || slot == 2 || slot == 3 // 允许提取所有槽，但受 pendingSlots 限制
-    ) {
-        @Override
-        @Nonnull
-        public ItemStack extractItem(int slot, int amount, boolean simulate) {
-            // 直接调用内部处理器的提取逻辑（它已经检查 pendingSlots）
-            return internalHandler.extractItem(slot, amount, simulate);
-        }
-    };
-
     private int progress = 0;
+    private boolean isRunning = false;
     private int soundTimer = 0;
-    private static final int SOUND_INTERVAL = 40;
 
     public DistilleryApparatusBlockEntity(BlockPos pos, BlockState state) {
-        super(BlockEntities.DISTILLERY_APPARATUS.get(), pos, state);
+        super(MHBlockEntities.DISTILLERY_APPARATUS.get(), pos, state);
     }
 
-    // 供能力注册使用
-    public IItemHandler getHandlerForSide(@Nullable Direction side) {
-        if (side == null) return internalHandler;
-        return switch (side) {
-            case UP -> upHandler;
-            case DOWN -> downHandler;
-            default -> sideHandler; // 水平方向
-        };
+
+    @Override
+    public int getContainerSize() {
+        return 5;
+    }
+
+    @Override
+    public boolean isEmpty() {
+        for (int i = 0; i < 5; i++) {
+            if (!internalHandler.getStackInSlot(i).isEmpty()) return false;
+        }
+        return true;
+    }
+
+    @Override
+    public ItemStack getItem(int slot) {
+        return internalHandler.getStackInSlot(slot);
+    }
+
+    @Override
+    public ItemStack removeItem(int slot, int amount) {
+        return internalHandler.extractItem(slot, amount, false);
+    }
+
+    @Override
+    public ItemStack removeItemNoUpdate(int slot) {
+        var stack = internalHandler.getStackInSlot(slot);
+        internalHandler.setStackInSlot(slot, ItemStack.EMPTY);
+        return stack;
+    }
+
+    @Override
+    public void setItem(int slot, ItemStack stack) {
+        internalHandler.setStackInSlot(slot, stack);
+    }
+
+    @Override
+    public boolean stillValid(Player player) {
+        if (level == null || level.getBlockEntity(worldPosition) != this) return false;
+        return player.distanceToSqr(
+                worldPosition.getX() + 0.5,
+                worldPosition.getY() + 0.5,
+                worldPosition.getZ() + 0.5) <= 64.0;
+    }
+
+    @Override
+    public void clearContent() {
+        for (int i = 0; i < 5; i++) {
+            internalHandler.setStackInSlot(i, ItemStack.EMPTY);
+        }
+        pendingSlots.clear();
     }
 
     public void tick() {
         if (level == null || level.isClientSide) return;
 
-        DistillingRecipeInput input = new DistillingRecipeInput(
-                internalHandler.getStackInSlot(0),
-                internalHandler.getStackInSlot(1)
-        );
         Optional<DistillingRecipe> recipeOpt = level.getRecipeManager()
-                .getRecipeFor(Recipes.DISTILLING_TYPE.get(), input, level)
-                .map(RecipeHolder::value);
+                .getRecipeFor(MHRecipes.DISTILLING_TYPE.get(), this, level);
 
         boolean shouldBeWorking = recipeOpt.isPresent() && canStartProcess(recipeOpt.get());
+        isRunning = shouldBeWorking;
+
         if (shouldBeWorking) {
             if (progress < MAX_PROGRESS) {
                 progress++;
-                setChanged();
-                level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
+
                 if (--soundTimer <= 0) {
                     soundTimer = SOUND_INTERVAL;
                     float pitch = 0.8f + level.random.nextFloat() * 0.4f;
-                    level.playSound(null, worldPosition, Sounds.DISTILLERY_APPARATUS.get(),
+                    level.playSound(null, worldPosition, MHSounds.DISTILLERY_APPARATUS.get(),
                             SoundSource.BLOCKS, 0.5f, pitch);
                 }
             }
             if (progress >= MAX_PROGRESS) {
                 craftRecipe(recipeOpt.get());
                 progress = 0;
-                setChanged();
-                level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
-                level.playSound(null, worldPosition, Sounds.DISTILLERY_APPARATUS.get(),
+                level.playSound(null, worldPosition, MHSounds.DISTILLERY_APPARATUS.get(),
                         SoundSource.BLOCKS, 1.0f, 1.0f);
+                setChanged();
             }
-        } else {
-            if (progress != 0) change();
+        } else if (progress != 0) {
+            progress = 0;
         }
     }
 
     private boolean canStartProcess(DistillingRecipe recipe) {
         ItemStack bottle = internalHandler.getStackInSlot(2);
-        if (!recipe.matchesEmptyBottle(bottle)) return false;
-        if (!recipe.stillage().isEmpty() && !canFit(recipe.stillage())) return false;
-        if (recipe.emptyBottle().isPresent()) {
-            return recipe.matchesEmptyBottle(bottle);
-        } else {
-            return bottle.isEmpty();
+
+        // does recipe need bottle
+        if (recipe.getEmptyBottle().isPresent()) {
+            if (!recipe.matchesEmptyBottle(bottle)) return false; // not am empty bottle
+        } else if (!bottle.isEmpty()) {  // recipe doesnt need bottle but bottle is present
+            return false;
         }
+
+        if (!canFit(3, recipe.getOutput())) return false;
+        if (!recipe.getSpillage().isEmpty() && !canFit(4, recipe.getSpillage())) return false;
+
+        return true;
     }
 
     private void craftRecipe(DistillingRecipe recipe) {
-        // 清空旧记录
         pendingSlots.clear();
 
-        // 保存输入副本（返还物品用）
         ItemStack inputACopy = internalHandler.getStackInSlot(0).copy();
         ItemStack inputBCopy = internalHandler.getStackInSlot(1).copy();
 
-        // 消耗输入
-        if (recipe.inputA().isPresent()) {
-            internalHandler.extractItem(0, recipe.inputA().get().count(), false);
+        if (recipe.getInputA().isPresent()) {
+            internalHandler.extractItem(0, 1, false);
         }
-        if (recipe.inputB().isPresent()) {
-            internalHandler.extractItem(1, recipe.inputB().get().count(), false);
-        }
-
-        // 消耗空瓶
-        if (recipe.emptyBottle().isPresent()) {
-            int needed = recipe.emptyBottle().get().count();
-            internalHandler.extractItem(2, needed, false);
-            ItemStack leftover = internalHandler.getStackInSlot(2);
-            if (!leftover.isEmpty()) {
-                dropItem(leftover);
-                internalHandler.setStackInSlot(2, ItemStack.EMPTY);
-            }
+        if (recipe.getInputB().isPresent()) {
+            internalHandler.extractItem(1, 1, false);
         }
 
-        // 处理返还物品并记录
+        if (recipe.getEmptyBottle().isPresent()) {
+            internalHandler.extractItem(2, 1, false);
+            ItemStack dirty = new ItemStack(MHItems.DIRTY_MEDICINE_BOTTLE.get());
+            internalHandler.setStackInSlot(2, dirty);
+            pendingSlots.put(2, dirty.copy());
+        }
+
         processRemainderAndRecord(0, inputACopy);
         processRemainderAndRecord(1, inputBCopy);
 
-        // 放入主产物（槽2）并记录
-        insertItemSafeAndRecord(2, recipe.output());
-
-        // 放入副产物（槽3）并记录
-        insertItemSafeAndRecord(3, recipe.stillage());
-
-        // 配方完成音效已在外部播放
+        insertItemSafeAndRecord(3, recipe.getOutput());
+        insertItemSafeAndRecord(4, recipe.getSpillage());
     }
 
     private void processRemainderAndRecord(int slot, ItemStack stack) {
         ItemStack remainder = stack.getCraftingRemainingItem();
         if (remainder.isEmpty()) return;
 
-        // 尝试放回原槽
+        if (tryMergeStacks(slot, remainder)) return;
+        if (tryMergeStacks(2, remainder)) return;
+        if (tryMergeStacks(3, remainder)) return;
+        if (tryMergeStacks(4, remainder)) return;
+
+        dropItem(remainder);
+    }
+
+    private boolean tryMergeStacks(int slot, ItemStack stack) {
         ItemStack existing = internalHandler.getStackInSlot(slot);
+        int limit = internalHandler.getSlotLimit(slot);
+
         if (existing.isEmpty()) {
-            internalHandler.setStackInSlot(slot, remainder);
-            pendingSlots.put(slot, remainder.copy());
-            return;
+            ItemStack placed = stack.copy();
+            placed.setCount(Math.min(placed.getCount(), limit));
+            internalHandler.setStackInSlot(slot, placed);
+            pendingSlots.put(slot, placed.copy());
+            return true;
         }
-        if (ItemStack.isSameItemSameComponents(existing, remainder) &&
-                existing.getCount() + remainder.getCount() <= existing.getMaxStackSize()) {
-            existing.grow(remainder.getCount());
+
+        if (ItemStack.isSameItemSameTags(existing, stack)
+                && existing.getCount() + stack.getCount() <= existing.getMaxStackSize()
+                && existing.getCount() + stack.getCount() <= limit) {
+            existing.grow(stack.getCount());
             internalHandler.setStackInSlot(slot, existing);
             pendingSlots.put(slot, existing.copy());
-            return;
+            return true;
         }
 
-        // 尝试放入槽2
-        ItemStack existing2 = internalHandler.getStackInSlot(2);
-        if (existing2.isEmpty()) {
-            internalHandler.setStackInSlot(2, remainder);
-            pendingSlots.put(2, remainder.copy());
-            return;
-        }
-        if (ItemStack.isSameItemSameComponents(existing2, remainder) &&
-                existing2.getCount() + remainder.getCount() <= existing2.getMaxStackSize()) {
-            existing2.grow(remainder.getCount());
-            internalHandler.setStackInSlot(2, existing2);
-            pendingSlots.put(2, existing2.copy());
-            return;
-        }
-
-        // 尝试放入槽3
-        ItemStack existing3 = internalHandler.getStackInSlot(3);
-        if (existing3.isEmpty()) {
-            internalHandler.setStackInSlot(3, remainder);
-            pendingSlots.put(3, remainder.copy());
-            return;
-        }
-        if (ItemStack.isSameItemSameComponents(existing3, remainder) &&
-                existing3.getCount() + remainder.getCount() <= existing3.getMaxStackSize()) {
-            existing3.grow(remainder.getCount());
-            internalHandler.setStackInSlot(3, existing3);
-            pendingSlots.put(3, existing3.copy());
-            return;
-        }
-
-        // 所有槽都无法容纳，掉落
-        if (level != null) {
-            Containers.dropItemStack(level, worldPosition.getX(), worldPosition.getY(), worldPosition.getZ(), remainder);
-        }
+        return false;
     }
 
     private void insertItemSafeAndRecord(int slot, ItemStack stack) {
         if (stack.isEmpty()) return;
-        ItemStack existing = internalHandler.getStackInSlot(slot);
-        if (existing.isEmpty()) {
-            internalHandler.setStackInSlot(slot, stack);
-            pendingSlots.put(slot, stack.copy());
-        } else if (ItemStack.isSameItemSameComponents(existing, stack) &&
-                existing.getCount() + stack.getCount() <= existing.getMaxStackSize()) {
-            existing.grow(stack.getCount());
-            internalHandler.setStackInSlot(slot, existing);
-            pendingSlots.put(slot, existing.copy());
-        } else {
+        if (!tryMergeStacks(slot, stack)) {
             dropItem(stack);
         }
     }
 
-    private boolean canFit(ItemStack stack) {
+    private boolean canFit(int slot, ItemStack stack) {
         if (stack.isEmpty()) return true;
-        ItemStack existing = internalHandler.getStackInSlot(3);
+        ItemStack existing = internalHandler.getStackInSlot(slot);
         if (existing.isEmpty()) return true;
-        return ItemStack.isSameItemSameComponents(existing, stack) &&
+        return ItemStack.isSameItemSameTags(existing, stack) &&
                 existing.getCount() + stack.getCount() <= existing.getMaxStackSize();
     }
 
@@ -313,25 +300,8 @@ public class DistilleryApparatusBlockEntity extends BlockEntity implements MenuP
         }
     }
 
-    private void change() {
-        progress = 0;
-        // 不清除 pendingSlots，保留待提取物品
-        setChanged();
-        if (level != null && !level.isClientSide) {
-            level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
-        }
-    }
-
-    public boolean isCooking() {
-        if (level == null) return false;
-        DistillingRecipeInput input = new DistillingRecipeInput(
-                internalHandler.getStackInSlot(0),
-                internalHandler.getStackInSlot(1)
-        );
-        Optional<DistillingRecipe> recipe = level.getRecipeManager()
-                .getRecipeFor(Recipes.DISTILLING_TYPE.get(), input, level)
-                .map(RecipeHolder::value);
-        return recipe.isPresent() && canStartProcess(recipe.get());
+    public boolean isRunning() {
+        return isRunning;
     }
 
     public ItemStackHandler getItemHandler() {
@@ -346,7 +316,15 @@ public class DistilleryApparatusBlockEntity extends BlockEntity implements MenuP
         return MAX_PROGRESS;
     }
 
-    // ---------- MenuProvider ----------
+    public IItemHandler getHandlerForSide(@Nullable Direction side) {
+        if (side == null) return internalHandler;
+        return switch (side) {
+            case UP -> upHandler;
+            case DOWN -> downHandler;
+            default -> sideHandler;
+        };
+    }
+
     @Override
     @Nonnull
     public Component getDisplayName() {
@@ -358,7 +336,6 @@ public class DistilleryApparatusBlockEntity extends BlockEntity implements MenuP
         return new DistilleryApparatusGUIMenu(id, inv, this);
     }
 
-    // ---------- 数据同步 ----------
     @Override
     @Nullable
     public Packet<ClientGamePacketListener> getUpdatePacket() {
@@ -367,49 +344,44 @@ public class DistilleryApparatusBlockEntity extends BlockEntity implements MenuP
 
     @Override
     @Nonnull
-    public CompoundTag getUpdateTag(@Nonnull HolderLookup.Provider registries) {
-        CompoundTag tag = new CompoundTag();
-        saveAdditional(tag, registries);
-        return tag;
+    public CompoundTag getUpdateTag() {
+        return saveWithoutMetadata();
     }
 
     @Override
-    public void handleUpdateTag(@Nonnull CompoundTag tag, @Nonnull HolderLookup.Provider registries) {
-        loadAdditional(tag, registries);
+    public void handleUpdateTag(@Nonnull CompoundTag tag) {
+        load(tag);
     }
 
-    // ---------- NBT ----------
     @Override
-    protected void saveAdditional(@Nonnull CompoundTag tag, @Nonnull HolderLookup.Provider registries) {
-        super.saveAdditional(tag, registries);
-        tag.put("inventory", internalHandler.serializeNBT(registries));
+    protected void saveAdditional(@Nonnull CompoundTag tag) {
+        super.saveAdditional(tag);
+        tag.put("inventory", internalHandler.serializeNBT());
         tag.putInt("progress", progress);
 
-        // 保存 pendingSlots
         ListTag pendingTag = new ListTag();
         for (Map.Entry<Integer, ItemStack> entry : pendingSlots.entrySet()) {
             CompoundTag entryTag = new CompoundTag();
             entryTag.putInt("slot", entry.getKey());
-            entryTag.put("stack", entry.getValue().save(registries));
+            entryTag.put("stack", entry.getValue().save(new CompoundTag()));
             pendingTag.add(entryTag);
         }
         tag.put("pendingSlots", pendingTag);
     }
 
     @Override
-    protected void loadAdditional(@Nonnull CompoundTag tag, @Nonnull HolderLookup.Provider registries) {
-        super.loadAdditional(tag, registries);
+    public void load(@Nonnull CompoundTag tag) {
+        super.load(tag);
         progress = tag.getInt("progress");
-        LoadItemList.loadItemsFromTag(internalHandler, tag, registries);
+        LoadItemList.loadItemsFromTag(internalHandler, tag);
 
-        // 恢复 pendingSlots
         pendingSlots.clear();
         if (tag.contains("pendingSlots", Tag.TAG_LIST)) {
             ListTag pendingTag = tag.getList("pendingSlots", Tag.TAG_COMPOUND);
             for (int i = 0; i < pendingTag.size(); i++) {
                 CompoundTag entryTag = pendingTag.getCompound(i);
                 int slot = entryTag.getInt("slot");
-                ItemStack stack = ItemStack.parse(registries, entryTag.getCompound("stack")).orElse(ItemStack.EMPTY);
+                ItemStack stack = ItemStack.of(entryTag.getCompound("stack"));
                 if (!stack.isEmpty()) {
                     pendingSlots.put(slot, stack);
                 }
@@ -417,13 +389,14 @@ public class DistilleryApparatusBlockEntity extends BlockEntity implements MenuP
         }
     }
 
-    // ---------- 内部过滤器 ----------
     private static class FilteredItemHandler implements IItemHandler {
         private final IItemHandler delegate;
         private final Predicate<Integer> insertAllowed;
         private final Predicate<Integer> extractAllowed;
 
-        public FilteredItemHandler(IItemHandler delegate, Predicate<Integer> insertAllowed, Predicate<Integer> extractAllowed) {
+        public FilteredItemHandler(IItemHandler delegate,
+                                   Predicate<Integer> insertAllowed,
+                                   Predicate<Integer> extractAllowed) {
             this.delegate = delegate;
             this.insertAllowed = insertAllowed;
             this.extractAllowed = extractAllowed;
@@ -451,12 +424,12 @@ public class DistilleryApparatusBlockEntity extends BlockEntity implements MenuP
         }
 
         @Override
-        public int getSlotLimit(int slot) { return delegate.getSlotLimit(slot); }
-
-        @Override
         public boolean isItemValid(int slot, @Nonnull ItemStack stack) {
             if (!insertAllowed.test(slot)) return false;
             return delegate.isItemValid(slot, stack);
         }
+
+        @Override
+        public int getSlotLimit(int slot) { return delegate.getSlotLimit(slot); }
     }
 }
