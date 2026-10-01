@@ -1,98 +1,126 @@
 package com.plank.meds_and_herbs.recipe;
 
-import com.mojang.serialization.MapCodec;
-import com.plank.meds_and_herbs.data.BouquetFlowers;
-import com.plank.meds_and_herbs.init.DataComponents;
-import com.plank.meds_and_herbs.init.Items;
-import com.plank.meds_and_herbs.init.Recipes;
-import com.plank.meds_and_herbs.init.Tags;
+import com.google.gson.JsonObject;
+import com.plank.meds_and_herbs.MedsAndHerbs;
+import com.plank.meds_and_herbs.init.MHItems;
+import com.plank.meds_and_herbs.init.MHRecipes;
 import net.minecraft.ChatFormatting;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.StringTag;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.ItemTags;
+import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.component.ItemLore;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nonnull;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Locale;
 
-/**
- * 花束合成配方（硬编码）
- * 使用 4 朵任意带有 meds_and_herbs:flowers 标签的花合成花束。
- * 实现 CraftingRecipe 以兼容 JEI 等模组。
- */
 public class BouquetRecipe implements CraftingRecipe {
 
     public static final BouquetRecipe INSTANCE = new BouquetRecipe();
+    public static final ResourceLocation ID = MedsAndHerbs.id("bouquet");
+
+    public static final String NBT_KEY = "BouquetFlowers";
+    public static final String FLOWERS_KEY = "flowers";
+    public static final int REQUIRED_COUNT = 4;
 
     @Override
-    public boolean matches(CraftingInput container, @Nonnull Level level) {
+    public boolean matches(@Nonnull CraftingContainer container, @Nonnull Level level) {
         int flowerCount = 0;
-        for (int i = 0; i < container.size(); i++) {
+        for (int i = 0; i < container.getContainerSize(); i++) {
             ItemStack stack = container.getItem(i);
             if (!stack.isEmpty() && isFlower(stack)) {
                 flowerCount++;
             }
         }
-        return flowerCount == 4;
+        return flowerCount == REQUIRED_COUNT;
     }
 
     @Override
     @Nonnull
-    public ItemStack assemble(@Nonnull CraftingInput container, @Nonnull HolderLookup.Provider registries) {
+    public ItemStack assemble(@Nonnull CraftingContainer container,
+                              @Nonnull RegistryAccess registries) {
         List<ItemStack> flowers = new ArrayList<>();
-        for (int i = 0; i < container.size(); i++) {
+        for (int i = 0; i < container.getContainerSize(); i++) {
             ItemStack stack = container.getItem(i);
             if (!stack.isEmpty() && isFlower(stack)) {
                 flowers.add(stack.copy());
             }
         }
-        if (flowers.size() != 4) {
+        if (flowers.size() != REQUIRED_COUNT) {
             return ItemStack.EMPTY;
         }
         flowers.sort(Comparator.comparing(this::getSortKey));
-        ItemStack bouquet = new ItemStack(Items.BOUQUET.get());
-        bouquet.set(DataComponents.BOUQUET_FLOWERS.get(), BouquetFlowers.create(flowers));
+
+        ItemStack bouquet = new ItemStack(MHItems.BOUQUET.get());
+
+        ListTag listTag = new ListTag();
+        for (ItemStack flower : flowers) {
+            if (flower.isEmpty()) return ItemStack.EMPTY;
+            ResourceLocation id = ForgeRegistries.ITEMS.getKey(flower.getItem());
+            listTag.add(StringTag.valueOf(id.toString()));
+        }
+
+        CompoundTag sub = new CompoundTag();
+        sub.put(FLOWERS_KEY, listTag);
+        bouquet.getOrCreateTag().put(NBT_KEY, sub);
+
         return bouquet;
     }
 
     @Override
     public boolean canCraftInDimensions(int width, int height) {
-        return width * height >= 4;
+        return width * height >= REQUIRED_COUNT;
     }
 
     @Override
     @Nonnull
-    public ItemStack getResultItem(@Nonnull HolderLookup.Provider registries) {
-        ItemStack result = new ItemStack(Items.BOUQUET.get());
-        // 添加一条 lore 提示（仅用于 JEI 显示）
-        Component hint = Component.translatable("jei.meds_and_herbs.bouquet.hint").withStyle(ChatFormatting.GOLD);
-        result.set(net.minecraft.core.component.DataComponents.LORE, new ItemLore(List.of(hint)));
+    public ItemStack getResultItem(@Nonnull RegistryAccess registries) {
+        ItemStack result = new ItemStack(MHItems.BOUQUET.get());
+
+        Component hint = Component.translatable("jei.meds_and_herbs.bouquet.hint")
+                .withStyle(ChatFormatting.GOLD);
+
+        CompoundTag display = new CompoundTag();
+        ListTag lore = new ListTag();
+        lore.add(StringTag.valueOf(Component.Serializer.toJson(hint)));
+        display.put("Lore", lore);
+
+        result.getOrCreateTag().put("display", display);
         return result;
     }
 
-    // ✅ 返回 4 个花朵标签输入（供 JEI 显示）
     @Override
     @Nonnull
     public NonNullList<Ingredient> getIngredients() {
         NonNullList<Ingredient> list = NonNullList.create();
-        Ingredient flowerIngredient = Ingredient.of(Tags.Items.FLOWERS);
-        for (int i = 0; i < 4; i++) {
+        Ingredient flowerIngredient = Ingredient.of(ItemTags.FLOWERS);
+        for (int i = 0; i < REQUIRED_COUNT; i++) {
             list.add(flowerIngredient);
         }
         return list;
     }
 
+    public ResourceLocation getId() {
+        return ID;
+    }
+
     @Override
     @Nonnull
     public RecipeSerializer<?> getSerializer() {
-        return Recipes.BOUQUET_SERIALIZER.get();
+        return MHRecipes.BOUQUET_SERIALIZER.get();
     }
 
     @Override
@@ -107,33 +135,36 @@ public class BouquetRecipe implements CraftingRecipe {
         return CraftingBookCategory.MISC;
     }
 
-    // ----- 辅助方法 -----
-
     private boolean isFlower(ItemStack stack) {
-        return stack.is(Tags.Items.FLOWERS);
+        return stack.is(ItemTags.FLOWERS);
     }
 
     private String getSortKey(ItemStack stack) {
-        ResourceLocation key = BuiltInRegistries.ITEM.getKey(stack.getItem());
+        ResourceLocation key = ForgeRegistries.ITEMS.getKey(stack.getItem());
         String path = key.getPath();
         return path.isEmpty() ? "~" : path.substring(0, 1).toLowerCase(Locale.ROOT);
     }
 
-    // ----- 序列化器 -----
-
     public static class Serializer implements RecipeSerializer<BouquetRecipe> {
         public static final Serializer INSTANCE = new Serializer();
-
         private Serializer() {}
 
         @Override
-        public @Nonnull MapCodec<BouquetRecipe> codec() {
-            return MapCodec.unit(BouquetRecipe.INSTANCE);
+        @Nonnull
+        public BouquetRecipe fromJson(@Nonnull ResourceLocation id,
+                                      @Nonnull JsonObject json) {
+            return BouquetRecipe.INSTANCE;
         }
 
         @Override
-        public @Nonnull StreamCodec<RegistryFriendlyByteBuf, BouquetRecipe> streamCodec() {
-            return StreamCodec.unit(BouquetRecipe.INSTANCE);
+        public BouquetRecipe fromNetwork(@Nonnull ResourceLocation id,
+                                         @Nonnull FriendlyByteBuf buf) {
+            return BouquetRecipe.INSTANCE;
+        }
+
+        @Override
+        public void toNetwork(@Nonnull FriendlyByteBuf buf,
+                              @Nonnull BouquetRecipe recipe) {
         }
     }
 }

@@ -1,50 +1,85 @@
 package com.plank.meds_and_herbs.recipe;
 
-import com.mojang.serialization.MapCodec;
+import com.google.gson.JsonObject;
+import com.plank.meds_and_herbs.MedsAndHerbs;
 import com.plank.meds_and_herbs.data.BouquetFlowers;
-import com.plank.meds_and_herbs.init.DataComponents;
-import com.plank.meds_and_herbs.init.Items;
-import com.plank.meds_and_herbs.init.Recipes;
+import com.plank.meds_and_herbs.init.MHItems;
+import com.plank.meds_and_herbs.init.MHRecipes;
 import net.minecraft.ChatFormatting;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
-import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.StringTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.component.ItemLore;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
-import net.minecraft.world.item.crafting.SingleRecipeInput;
 import net.minecraft.world.level.Level;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nonnull;
-import java.util.List;
 
-public class BouquetGrinderRecipe implements Recipe<SingleRecipeInput> {
+public class BouquetGrinderRecipe implements Recipe<Container> {
     public static final BouquetGrinderRecipe INSTANCE = new BouquetGrinderRecipe();
+    public static final ResourceLocation ID = MedsAndHerbs.id("bouquet_grinder");
+
+    public static final String NBT_KEY = "BouquetFlowers";
+    public static final String FLOWERS_KEY = "flowers";
 
     @Override
-    public boolean matches(@Nonnull SingleRecipeInput input, @Nonnull Level level) {
+    public boolean matches(@Nonnull Container input, @Nonnull Level level) {
         ItemStack stack = input.getItem(0);
-        if (stack.isEmpty() || !stack.is(Items.BOUQUET.get())) return false;
-        BouquetFlowers flowers = stack.get(DataComponents.BOUQUET_FLOWERS.get());
-        return flowers != null && flowers.isValid();
+        return !stack.isEmpty() && stack.is(MHItems.BOUQUET.get()) && isValid(stack);
     }
 
     @Override
     @Nonnull
-    public ItemStack assemble(@Nonnull SingleRecipeInput input, @Nonnull HolderLookup.Provider registries) {
-        ItemStack bouquet = input.getItem(0);
-        BouquetFlowers flowers = bouquet.get(DataComponents.BOUQUET_FLOWERS.get());
-        if (flowers == null || !flowers.isValid()) {
+    public ItemStack assemble(Container container, RegistryAccess registryAccess) {
+        ItemStack bouquet = container.getItem(0);
+
+        if (bouquet.isEmpty() || !isValid(bouquet)) {
             return ItemStack.EMPTY;
         }
-        ItemStack powder = new ItemStack(Items.POWDER_HERBAL.get());
-        powder.set(DataComponents.BOUQUET_FLOWERS.get(), flowers);
+
+        ItemStack powder = new ItemStack(MHItems.POWDER_HERBAL.get());
+        powder.setTag(bouquet.getTag().copy());
         return powder;
+    }
+
+    private static boolean isValid(ItemStack bouquetStack) {
+        // check for tags present
+        CompoundTag tag = bouquetStack.getTag();
+        if (tag == null || !tag.contains("BouquetFlowers", Tag.TAG_COMPOUND)) {
+            return false;
+        }
+        CompoundTag bouquetTag = tag.getCompound("BouquetFlowers");
+        if (!bouquetTag.contains("flowers", Tag.TAG_LIST)) {
+            return false;
+        }
+
+        // check if 4 flowers
+        ListTag flowers = bouquetTag.getList("flowers", Tag.TAG_STRING);
+        if (flowers.size() != 4) {
+            return false;
+        }
+
+        // check if flowers exist
+        for (int i = 0; i < flowers.size(); i++) {
+            ResourceLocation id = ResourceLocation.tryParse(flowers.getString(i));
+            if (id == null || !ForgeRegistries.ITEMS.containsKey(id)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     @Override
@@ -52,36 +87,44 @@ public class BouquetGrinderRecipe implements Recipe<SingleRecipeInput> {
         return true;
     }
 
-    // ✅ JEI 显示用的结果：带提示
     @Override
-    @Nonnull
-    public ItemStack getResultItem(@Nonnull HolderLookup.Provider registries) {
-        ItemStack result = new ItemStack(Items.POWDER_HERBAL.get());
-        // 添加提示：保留花朵类型
+    public ItemStack getResultItem(RegistryAccess registryAccess) {
+        ItemStack result = new ItemStack(MHItems.POWDER_HERBAL.get());
         Component hint = Component.translatable("jei.meds_and_herbs.bouquet_grinder.hint")
                 .withStyle(ChatFormatting.GOLD);
-        result.set(net.minecraft.core.component.DataComponents.LORE, new ItemLore(List.of(hint)));
-        return result;
-    }
+
+        CompoundTag display = new CompoundTag();
+        ListTag lore = new ListTag();
+        lore.add(StringTag.valueOf(Component.Serializer.toJson(hint)));
+        display.put("Lore", lore);
+
+        result.getOrCreateTag().put("display", display);
+        return result;    }
 
     @Override
     @Nonnull
     public NonNullList<Ingredient> getIngredients() {
         NonNullList<Ingredient> list = NonNullList.create();
-        list.add(Ingredient.of(Items.BOUQUET.get()));
+        list.add(Ingredient.of(MHItems.BOUQUET.get()));
         return list;
     }
 
     @Override
     @Nonnull
+    public ResourceLocation getId() {
+        return ID;
+    }
+
+    @Override
+    @Nonnull
     public RecipeSerializer<?> getSerializer() {
-        return Recipes.BOUQUET_GRINDER_SERIALIZER.get();
+        return MHRecipes.BOUQUET_GRINDER_SERIALIZER.get();
     }
 
     @Override
     @Nonnull
     public RecipeType<?> getType() {
-        return Recipes.GRINDER_TYPE.get();
+        return MHRecipes.GRINDER_TYPE.get();
     }
 
     public static class Serializer implements RecipeSerializer<BouquetGrinderRecipe> {
@@ -89,13 +132,21 @@ public class BouquetGrinderRecipe implements Recipe<SingleRecipeInput> {
         private Serializer() {}
 
         @Override
-        public @Nonnull MapCodec<BouquetGrinderRecipe> codec() {
-            return MapCodec.unit(BouquetGrinderRecipe.INSTANCE);
+        @Nonnull
+        public BouquetGrinderRecipe fromJson(@Nonnull ResourceLocation recipeId,
+                                             @Nonnull JsonObject json) {
+            return BouquetGrinderRecipe.INSTANCE;
         }
 
         @Override
-        public @Nonnull StreamCodec<RegistryFriendlyByteBuf, BouquetGrinderRecipe> streamCodec() {
-            return StreamCodec.unit(BouquetGrinderRecipe.INSTANCE);
+        public BouquetGrinderRecipe fromNetwork(@Nonnull ResourceLocation recipeId,
+                                                @Nonnull FriendlyByteBuf buffer) {
+            return BouquetGrinderRecipe.INSTANCE;
+        }
+
+        @Override
+        public void toNetwork(@Nonnull FriendlyByteBuf buffer,
+                              @Nonnull BouquetGrinderRecipe recipe) {
         }
     }
 }
