@@ -1,28 +1,39 @@
 package com.plank.meds_and_herbs.recipe;
 
-import com.mojang.serialization.MapCodec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
-import com.plank.meds_and_herbs.init.MHRecipeTypes;
-import net.minecraft.core.HolderLookup;
+import com.google.gson.JsonObject;
+import com.plank.meds_and_herbs.init.MHRecipes;
 import net.minecraft.core.NonNullList;
-import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.GsonHelper;
+import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
 
 import javax.annotation.Nonnull;
 
-public record GrinderRecipe(Ingredient input, ItemStack output) implements Recipe<SingleRecipeInput> {
+public class GrinderRecipe implements Recipe<Container> {
+    private final ResourceLocation id;
+    private final Ingredient input;
+    private final ItemStack output;
+
+    public GrinderRecipe(ResourceLocation id, Ingredient input, ItemStack output) {
+        this.id = id;
+        this.input = input;
+        this.output = output;
+    }
 
     @Override
-    public boolean matches(SingleRecipeInput inv, @Nonnull Level level) {
-        return input.test(inv.item());
+    public boolean matches(@Nonnull Container container, @Nonnull Level level) {
+        return input.test(container.getItem(0));
     }
 
     @Override
     @Nonnull
-    public ItemStack assemble(@Nonnull SingleRecipeInput inv, @Nonnull HolderLookup.Provider registries) {
+    public ItemStack assemble(@Nonnull Container container,
+                              @Nonnull RegistryAccess registryAccess) {
         return output.copy();
     }
 
@@ -33,7 +44,7 @@ public record GrinderRecipe(Ingredient input, ItemStack output) implements Recip
 
     @Override
     @Nonnull
-    public ItemStack getResultItem(@Nonnull HolderLookup.Provider registries) {
+    public ItemStack getResultItem(@Nonnull RegistryAccess registryAccess) {
         return output;
     }
 
@@ -44,41 +55,56 @@ public record GrinderRecipe(Ingredient input, ItemStack output) implements Recip
     }
 
     @Override
+    public ResourceLocation getId() {
+        return id;
+    }
+
+    @Override
     @Nonnull
     public RecipeSerializer<?> getSerializer() {
-        return MHRecipeTypes.GRINDER_SERIALIZER.get();
+        return MHRecipes.GRINDER_SERIALIZER.get();
     }
 
     @Override
     @Nonnull
     public RecipeType<?> getType() {
-        return MHRecipeTypes.GRINDER_TYPE.get();
+        return MHRecipes.GRINDER_TYPE.get();
     }
 
     public static class Serializer implements RecipeSerializer<GrinderRecipe> {
+
         public static final Serializer INSTANCE = new Serializer();
-        public static final MapCodec<GrinderRecipe> CODEC = RecordCodecBuilder.mapCodec(inst ->
-                inst.group(
-                        Ingredient.CODEC_NONEMPTY.fieldOf("input").forGetter(r -> r.input),
-                        ItemStack.CODEC.fieldOf("output").forGetter(r -> r.output)
-                ).apply(inst, GrinderRecipe::new)
-        );
-        public static final StreamCodec<RegistryFriendlyByteBuf, GrinderRecipe> STREAM_CODEC = StreamCodec.of(
-                (buf, recipe) -> {
-                    Ingredient.CONTENTS_STREAM_CODEC.encode(buf, recipe.input);
-                    ItemStack.STREAM_CODEC.encode(buf, recipe.output);
-                },
-                buf -> {
-                    Ingredient input = Ingredient.CONTENTS_STREAM_CODEC.decode(buf);
-                    ItemStack output = ItemStack.STREAM_CODEC.decode(buf);
-                    return new GrinderRecipe(input, output);
-                }
-        );
-        @Nonnull
+
         @Override
-        public MapCodec<GrinderRecipe> codec() { return CODEC; }
         @Nonnull
+        public GrinderRecipe fromJson(@Nonnull ResourceLocation recipeId,
+                                      @Nonnull JsonObject json) {
+            Ingredient input = Ingredient.fromJson(
+                    GsonHelper.getAsJsonObject(json, "input")
+            );
+
+            ItemStack output = ShapedRecipe.itemStackFromJson(
+                    GsonHelper.getAsJsonObject(json, "output")
+            );
+
+            return new GrinderRecipe(recipeId, input, output);
+        }
+
         @Override
-        public StreamCodec<RegistryFriendlyByteBuf, GrinderRecipe> streamCodec() { return STREAM_CODEC; }
+        public GrinderRecipe fromNetwork(@Nonnull ResourceLocation recipeId,
+                                         @Nonnull FriendlyByteBuf buffer) {
+            var id = buffer.readResourceLocation();
+            Ingredient input = Ingredient.fromNetwork(buffer);
+            ItemStack output = buffer.readItem();
+
+            return new GrinderRecipe(id, input, output);
+        }
+
+        @Override
+        public void toNetwork(@Nonnull FriendlyByteBuf buffer,
+                              @Nonnull GrinderRecipe recipe) {
+            recipe.input.toNetwork(buffer);
+            buffer.writeItem(recipe.output);
+        }
     }
 }
