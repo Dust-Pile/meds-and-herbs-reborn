@@ -1,53 +1,75 @@
 package com.plank.meds_and_herbs.recipe;
 
-import com.mojang.serialization.MapCodec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
-import com.plank.meds_and_herbs.init.Items;
-import com.plank.meds_and_herbs.init.Recipes;
-import net.minecraft.core.HolderLookup;
+import com.google.gson.JsonObject;
+import com.plank.meds_and_herbs.init.MHRecipes;
 import net.minecraft.core.NonNullList;
-import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.GsonHelper;
+import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.*;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
+import net.minecraftforge.common.crafting.CraftingHelper;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
 import java.util.Optional;
 
-public record ExtractionRecipe(
-        DistillingIngredient powder,
-        DistillingIngredient solvent,
-        Optional<DistillingIngredient> emptyBottle,
-        ItemStack output,
-        ItemStack stillage
-) implements Recipe<ExtractionRecipeInput> {
+public class ExtractionRecipe implements Recipe<Container> {
     public static final int MAX_PROGRESS = 200;
 
+    private final ResourceLocation id;
+    private final Ingredient powder;
+    private final Ingredient solvent;
+    private final Optional<Ingredient> emptyBottle;
+    private final Ingredient filter;
+    private final ItemStack output;
+    private final ItemStack spillage;
+
+    public ExtractionRecipe(ResourceLocation id,
+                            Ingredient powder,
+                            Ingredient solvent,
+                            Optional<Ingredient> emptyBottle,
+                            Ingredient filter,
+                            ItemStack output,
+                            ItemStack spillage) {
+        this.id = id;
+        this.powder = powder;
+        this.solvent = solvent;
+        this.emptyBottle = emptyBottle;
+        this.filter = filter;
+        this.output = output;
+        this.spillage = spillage;
+    }
+
+    public Ingredient getPowder() { return powder; }
+    public Ingredient getSolvent() { return solvent; }
+    public Optional<Ingredient> getEmptyBottle() { return emptyBottle; }
+    public Ingredient getFilter() { return filter; }
+    public ItemStack getOutput() { return output; }
+    public ItemStack getSpillage() { return spillage; }
+
     @Override
-    public boolean matches(ExtractionRecipeInput inv, @Nonnull Level level) {
-        // 1. 检查粉末
-        if (!powder.test(inv.powder())) return false;
+    public boolean matches(@NotNull Container container, @NotNull Level level) {
+        if (!powder.test(container.getItem(0))) return false;
+        if (!solvent.test(container.getItem(1))) return false;
 
-        // 2. 检查溶剂
-        if (!solvent.test(inv.solvent())) return false;
-
-        // 3. 检查空瓶（如果配方需要）
+        ItemStack bottle = container.getItem(2);
         if (emptyBottle.isPresent()) {
-            if (!emptyBottle.get().test(inv.emptyBottle())) return false;
-        } else {
-            // 配方不需要空瓶，输入槽必须为空
-            if (!inv.emptyBottle().isEmpty()) return false;
+            if (!emptyBottle.get().test(bottle)) return false;
+        } else if (!bottle.isEmpty()) {
+            return false;
         }
 
-        // 4. 检查过滤棉
-        return inv.filter().is(Items.COTTON_FILTER.get());
+        return filter.test(container.getItem(3));
     }
 
     @Override
-    @Nonnull
-    public ItemStack assemble(@Nonnull ExtractionRecipeInput inv, @Nonnull HolderLookup.Provider registries) {
+    public @NotNull ItemStack assemble(@NotNull Container container, @NotNull RegistryAccess registries) {
         return output.copy();
     }
 
@@ -57,73 +79,92 @@ public record ExtractionRecipe(
     }
 
     @Override
-    @Nonnull
-    public ItemStack getResultItem(@Nonnull HolderLookup.Provider registries) {
+    public @NotNull ItemStack getResultItem(@NotNull RegistryAccess registries) {
         return output;
     }
 
     @Override
-    @Nonnull
-    public NonNullList<Ingredient> getIngredients() {
+    public @NotNull NonNullList<Ingredient> getIngredients() {
         NonNullList<Ingredient> list = NonNullList.create();
-        list.add(powder.ingredient());
-        list.add(solvent.ingredient());
-        emptyBottle.ifPresent(ing -> list.add(ing.ingredient()));
+        list.add(powder);
+        list.add(solvent);
+        emptyBottle.ifPresent(list::add);
+        list.add(filter);
         return list;
     }
 
     @Override
-    @Nonnull
-    public RecipeSerializer<?> getSerializer() {
-        return Recipes.EXTRACTION_SERIALIZER.get();
+    public @NotNull ResourceLocation getId() {
+        return id;
     }
 
     @Override
-    @Nonnull
-    public RecipeType<?> getType() {
-        return Recipes.EXTRACTION_TYPE.get();
+    public @NotNull RecipeSerializer<?> getSerializer() {
+        return MHRecipes.EXTRACTION_SERIALIZER.get();
     }
 
-    // ----- 序列化器 -----
+    @Override
+    public @NotNull RecipeType<?> getType() {
+        return MHRecipes.EXTRACTION_TYPE.get();
+    }
+
     public static class Serializer implements RecipeSerializer<ExtractionRecipe> {
         public static final Serializer INSTANCE = new Serializer();
 
         @Override
-        @Nonnull
-        public MapCodec<ExtractionRecipe> codec() {
-            return RecordCodecBuilder.mapCodec(inst -> inst.group(
-                    DistillingIngredient.CODEC.fieldOf("powder").forGetter(r -> r.powder),
-                    DistillingIngredient.CODEC.fieldOf("solvent").forGetter(r -> r.solvent),
-                    DistillingIngredient.CODEC.optionalFieldOf("emptyBottle").forGetter(r -> r.emptyBottle),
-                    ItemStack.CODEC.fieldOf("output").forGetter(r -> r.output),
-                    ItemStack.CODEC.optionalFieldOf("stillage", ItemStack.EMPTY).forGetter(r -> r.stillage)
-            ).apply(inst, ExtractionRecipe::new));
+        public @NotNull ExtractionRecipe fromJson(@NotNull ResourceLocation recipeId,
+                                                  @NotNull JsonObject json) {
+            Ingredient powder = Ingredient.fromJson(GsonHelper.getAsJsonObject(json, "powder"));
+            Ingredient solvent = Ingredient.fromJson(GsonHelper.getAsJsonObject(json, "solvent"));
+
+            Optional<Ingredient> emptyBottle = Optional.empty();
+            if (json.has("empty_bottle")) {
+                emptyBottle = Optional.of(Ingredient.fromJson(GsonHelper.getAsJsonObject(json, "empty_bottle")));
+            }
+
+            Ingredient filter = Ingredient.fromJson(GsonHelper.getAsJsonObject(json, "filter"));
+
+            ItemStack output = CraftingHelper.getItemStack(
+                    GsonHelper.getAsJsonObject(json, "output"), true);
+
+            ItemStack spillage = ItemStack.EMPTY;
+            if (json.has("spillage")) {
+                spillage = CraftingHelper.getItemStack(
+                        GsonHelper.getAsJsonObject(json, "spillage"), true);
+            }
+
+            return new ExtractionRecipe(recipeId, powder, solvent, emptyBottle, filter, output, spillage);
         }
 
         @Override
-        @Nonnull
-        public StreamCodec<RegistryFriendlyByteBuf, ExtractionRecipe> streamCodec() {
-            return StreamCodec.of(
-                    (buf, recipe) -> {
-                        DistillingIngredient.STREAM_CODEC.encode(buf, recipe.powder);
-                        DistillingIngredient.STREAM_CODEC.encode(buf, recipe.solvent);
-                        ByteBufCodecs.optional(DistillingIngredient.STREAM_CODEC)
-                                .encode(buf, recipe.emptyBottle);
-                        ItemStack.STREAM_CODEC.encode(buf, recipe.output);
-                        ByteBufCodecs.optional(ItemStack.STREAM_CODEC)
-                                .encode(buf, Optional.of(recipe.stillage).filter(s -> !s.isEmpty()));
-                    },
-                    buf -> {
-                        DistillingIngredient powder = DistillingIngredient.STREAM_CODEC.decode(buf);
-                        DistillingIngredient solvent = DistillingIngredient.STREAM_CODEC.decode(buf);
-                        Optional<DistillingIngredient> emptyBottle =
-                                ByteBufCodecs.optional(DistillingIngredient.STREAM_CODEC).decode(buf);
-                        ItemStack output = ItemStack.STREAM_CODEC.decode(buf);
-                        ItemStack stillage = ByteBufCodecs.optional(ItemStack.STREAM_CODEC)
-                                .decode(buf).orElse(ItemStack.EMPTY);
-                        return new ExtractionRecipe(powder, solvent, emptyBottle, output, stillage);
-                    }
-            );
+        public void toNetwork(@NotNull FriendlyByteBuf buf, @NotNull ExtractionRecipe recipe) {
+            recipe.powder.toNetwork(buf);
+            recipe.solvent.toNetwork(buf);
+
+            buf.writeBoolean(recipe.emptyBottle.isPresent());
+            recipe.emptyBottle.ifPresent(ing -> ing.toNetwork(buf));
+
+            recipe.filter.toNetwork(buf);
+            buf.writeItem(recipe.output);
+            buf.writeItem(recipe.spillage);
+        }
+
+        @Override
+        public @NotNull ExtractionRecipe fromNetwork(@NotNull ResourceLocation recipeId,
+                                                     @NotNull FriendlyByteBuf buf) {
+            Ingredient powder = Ingredient.fromNetwork(buf);
+            Ingredient solvent = Ingredient.fromNetwork(buf);
+
+            Optional<Ingredient> emptyBottle = Optional.empty();
+            if (buf.readBoolean()) {
+                emptyBottle = Optional.of(Ingredient.fromNetwork(buf));
+            }
+
+            Ingredient filter = Ingredient.fromNetwork(buf);
+            ItemStack output = buf.readItem();
+            ItemStack spillage = buf.readItem();
+
+            return new ExtractionRecipe(recipeId, powder, solvent, emptyBottle, filter, output, spillage);
         }
     }
 }

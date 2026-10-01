@@ -1,8 +1,8 @@
 package com.plank.meds_and_herbs.client.gui.menu;
 
 import com.plank.meds_and_herbs.block.entity.ExtractionApparatusBlockEntity;
-import com.plank.meds_and_herbs.init.Menus;
-import com.plank.meds_and_herbs.init.Tags;
+import com.plank.meds_and_herbs.init.MHMenus;
+import com.plank.meds_and_herbs.init.MHTags;
 import com.plank.meds_and_herbs.recipe.ExtractionRecipe;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -22,7 +22,7 @@ public class ExtractApparatusGUIMenu extends AbstractContainerMenu {
     private final ItemStackHandler handler;
 
     public ExtractApparatusGUIMenu(int id, Inventory inv, ExtractionApparatusBlockEntity be) {
-        super(Menus.EXTRACTION_APPARATUS_GUI.get(), id);
+        super(MHMenus.EXTRACTION_APPARATUS_GUI.get(), id);
         this.blockEntity = be;
         this.handler = be.getItemHandler();
         // 容量改为 2：索引0=进度，索引1=是否在烹饪
@@ -33,7 +33,7 @@ public class ExtractApparatusGUIMenu extends AbstractContainerMenu {
 
     // 安全降级构造器
     public ExtractApparatusGUIMenu(int id, Inventory inv) {
-        super(Menus.EXTRACTION_APPARATUS_GUI.get(), id);
+        super(MHMenus.EXTRACTION_APPARATUS_GUI.get(), id);
         this.blockEntity = null;
         this.handler = new ItemStackHandler(5);
         this.data = new SimpleContainerData(2);
@@ -97,13 +97,13 @@ public class ExtractApparatusGUIMenu extends AbstractContainerMenu {
             }
         } else {
             // 从玩家背包移动，根据物品类型匹配到对应槽位
-            if (stack.is(Tags.Items.POWDERS)) {
+            if (stack.is(MHTags.Items.POWDERS)) {
                 moveToSlot(stack, 0);
-            } else if (stack.is(Tags.Items.EMPTY_BOTTLE)) {
+            } else if (stack.is(MHTags.Items.EMPTY_BOTTLE)) {
                 moveToSlot(stack, 2);
-            } else if (stack.is(Tags.Items.MEDICINE)) {
+            } else if (stack.is(MHTags.Items.MEDICINE)) {
                 moveToSlot(stack, 1);
-            } else if (stack.is(Tags.Items.FILTER)) {
+            } else if (stack.is(MHTags.Items.FILTER)) {
                 moveToSlot(stack, 4);
             } else {
                 // 默认尝试放入槽2（输出/空瓶槽）
@@ -132,7 +132,7 @@ public class ExtractApparatusGUIMenu extends AbstractContainerMenu {
         if (!slots.get(slotIndex).mayPlace(stack)) return false;
         if (slots.get(slotIndex).hasItem()) {
             ItemStack existing = slots.get(slotIndex).getItem();
-            if (ItemStack.isSameItemSameComponents(existing, stack) &&
+            if (ItemStack.isSameItemSameTags(existing, stack) &&
                     existing.getCount() + stack.getCount() <= existing.getMaxStackSize()) {
                 existing.grow(stack.getCount());
                 stack.setCount(0);
