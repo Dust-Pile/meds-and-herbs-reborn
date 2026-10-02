@@ -2,6 +2,7 @@ package com.plank.meds_and_herbs.block;
 
 import com.plank.meds_and_herbs.MedsAndHerbs;
 import com.plank.meds_and_herbs.block.entity.ExtractionApparatusBlockEntity;
+import com.plank.meds_and_herbs.init.MHTags;
 import com.plank.meds_and_herbs.procedures.VoxelShapeHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -10,6 +11,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.*;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
@@ -30,7 +32,8 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.neoforged.neoforge.items.IItemHandler;
+import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.ItemStackHandler;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -41,7 +44,6 @@ import java.util.stream.IntStream;
 public class ExtractionApparatusBlock extends Block implements EntityBlock {
     public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
 
-    // 基准碰撞箱（朝北）
     private static final VoxelShape BASE_SHAPE = Shapes.or(
             Block.box(1, 0, 1, 15, 2, 15),
             Block.box(2, 2, 8, 8, 14, 14),
@@ -102,20 +104,13 @@ public class ExtractionApparatusBlock extends Block implements EntityBlock {
     public boolean canSurvive(@Nonnull BlockState state, @Nonnull LevelReader level, @Nonnull BlockPos pos) {
         BlockPos below = pos.below();
         return !level.isEmptyBlock(below) &&
-                !level.getBlockState(below).is(BlockTags.create(ResourceLocation.fromNamespaceAndPath(MedsAndHerbs.MODID, "stations")));
+                !level.getBlockState(below).is(MHTags.Blocks.STATIONS);
     }
 
     @Override
     @Nonnull
     public BlockState updateShape(BlockState state, @Nonnull Direction direction, @Nonnull BlockState neighborState, @Nonnull LevelAccessor level, @Nonnull BlockPos pos, @Nonnull BlockPos neighborPos) {
         return !state.canSurvive(level, pos) ? Blocks.AIR.defaultBlockState() : super.updateShape(state, direction, neighborState, level, pos, neighborPos);
-    }
-
-    @Override
-    @Nonnull
-    public List<ItemStack> getDrops(@Nonnull BlockState state, @Nonnull LootParams.Builder builder) {
-        List<ItemStack> dropsOriginal = super.getDrops(state, builder);
-        return dropsOriginal.isEmpty() ? Collections.singletonList(new ItemStack(this, 1)) : dropsOriginal;
     }
 
     @Override
@@ -139,21 +134,16 @@ public class ExtractionApparatusBlock extends Block implements EntityBlock {
     }
 
     @Override
-    @Nonnull
-    public ItemInteractionResult useItemOn(@Nonnull ItemStack stack, @Nonnull BlockState state, Level level, @Nonnull BlockPos pos, @Nonnull Player player, @Nonnull InteractionHand hand, @Nonnull BlockHitResult hit) {
+    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
         if (!level.isClientSide && player instanceof ServerPlayer serverPlayer) {
             BlockEntity be = level.getBlockEntity(pos);
             if (be instanceof MenuProvider menuProvider) {
-                serverPlayer.openMenu(menuProvider, pos);
+                serverPlayer.openMenu(menuProvider);
+                return InteractionResult.SUCCESS;
             }
         }
-        return ItemInteractionResult.SUCCESS;
-    }
 
-    @Override
-    @Nonnull
-    public InteractionResult useWithoutItem(@Nonnull BlockState state, @Nonnull Level level, @Nonnull BlockPos pos, @Nonnull Player player, @Nonnull BlockHitResult hit) {
-        return useItemOn(ItemStack.EMPTY, state, level, pos, player, InteractionHand.MAIN_HAND, hit).result();
+        return InteractionResult.PASS;
     }
 
     @Nullable
