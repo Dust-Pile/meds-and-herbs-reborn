@@ -1,5 +1,6 @@
 package com.plank.meds_and_herbs.client.jade;
 
+import com.plank.meds_and_herbs.MedsAndHerbs;
 import com.plank.meds_and_herbs.block.entity.FermentationBarrelBlockEntity;
 import com.plank.meds_and_herbs.recipe.FermentationRecipe;
 import net.minecraft.ChatFormatting;
@@ -38,16 +39,13 @@ public enum FermentationBarrelComponentProvider implements IBlockComponentProvid
             return;
         }
 
-        int count = items.size();
-
-        if (count < 5) {
-            // 1-4 个：小图标 + 灰色名称，每行一个
+        if (items.size() < 5) {
             for (ItemStack stack : items) {
                 tooltip.add(elements.smallItem(stack));
-                tooltip.append(elements.text(stack.getHoverName().plainCopy().withStyle(ChatFormatting.GRAY)));
+                tooltip.append(elements.text(
+                        stack.getHoverName().plainCopy().withStyle(ChatFormatting.GRAY)));
             }
         } else {
-            // 5-9 个：大图标，水平排列一行
             boolean first = true;
             for (ItemStack stack : items) {
                 if (first) {
@@ -59,17 +57,18 @@ public enum FermentationBarrelComponentProvider implements IBlockComponentProvid
             }
         }
 
-        // 进度
-        int progress = barrel.getProgress();
-        if (progress > 0) {
+        var data = accessor.getServerData();
+        if (data.getBoolean("running")) {
+            var progress = data.getInt("progress");
             int percent = progress * 100 / FermentationRecipe.DEFAULT_COOKING_TIME;
-            tooltip.add(elements.text(Component.translatable("jade.meds_and_herbs.fermentation_progress", percent)
-                    .withStyle(ChatFormatting.AQUA)));
+            tooltip.add(elements.text(
+                    Component.translatable("jade.meds_and_herbs.fermentation_progress", percent)
+                            .withStyle(ChatFormatting.AQUA)));
         }
     }
 
     @Override
     public ResourceLocation getUid() {
-        return ResourceLocation.fromNamespaceAndPath("meds_and_herbs", "fermentation_barrel_provider");
+        return MedsAndHerbs.id("fermentation_barrel_provider");
     }
 }

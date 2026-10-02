@@ -4,6 +4,10 @@ import com.plank.meds_and_herbs.block.DistilleryApparatusBlock;
 import com.plank.meds_and_herbs.block.ExtractionApparatusBlock;
 import com.plank.meds_and_herbs.block.FermentationBarrelBlock;
 import com.plank.meds_and_herbs.block.IncubatorBlock;
+import com.plank.meds_and_herbs.block.entity.DistilleryApparatusBlockEntity;
+import com.plank.meds_and_herbs.block.entity.ExtractionApparatusBlockEntity;
+import com.plank.meds_and_herbs.block.entity.FermentationBarrelBlockEntity;
+import com.plank.meds_and_herbs.block.entity.IncubatorBlockEntity;
 import snownee.jade.api.IWailaClientRegistration;
 import snownee.jade.api.IWailaCommonRegistration;
 import snownee.jade.api.IWailaPlugin;
@@ -14,12 +18,14 @@ public class MedsAndHerbsJadePlugin implements IWailaPlugin {
 
     @Override
     public void register(IWailaCommonRegistration registration) {
-        // 无需注册数据提供者
+        registration.registerBlockDataProvider(DistilleryApparatusDataProvider.INSTANCE, DistilleryApparatusBlockEntity.class);
+        registration.registerBlockDataProvider(ExtractionApparatusDataProvider.INSTANCE, ExtractionApparatusBlockEntity.class);
+        registration.registerBlockDataProvider(FermentationBarrelDataProvider.INSTANCE, FermentationBarrelBlockEntity.class);
+        registration.registerBlockDataProvider(IncubatorDataProvider.INSTANCE, IncubatorBlockEntity.class);
     }
 
     @Override
     public void registerClient(IWailaClientRegistration registration) {
-        // ---- 注册自定义组件 ----
         registration.registerBlockComponent(FermentationBarrelComponentProvider.INSTANCE, FermentationBarrelBlock.class);
         registration.registerBlockComponent(IncubatorComponentProvider.INSTANCE, IncubatorBlock.class);
         registration.registerBlockComponent(DistilleryApparatusComponentProvider.INSTANCE, DistilleryApparatusBlock.class);
