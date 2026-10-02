@@ -1,7 +1,8 @@
 package com.plank.meds_and_herbs.block;
 
-import com.plank.meds_and_herbs.init.Effects;
+import com.plank.meds_and_herbs.init.MHEffects;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.player.Player;
@@ -12,8 +13,6 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.phys.BlockHitResult;
-
-import javax.annotation.Nonnull;
 
 public class BelladonnaPieBlock extends CakeBlock {
     public BelladonnaPieBlock() {
@@ -26,17 +25,12 @@ public class BelladonnaPieBlock extends CakeBlock {
     }
 
     @Override
-    @Nonnull
-    public InteractionResult useWithoutItem(@Nonnull BlockState state, @Nonnull Level level,
-                                            @Nonnull BlockPos pos, @Nonnull Player player,
-                                            @Nonnull BlockHitResult hit) {
-        // 检查玩家是否能够进食（非满饥饿）
+    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
         if (!player.canEat(false)) {
             return InteractionResult.PASS;
         }
 
-        // 调用原版蛋糕的食用逻辑（减少一片，增加 2 饥饿值 + 0.1 饱和度）
-        InteractionResult result = super.useWithoutItem(state, level, pos, player, hit);
+        InteractionResult result = super.use(state, level, pos, player, hand, hit);
 
         if (result.consumesAction() && !level.isClientSide) {
             applyBelladonnaEffect(player);
@@ -46,16 +40,14 @@ public class BelladonnaPieBlock extends CakeBlock {
     }
 
     private void applyBelladonnaEffect(Player player) {
-        var effect = Effects.BELLADONNA_BERRY;
+        var effect = MHEffects.BELLADONNA_BERRY.get();
         MobEffectInstance existing = player.getEffect(effect);
 
         if (existing != null) {
-            // 已有效果：持续时间 +600 刻（30秒），等级 +1
             int newDuration = existing.getDuration() + 600;
             int newAmplifier = existing.getAmplifier() + 1;
             player.addEffect(new MobEffectInstance(effect, newDuration, newAmplifier));
         } else {
-            // 新效果：持续 600 刻（30秒），等级 0
             player.addEffect(new MobEffectInstance(effect, 600, 0));
         }
     }
