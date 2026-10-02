@@ -5,7 +5,10 @@ import com.plank.meds_and_herbs.procedures.VoxelShapeHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.*;
+import net.minecraft.world.Containers;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -24,7 +27,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.neoforged.neoforge.items.ItemStackHandler;
+import net.minecraftforge.items.ItemStackHandler;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -32,9 +35,8 @@ import javax.annotation.Nullable;
 public class IncubatorBlock extends Block implements EntityBlock {
     public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
 
-    // 台阶形状碰撞箱
     private static final VoxelShape BASE_SHAPE = Shapes.or(
-            Block.box(0, 0, 0, 16, 8, 16)   // 主体
+            Block.box(0, 0, 0, 16, 8, 16)
     );
 
     public IncubatorBlock() {
@@ -93,28 +95,17 @@ public class IncubatorBlock extends Block implements EntityBlock {
         return RenderShape.MODEL;
     }
 
-    // ================== GUI 交互（完全复制蒸馏器风格） ==================
-
     @Override
     @Nonnull
-    public ItemInteractionResult useItemOn(@Nonnull ItemStack stack, @Nonnull BlockState state, Level level,
-                                           @Nonnull BlockPos pos, @Nonnull Player player,
-                                           @Nonnull InteractionHand hand, @Nonnull BlockHitResult hit) {
+    public InteractionResult use(@Nonnull BlockState state, @Nonnull Level level, @Nonnull BlockPos pos,
+                                 @Nonnull Player player, @Nonnull InteractionHand hand, @Nonnull BlockHitResult hit) {
         if (!level.isClientSide && player instanceof ServerPlayer serverPlayer) {
             BlockEntity be = level.getBlockEntity(pos);
             if (be instanceof MenuProvider menuProvider) {
-                serverPlayer.openMenu(menuProvider, pos);
+                serverPlayer.openMenu(menuProvider);
             }
         }
-        return ItemInteractionResult.SUCCESS;
-    }
-
-    @Override
-    @Nonnull
-    public InteractionResult useWithoutItem(@Nonnull BlockState state, @Nonnull Level level, @Nonnull BlockPos pos,
-                                            @Nonnull Player player, @Nonnull BlockHitResult hit) {
-        // 空手时直接调用上面的方法（传入空物品栈即可）
-        return useItemOn(ItemStack.EMPTY, state, level, pos, player, InteractionHand.MAIN_HAND, hit).result();
+        return InteractionResult.sidedSuccess(level.isClientSide);
     }
 
     @Override
@@ -123,8 +114,6 @@ public class IncubatorBlock extends Block implements EntityBlock {
         BlockEntity be = level.getBlockEntity(pos);
         return be instanceof MenuProvider ? (MenuProvider) be : null;
     }
-
-    // ================== 方块实体 ==================
 
     @Nullable
     @Override
@@ -143,9 +132,11 @@ public class IncubatorBlock extends Block implements EntityBlock {
             }
         };
     }
-    // ========== 破坏时掉落物品（必须实现） ==========
+
     @Override
     public void onRemove(BlockState state, @Nonnull Level level, @Nonnull BlockPos pos, BlockState newState, boolean moved) {
+        if (level.isClientSide()) return;
+
         if (!state.is(newState.getBlock())) {
             BlockEntity be = level.getBlockEntity(pos);
             if (be instanceof IncubatorBlockEntity incubator) {
@@ -158,11 +149,10 @@ public class IncubatorBlock extends Block implements EntityBlock {
                 }
                 level.updateNeighbourForOutputSignal(pos, this);
             }
-            super.onRemove(state, level, pos, newState, moved);
         }
+        super.onRemove(state, level, pos, newState, moved);
     }
 
-    // ========== 红石比较器支持（可选，但推荐） ==========
     @Override
     public boolean hasAnalogOutputSignal(@Nonnull BlockState state) {
         return true;

@@ -1,37 +1,35 @@
 package com.plank.meds_and_herbs.block.entity;
 
 import com.plank.meds_and_herbs.client.gui.menu.IncubatorGUIMenu;
-import com.plank.meds_and_herbs.data.PetriDishData;
-import com.plank.meds_and_herbs.init.BlockEntities;
-import com.plank.meds_and_herbs.init.DataComponents;
-import com.plank.meds_and_herbs.init.Recipes;
+import com.plank.meds_and_herbs.init.MHBlockEntities;
+import com.plank.meds_and_herbs.init.MHRecipes;
 import com.plank.meds_and_herbs.recipe.IncubatorRecipe;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.world.Container;
 import net.minecraft.world.MenuProvider;
+import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.inventory.SimpleContainerData;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.RecipeHolder;
-import net.minecraft.world.item.crafting.SingleRecipeInput;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.items.ItemStackHandler;
+import net.minecraftforge.items.ItemStackHandler;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Optional;
 
-public class IncubatorBlockEntity extends BlockEntity implements MenuProvider {
+public class IncubatorBlockEntity extends BlockEntity implements MenuProvider, Container {
+
     private final ItemStackHandler itemHandler = new ItemStackHandler(8) {
         @Override
         public int getSlotLimit(int slot) {
@@ -44,55 +42,73 @@ public class IncubatorBlockEntity extends BlockEntity implements MenuProvider {
             if (level != null && !level.isClientSide) {
                 level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
             }
-        }
-
-        @Override
-        public boolean isItemValid(int slot, @Nonnull ItemStack stack) {
-            if (level == null) return false;
-            SingleRecipeInput input = new SingleRecipeInput(stack);
-            return level.getRecipeManager()
-                    .getRecipeFor(Recipes.INCUBATOR_TYPE.get(), input, level)
-                    .isPresent();
-        }
-
-        // 🔥 核心修改：检测物品是否有孵化器配方，有则禁止提取，无则允许提取
-        @Override
-        @Nonnull
-        public ItemStack extractItem(int slot, int amount, boolean simulate) {
-            ItemStack stack = getStackInSlot(slot);
-            if (stack.isEmpty() || level == null) {
-                return ItemStack.EMPTY;
-            }
-
-            // 检查物品是否匹配任何孵化器配方（即是否为原料）
-            SingleRecipeInput input = new SingleRecipeInput(stack);
-            boolean hasRecipe = level.getRecipeManager()
-                    .getRecipeFor(Recipes.INCUBATOR_TYPE.get(), input, level)
-                    .isPresent();
-
-            if (hasRecipe) {
-                // 有配方 → 原料，不允许提取
-                return ItemStack.EMPTY;
-            }
-
-            // 没有配方 → 产物或无关物品，允许提取
-            return super.extractItem(slot, amount, simulate);
+            updateContainerData();
         }
     };
 
     private final IncubatorRecipe[] currentRecipe = new IncubatorRecipe[8];
     private final ItemStack[] lastStacks = new ItemStack[8];
-    private final ContainerData data = new SimpleContainerData(16) {
-        @Override
-        public void set(int index, int value) {
-            // 只读，客户端不能修改
-        }
-    };
+
+    private final ContainerData data = new SimpleContainerData(6);
 
     public IncubatorBlockEntity(BlockPos pos, BlockState state) {
-        super(BlockEntities.INCUBATOR.get(), pos, state);
+        super(MHBlockEntities.INCUBATOR.get(), pos, state);
         for (int i = 0; i < 8; i++) {
             lastStacks[i] = ItemStack.EMPTY;
+        }
+    }
+
+    @Override
+    public int getContainerSize() {
+        return 8;
+    }
+
+    @Override
+    public boolean isEmpty() {
+        for (int i = 0; i < 8; i++) {
+            if (!itemHandler.getStackInSlot(i).isEmpty()) return false;
+        }
+        return true;
+    }
+
+    @Override
+    @Nonnull
+    public ItemStack getItem(int slot) {
+        return itemHandler.getStackInSlot(slot);
+    }
+
+    @Override
+    @Nonnull
+    public ItemStack removeItem(int slot, int amount) {
+        return itemHandler.extractItem(slot, amount, false);
+    }
+
+    @Override
+    @Nonnull
+    public ItemStack removeItemNoUpdate(int slot) {
+        ItemStack stack = itemHandler.getStackInSlot(slot);
+        itemHandler.setStackInSlot(slot, ItemStack.EMPTY);
+        return stack;
+    }
+
+    @Override
+    public void setItem(int slot, @Nonnull ItemStack stack) {
+        itemHandler.setStackInSlot(slot, stack);
+    }
+
+    @Override
+    public boolean stillValid(@Nonnull Player player) {
+        if (level == null || level.getBlockEntity(worldPosition) != this) return false;
+        return player.distanceToSqr(
+                worldPosition.getX() + 0.5,
+                worldPosition.getY() + 0.5,
+                worldPosition.getZ() + 0.5) <= 64.0;
+    }
+
+    @Override
+    public void clearContent() {
+        for (int i = 0; i < 8; i++) {
+            itemHandler.setStackInSlot(i, ItemStack.EMPTY);
         }
     }
 
@@ -100,6 +116,7 @@ public class IncubatorBlockEntity extends BlockEntity implements MenuProvider {
         if (level.isClientSide) return;
 
         boolean dirty = false;
+
         for (int slot = 0; slot < 8; slot++) {
             ItemStack stack = itemHandler.getStackInSlot(slot);
 
@@ -112,54 +129,43 @@ public class IncubatorBlockEntity extends BlockEntity implements MenuProvider {
                 continue;
             }
 
-            // 检测物品是否变化（只比较物品类型，忽略组件）
-            if (stack.getItem() != lastStacks[slot].getItem()) {
+            if (!ItemStack.isSameItemSameTags(stack, lastStacks[slot])) {
                 currentRecipe[slot] = null;
                 lastStacks[slot] = stack.copy();
                 dirty = true;
             }
 
             if (currentRecipe[slot] == null) {
-                SingleRecipeInput input = new SingleRecipeInput(stack);
-                Optional<IncubatorRecipe> recipeOpt = level.getRecipeManager()
-                        .getRecipeFor(Recipes.INCUBATOR_TYPE.get(), input, level)
-                        .map(RecipeHolder::value);
-                if (recipeOpt.isPresent()) {
-                    currentRecipe[slot] = recipeOpt.get();
-                } else {
-                    continue;
-                }
+                currentRecipe[slot] = findRecipe(level, stack).orElse(null);
+                if (currentRecipe[slot] == null) continue;
             }
 
             IncubatorRecipe recipe = currentRecipe[slot];
-            PetriDishData dishData = stack.get(DataComponents.PETRI_DISH_DATA.get());
+            int progress = -1;
+            int maxProgress = 0;
 
-            if (dishData == null) {
-                dishData = new PetriDishData(0, recipe.processingTime());
-                stack.set(DataComponents.PETRI_DISH_DATA.get(), dishData);
-                itemHandler.setStackInSlot(slot, stack);
-                dirty = true;
-            } else {
-                if (dishData.maxProgress() != recipe.processingTime()) {
-                    dishData = new PetriDishData(0, recipe.processingTime());
-                    stack.set(DataComponents.PETRI_DISH_DATA.get(), dishData);
-                    itemHandler.setStackInSlot(slot, stack);
-                    dirty = true;
-                }
+            var tag = stack.getTag();
+            if (tag != null && tag.contains("PetriDishData", CompoundTag.TAG_COMPOUND)) {
+                progress = tag.getCompound("PetriDishData").getInt("progress");
+                maxProgress = tag.getCompound("PetriDishData").getInt("maxProgress");
             }
 
-            if (dishData.isComplete()) {
-                // 完成处理：手动清空槽位（不通过 extractItem，避免被拦截）
-                // 先保存输入用于配方匹配（但此处不需要，因为已经匹配了）
-                ItemStack consumed = stack.copy();
-                itemHandler.setStackInSlot(slot, ItemStack.EMPTY); // 清空
+            if (progress < 0 || maxProgress != recipe.getProcessingTime()) {
+                progress = 0;
+                maxProgress = recipe.getProcessingTime();
 
-                SingleRecipeInput input = new SingleRecipeInput(consumed);
-                ItemStack output = recipe.assemble(input, level.registryAccess());
-                if (!output.isEmpty()) {
-                    // 产物放入槽位（产物通常没有 PetriDishData 组件）
-                    itemHandler.setStackInSlot(slot, output);
-                }
+                CompoundTag petri = new CompoundTag();
+                petri.putInt("progress", progress);
+                petri.putInt("maxProgress", maxProgress);
+                stack.getOrCreateTag().put("PetriDishData", petri);
+
+                itemHandler.setStackInSlot(slot, stack);
+                dirty = true;
+            }
+
+            if (progress >= maxProgress) {
+                ItemStack output = recipe.assemble(this, level.registryAccess());
+                itemHandler.setStackInSlot(slot, output);
 
                 currentRecipe[slot] = null;
                 lastStacks[slot] = ItemStack.EMPTY;
@@ -167,14 +173,13 @@ public class IncubatorBlockEntity extends BlockEntity implements MenuProvider {
                 continue;
             }
 
-            // 增加进度
-            if (level.random.nextFloat() < 0.05f) {
-                int newProgress = Math.min(dishData.progress() + 1, dishData.maxProgress());
-                PetriDishData newData = new PetriDishData(newProgress, dishData.maxProgress());
-                stack.set(DataComponents.PETRI_DISH_DATA.get(), newData);
-                itemHandler.setStackInSlot(slot, stack);
-                dirty = true;
-            }
+            CompoundTag petri = new CompoundTag();
+            petri.putInt("progress", progress + 1);
+            petri.putInt("maxProgress", maxProgress);
+            stack.getOrCreateTag().put("PetriDishData", petri);
+
+            itemHandler.setStackInSlot(slot, stack);
+            dirty = true;
         }
 
         if (dirty) {
@@ -184,29 +189,46 @@ public class IncubatorBlockEntity extends BlockEntity implements MenuProvider {
         }
     }
 
+    private Optional<IncubatorRecipe> findRecipe(Level level, ItemStack stack) {
+        SimpleContainer container = new SimpleContainer(stack);
+        return level.getRecipeManager()
+                .getRecipeFor(MHRecipes.INCUBATOR_TYPE.get(), container, level);
+    }
+
     public void updateContainerData() {
         for (int i = 0; i < 8; i++) {
             ItemStack stack = itemHandler.getStackInSlot(i);
-            if (stack.isEmpty() || !stack.has(DataComponents.PETRI_DISH_DATA.get())) {
+            if (stack.isEmpty()) {
+                data.set(i, 0);
+                data.set(i + 8, 0);
+                continue;
+            }
+
+            int progress = -1;
+            int maxProgress = 0;
+
+            var tag = stack.getTag();
+            if (tag != null && tag.contains("PetriDishData", CompoundTag.TAG_COMPOUND)) {
+                progress = tag.getCompound("PetriDishData").getInt("progress");
+                maxProgress = tag.getCompound("PetriDishData").getInt("maxProgress");
+            }
+
+            if (progress < 0) {
                 data.set(i, 0);
                 data.set(i + 8, 0);
             } else {
-                PetriDishData dishData = stack.get(DataComponents.PETRI_DISH_DATA.get());
-                if (dishData != null) {
-                    data.set(i, dishData.progress());
-                    data.set(i + 8, dishData.maxProgress());
-                }
+                data.set(i, progress);
+                data.set(i + 8, maxProgress);
             }
         }
     }
 
-    public ItemStackHandler getItemHandler() {
-        return itemHandler;
+    public ContainerData getContainerData() {
+        return data;
     }
 
-    public ItemStack getItemInSlot(int slot) {
-        return itemHandler.getStackInSlot(slot);
-    }
+    public ItemStackHandler getItemHandler() { return itemHandler; }
+    public ItemStack getItemInSlot(int slot) { return itemHandler.getStackInSlot(slot); }
 
     @Override
     @Nonnull
@@ -227,48 +249,28 @@ public class IncubatorBlockEntity extends BlockEntity implements MenuProvider {
 
     @Override
     @Nonnull
-    public CompoundTag getUpdateTag(@Nonnull HolderLookup.Provider registries) {
-        CompoundTag tag = new CompoundTag();
-        saveAdditional(tag, registries);
-        return tag;
+    public CompoundTag getUpdateTag() {
+        return saveWithoutMetadata();
     }
 
     @Override
-    public void handleUpdateTag(@Nonnull CompoundTag tag, @Nonnull HolderLookup.Provider registries) {
-        loadAdditional(tag, registries);
+    public void handleUpdateTag(@Nonnull CompoundTag tag) {
+        load(tag);
     }
 
     @Override
-    protected void saveAdditional(@Nonnull CompoundTag tag, @Nonnull HolderLookup.Provider registries) {
-        super.saveAdditional(tag, registries);
-        tag.put("inventory", itemHandler.serializeNBT(registries));
-        CompoundTag lastTag = new CompoundTag();
-        for (int i = 0; i < 8; i++) {
-            if (!lastStacks[i].isEmpty()) {
-                lastTag.put("slot_" + i, lastStacks[i].save(registries));
-            }
-        }
-        if (!lastTag.isEmpty()) {
-            tag.put("lastStacks", lastTag);
-        }
+    protected void saveAdditional(@Nonnull CompoundTag tag) {
+        super.saveAdditional(tag);
+        tag.put("inventory", itemHandler.serializeNBT());
     }
 
     @Override
-    protected void loadAdditional(@Nonnull CompoundTag tag, @Nonnull HolderLookup.Provider registries) {
-        super.loadAdditional(tag, registries);
-        itemHandler.deserializeNBT(registries, tag.getCompound("inventory"));
-        if (tag.contains("lastStacks")) {
-            CompoundTag lastTag = tag.getCompound("lastStacks");
-            for (int i = 0; i < 8; i++) {
-                if (lastTag.contains("slot_" + i)) {
-                    lastStacks[i] = ItemStack.parse(registries, lastTag.getCompound("slot_" + i)).orElse(ItemStack.EMPTY);
-                } else {
-                    lastStacks[i] = ItemStack.EMPTY;
-                }
-            }
-        }
+    public void load(@Nonnull CompoundTag tag) {
+        super.load(tag);
+        itemHandler.deserializeNBT(tag.getCompound("inventory"));
         for (int i = 0; i < 8; i++) {
             currentRecipe[i] = null;
+            lastStacks[i] = ItemStack.EMPTY;
         }
         updateContainerData();
     }
