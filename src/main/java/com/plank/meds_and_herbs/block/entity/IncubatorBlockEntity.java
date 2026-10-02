@@ -5,6 +5,7 @@ import com.plank.meds_and_herbs.init.MHBlockEntities;
 import com.plank.meds_and_herbs.init.MHRecipes;
 import com.plank.meds_and_herbs.recipe.IncubatorRecipe;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
@@ -22,6 +23,9 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
+import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.ItemStackHandler;
 
 import javax.annotation.Nonnull;
@@ -56,6 +60,15 @@ public class IncubatorBlockEntity extends BlockEntity implements MenuProvider, C
         for (int i = 0; i < 8; i++) {
             lastStacks[i] = ItemStack.EMPTY;
         }
+    }
+
+    @Nonnull
+    @Override
+    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
+        if (cap == ForgeCapabilities.ITEM_HANDLER) {
+            return LazyOptional.of(this::getItemHandler).cast();
+        }
+        return super.getCapability(cap, side);
     }
 
     @Override

@@ -6,6 +6,7 @@ import com.plank.meds_and_herbs.init.MHSounds;
 import com.plank.meds_and_herbs.procedures.LoadItemList;
 import com.plank.meds_and_herbs.recipe.FermentationRecipe;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
@@ -24,6 +25,9 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
+import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.ItemStackHandler;
 import org.jetbrains.annotations.NotNull;
 
@@ -77,6 +81,15 @@ public class FermentationBarrelBlockEntity extends BlockEntity implements Contai
 
     public FermentationBarrelBlockEntity(BlockPos pos, BlockState state) {
         super(MHBlockEntities.FERMENTATION_BARREL.get(), pos, state);
+    }
+
+    @Nonnull
+    @Override
+    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
+        if (cap == ForgeCapabilities.ITEM_HANDLER) {
+            return LazyOptional.of(this::getItemHandler).cast();
+        }
+        return super.getCapability(cap, side);
     }
 
     @Override public int getContainerSize() { return 8; }

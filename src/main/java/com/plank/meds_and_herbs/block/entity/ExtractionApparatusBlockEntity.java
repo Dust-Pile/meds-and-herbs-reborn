@@ -26,6 +26,9 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
+import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 
@@ -112,6 +115,15 @@ public class ExtractionApparatusBlockEntity extends BlockEntity implements MenuP
 
     public ExtractionApparatusBlockEntity(BlockPos pos, BlockState state) {
         super(MHBlockEntities.EXTRACTION_APPARATUS.get(), pos, state);
+    }
+
+    @Nonnull
+    @Override
+    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
+        if (cap == ForgeCapabilities.ITEM_HANDLER) {
+            return LazyOptional.of(() -> getHandlerForSide(side)).cast();
+        }
+        return super.getCapability(cap, side);
     }
 
     @Override public int getContainerSize() { return 5; }
