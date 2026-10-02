@@ -17,19 +17,19 @@ public class MHTags {
         public static final TagKey<Item> POWDERS = tag("powders");
         public static final TagKey<Item> FILTER = tag("filter");
         public static final TagKey<Item> EMPTY_BOTTLE = tag("empty_bottle");
-        // 花朵标签：包含模组自带的花 + 原版小花
-        public static final TagKey<Item> FLOWERS = tag("flowers");
 
         private static TagKey<Item> tag(String name) {
             return TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath(MedsAndHerbs.MODID, name));
         }
     }
+
     public static final class Blocks {
         public static final TagKey<Block> STATIONS = tag("stations");
         private static TagKey<Block> tag(String name) {
             return TagKey.create(Registries.BLOCK, ResourceLocation.fromNamespaceAndPath(MedsAndHerbs.MODID, name));
         }
     }
+
     public static final class DamageTypes {
         public static final TagKey<DamageType> FIRE = tag("fire");
         public  static final TagKey<DamageType> PHYSICAL = tag("physical");
