@@ -11,8 +11,8 @@ import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.inventory.SimpleContainerData;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.items.ItemStackHandler;
-import net.neoforged.neoforge.items.SlotItemHandler;
+import net.minecraftforge.items.ItemStackHandler;
+import net.minecraftforge.items.SlotItemHandler;
 
 import javax.annotation.Nonnull;
 
@@ -65,7 +65,7 @@ public class ExtractApparatusGUIMenu extends AbstractContainerMenu {
         super.broadcastChanges();
         if (blockEntity != null) {
             data.set(0, blockEntity.getProgress());
-            data.set(1, blockEntity.isCooking() ? 1 : 0);
+            data.set(1, blockEntity.isRunning() ? 1 : 0);
         }
     }
 

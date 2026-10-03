@@ -5,6 +5,7 @@ import com.plank.meds_and_herbs.item.Medicine;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraftforge.common.BasicItemListing;
 import net.minecraftforge.event.village.VillagerTradesEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -12,7 +13,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import java.util.List;
 
 public class MHVillagerTrades {
-    static Item EMERALD = net.minecraft.world.item.Items.EMERALD;
+    static Item EMERALD = Items.EMERALD;
 
     @SubscribeEvent
     public static void registerTrades(VillagerTradesEvent event) {
@@ -47,10 +48,10 @@ public class MHVillagerTrades {
         ));
 
         trades.get(4).addAll(List.of(
-                medicineTrade(32, MedsType.GLUCOSE, net.minecraft.world.item.Items.SUGAR),
+                medicineTrade(32, MedsType.GLUCOSE, Items.SUGAR),
                 medicineTrade(32, MedsType.ALOE, MHItems.BARK.get()),
-                medicineTrade(32, MedsType.MUSHROOM, net.minecraft.world.item.Items.BROWN_MUSHROOM),
-                medicineTrade(32, MedsType.CAFFEINE, net.minecraft.world.item.Items.COCOA_BEANS)
+                medicineTrade(32, MedsType.MUSHROOM, Items.BROWN_MUSHROOM),
+                medicineTrade(32, MedsType.CAFFEINE, Items.COCOA_BEANS)
         ));
 
         trades.get(5).addAll(List.of(

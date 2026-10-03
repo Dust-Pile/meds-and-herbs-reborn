@@ -10,7 +10,7 @@ public record MedicineDefinition(
         Type type,
         int color,
         ResourceLocation functionPath,
-        List<ResourceLocation> cures   // 可治愈的效果 ID 列表
+        List<ResourceLocation> cures
 ) {
     protected enum Type { INTERNAL, EXTERNAL }
     public boolean isInternal() {

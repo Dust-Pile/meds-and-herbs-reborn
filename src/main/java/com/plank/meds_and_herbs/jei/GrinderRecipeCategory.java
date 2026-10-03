@@ -1,6 +1,7 @@
 package com.plank.meds_and_herbs.jei;
 
-import com.plank.meds_and_herbs.init.Items;
+import com.plank.meds_and_herbs.init.MHItems;
+import com.plank.meds_and_herbs.recipe.GrinderRecipe;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.builder.ITooltipBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
@@ -17,13 +18,11 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.item.crafting.Recipe;
-import net.minecraft.world.item.crafting.SingleRecipeInput;
 
 import javax.annotation.Nonnull;
 import java.util.List;
 
-public class GrinderRecipeCategory implements IRecipeCategory<Recipe<SingleRecipeInput>> {
+public class GrinderRecipeCategory implements IRecipeCategory<GrinderRecipe> {
 
     private final IDrawable icon;
     private final IDrawable slotBackground;
@@ -31,7 +30,7 @@ public class GrinderRecipeCategory implements IRecipeCategory<Recipe<SingleRecip
     private final IDrawableAnimated arrow;
 
     public GrinderRecipeCategory(IGuiHelper guiHelper) {
-        this.icon = guiHelper.createDrawableItemStack(new ItemStack(Items.GRINDER.get()));
+        this.icon = guiHelper.createDrawableItemStack(new ItemStack(MHItems.GRINDER.get()));
         this.slotBackground = guiHelper.getSlotDrawable();
         this.arrowBackground = guiHelper.getRecipeArrow();
         this.arrow = guiHelper.createAnimatedRecipeArrow(200);
@@ -39,7 +38,7 @@ public class GrinderRecipeCategory implements IRecipeCategory<Recipe<SingleRecip
 
     @Override
     @Nonnull
-    public RecipeType<Recipe<SingleRecipeInput>> getRecipeType() {
+    public RecipeType<GrinderRecipe> getRecipeType() {
         return MedsAndHerbsJEIPlugin.GRINDER_TYPE;
     }
 
@@ -65,11 +64,10 @@ public class GrinderRecipeCategory implements IRecipeCategory<Recipe<SingleRecip
     }
 
     @Override
-    public void setRecipe(@Nonnull IRecipeLayoutBuilder builder, Recipe<SingleRecipeInput> recipe, @Nonnull IFocusGroup focuses) {
-        // ---- 输入 ----
+    public void setRecipe(@Nonnull IRecipeLayoutBuilder builder, GrinderRecipe recipe, @Nonnull IFocusGroup focuses) {
         var ingredients = recipe.getIngredients();
         if (!ingredients.isEmpty()) {
-            Ingredient inputIng = ingredients.getFirst();
+            Ingredient inputIng = ingredients.get(0);
             if (!inputIng.isEmpty()) {
                 builder.addSlot(RecipeIngredientRole.INPUT, 10, 25)
                         .setBackground(slotBackground, -1, -1)
@@ -77,7 +75,6 @@ public class GrinderRecipeCategory implements IRecipeCategory<Recipe<SingleRecip
             }
         }
 
-        // ---- 输出 ----
         ItemStack output;
         if (Minecraft.getInstance().level != null) {
             output = recipe.getResultItem(Minecraft.getInstance().level.registryAccess());
@@ -90,20 +87,17 @@ public class GrinderRecipeCategory implements IRecipeCategory<Recipe<SingleRecip
     }
 
     @Override
-    public void draw(@Nonnull Recipe<SingleRecipeInput> recipe, @Nonnull IRecipeSlotsView recipeSlotsView, @Nonnull GuiGraphics guiGraphics, double mouseX, double mouseY) {
-        // ---- 动态箭头 ----
+    public void draw(@Nonnull GrinderRecipe recipe, @Nonnull IRecipeSlotsView recipeSlotsView, @Nonnull GuiGraphics guiGraphics, double mouseX, double mouseY) {
         arrowBackground.draw(guiGraphics, 48, 25);
         arrow.draw(guiGraphics, 48, 25);
 
     }
 
     @Override
-    public void createRecipeExtras(@Nonnull IRecipeExtrasBuilder builder, @Nonnull Recipe<SingleRecipeInput> recipe, @Nonnull IFocusGroup focuses) {
-        // 无需额外控件
+    public void createRecipeExtras(@Nonnull IRecipeExtrasBuilder builder, @Nonnull GrinderRecipe recipe, @Nonnull IFocusGroup focuses) {
     }
 
     @Override
-    public void getTooltip(@Nonnull ITooltipBuilder tooltip, @Nonnull Recipe<SingleRecipeInput> recipe, @Nonnull IRecipeSlotsView recipeSlotsView, double mouseX, double mouseY) {
-        // 无额外提示
+    public void getTooltip(@Nonnull ITooltipBuilder tooltip, @Nonnull GrinderRecipe recipe, @Nonnull IRecipeSlotsView recipeSlotsView, double mouseX, double mouseY) {
     }
 }

@@ -1,8 +1,8 @@
 package com.plank.meds_and_herbs.item;
 
+import com.plank.meds_and_herbs.MedsAndHerbs;
 import com.plank.meds_and_herbs.data.MedicineDefinition;
 import com.plank.meds_and_herbs.data.MedicineTypeLoader;
-import com.plank.meds_and_herbs.data.MedsType;
 import com.plank.meds_and_herbs.data.UseMedicine;
 import com.plank.meds_and_herbs.init.MHDamageTypes;
 import com.plank.meds_and_herbs.init.MHEffects;
@@ -90,20 +90,20 @@ public class Syringe extends Item {
         if (otherHand.getItem() == MHItems.MEDICINE_BOTTLE.get()) {
             List<ResourceLocation> availableBloodTypes = new ArrayList<>();
             if (target.hasEffect(MHEffects.ADRENALINE.get())) {
-                availableBloodTypes.add(MedsType.ADRENALINE_BLOOD);
+                availableBloodTypes.add(MedsAndHerbs.id("adrenaline_blood"));
             }
             if (target.hasEffect(MobEffects.POISON)) {
-                availableBloodTypes.add(MedsType.POISON_BLOOD);
+                availableBloodTypes.add(MedsAndHerbs.id("poison_blood"));
             }
             if (target.hasEffect(MHEffects.BELLADONNA_BERRY.get())) {
-                availableBloodTypes.add(MedsType.BELLADONNA_POISON_BLOOD);
+                availableBloodTypes.add(MedsAndHerbs.id("belladonna_poison_blood"));
             }
             if (target.hasEffect(MHEffects.HIGH_POTENCY_POISON.get())) {
-                availableBloodTypes.add(MedsType.HIGH_POTENCY_POISON_BLOOD);
+                availableBloodTypes.add(MedsAndHerbs.id("high_potency_poison_blood"));
             }
 
             ResourceLocation bloodType = availableBloodTypes.isEmpty()
-                    ? MedsType.BLOOD
+                    ? MedsAndHerbs.id("blood")
                     : availableBloodTypes.get(player.getRandom().nextInt(availableBloodTypes.size()));
 
             ItemStack bloodBottle = Medicine.create(bloodType, 3);

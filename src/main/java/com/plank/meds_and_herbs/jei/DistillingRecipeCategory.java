@@ -1,7 +1,7 @@
 package com.plank.meds_and_herbs.jei;
 
 import com.plank.meds_and_herbs.MedsAndHerbs;
-import com.plank.meds_and_herbs.init.Blocks;
+import com.plank.meds_and_herbs.init.MHBlocks;
 import com.plank.meds_and_herbs.recipe.DistillingRecipe;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.builder.IRecipeSlotBuilder;
@@ -22,6 +22,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 
 import javax.annotation.Nonnull;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DistillingRecipeCategory implements IRecipeCategory<DistillingRecipe> {
 
@@ -31,7 +33,7 @@ public class DistillingRecipeCategory implements IRecipeCategory<DistillingRecip
     private final IDrawableAnimated arrow;
 
     public DistillingRecipeCategory(IGuiHelper guiHelper) {
-        this.icon = guiHelper.createDrawableItemStack(new ItemStack(Blocks.DISTILLERY_APPARATUS.get()));
+        this.icon = guiHelper.createDrawableItemStack(new ItemStack(MHBlocks.DISTILLERY_APPARATUS.get()));
         this.slotBackground = guiHelper.getSlotDrawable();
         this.arrowBackground = guiHelper.getRecipeArrow();
         this.arrow = guiHelper.createAnimatedRecipeArrow(200);
@@ -66,80 +68,62 @@ public class DistillingRecipeCategory implements IRecipeCategory<DistillingRecip
 
     @Override
     public void setRecipe(IRecipeLayoutBuilder builder, DistillingRecipe recipe, @Nonnull IFocusGroup focuses) {
-        // ✅ 标记为无序配方（JEI 自动在右上角显示弯曲箭头图标）
         builder.setShapeless();
 
-        // ---- 输入（水平排列） ----
-        IRecipeSlotBuilder inputASlot = null;
-        IRecipeSlotBuilder inputBSlot = null;
+        List<IRecipeSlotBuilder> linkedSlots = new ArrayList<>();
 
-        if (recipe.inputA().isPresent()) {
-            ItemStack stackA = recipe.inputA().get().ingredient().getItems()[0].copy();
-            stackA.setCount(recipe.inputA().get().count());
-            inputASlot = builder.addSlot(RecipeIngredientRole.INPUT, 10, 25)
+        recipe.getInputA().ifPresent(ingredient -> {
+            IRecipeSlotBuilder slot = builder.addSlot(RecipeIngredientRole.INPUT, 10, 25)
                     .setBackground(slotBackground, -1, -1)
-                    .addItemStack(stackA);
-        }
-        if (recipe.inputB().isPresent()) {
-            ItemStack stackB = recipe.inputB().get().ingredient().getItems()[0].copy();
-            stackB.setCount(recipe.inputB().get().count());
-            inputBSlot = builder.addSlot(RecipeIngredientRole.INPUT, 28, 25)
-                    .setBackground(slotBackground, -1, -1)
-                    .addItemStack(stackB);
-        }
+                    .addIngredients(ingredient);
+            linkedSlots.add(slot);
+        });
 
-        // ---- 空瓶输入（右上） ----
-        IRecipeSlotBuilder emptyBottleSlot = null;
-        if (recipe.emptyBottle().isPresent()) {
-            ItemStack bottleStack = recipe.emptyBottle().get().ingredient().getItems()[0].copy();
-            bottleStack.setCount(recipe.emptyBottle().get().count());
-            emptyBottleSlot = builder.addSlot(RecipeIngredientRole.INPUT, 69, 6)
+        recipe.getInputB().ifPresent(ingredient -> {
+            IRecipeSlotBuilder slot = builder.addSlot(RecipeIngredientRole.INPUT, 28, 25)
                     .setBackground(slotBackground, -1, -1)
-                    .addItemStack(bottleStack);
-        }
+                    .addIngredients(ingredient);
+            linkedSlots.add(slot);
+        });
 
-        // ---- 输出（水平排列） ----
+        recipe.getEmptyBottle().ifPresent(ingredient -> {
+            IRecipeSlotBuilder slot = builder.addSlot(RecipeIngredientRole.INPUT, 69, 6)
+                    .setBackground(slotBackground, -1, -1)
+                    .addIngredients(ingredient);
+            linkedSlots.add(slot);
+        });
+
         IRecipeSlotBuilder outputSlot = builder.addSlot(RecipeIngredientRole.OUTPUT, 96, 25)
                 .setBackground(slotBackground, -1, -1)
-                .addItemStack(recipe.output());
+                .addItemStack(recipe.getOutput());
+        linkedSlots.add(outputSlot);
 
-        IRecipeSlotBuilder stillageSlot = null;
-        if (!recipe.stillage().isEmpty()) {
-            stillageSlot = builder.addSlot(RecipeIngredientRole.OUTPUT, 114, 25)
+        if (!recipe.getSpillage().isEmpty()) {
+            IRecipeSlotBuilder spillageSlot = builder.addSlot(RecipeIngredientRole.OUTPUT, 114, 25)
                     .setBackground(slotBackground, -1, -1)
-                    .addItemStack(recipe.stillage());
+                    .addItemStack(recipe.getSpillage());
+            linkedSlots.add(spillageSlot);
         }
 
-        // ---- 关联焦点 ----
-        java.util.ArrayList<IRecipeSlotBuilder> slots = new java.util.ArrayList<>();
-        if (inputASlot != null) slots.add(inputASlot);
-        if (inputBSlot != null) slots.add(inputBSlot);
-        if (emptyBottleSlot != null) slots.add(emptyBottleSlot);
-        slots.add(outputSlot);
-        if (stillageSlot != null) slots.add(stillageSlot);
-        builder.createFocusLink(slots.toArray(new IRecipeSlotBuilder[0]));
+        builder.createFocusLink(linkedSlots.toArray(new IRecipeSlotBuilder[0]));
     }
 
     @Override
     public void draw(DistillingRecipe recipe, @Nonnull IRecipeSlotsView recipeSlotsView, @Nonnull GuiGraphics guiGraphics, double mouseX, double mouseY) {
         Minecraft minecraft = Minecraft.getInstance();
 
-        // ---- 主加工箭头 ----
         arrowBackground.draw(guiGraphics, 48, 25);
         arrow.draw(guiGraphics, 48, 25);
 
-        // ---- 特殊槽位背景图标 ----
         ResourceLocation texture = ResourceLocation.fromNamespaceAndPath(MedsAndHerbs.MODID, "textures/jei/empty_bottle_slot.png");
         guiGraphics.blit(texture, 95, 5, 0, 0, 18, 18, 18, 18);
 
-        // ---- “需要：”文字 + 小箭头 ----
-        if (recipe.emptyBottle().isPresent()) {
+        if (recipe.getEmptyBottle().isPresent()) {
             Component requireText = Component.translatable("jei.recipe.requires");
             guiGraphics.drawString(minecraft.font, requireText, 40, 9, 0xFFFFFFFF, false);
             guiGraphics.drawString(minecraft.font, "→", 87, 12, 0xFFFFFFFF, false);
         }
 
-        // ---- 时间文字 ----
         int seconds = DistillingRecipe.MAX_PROGRESS / 20;
         Component timeText = Component.translatable("gui.jei.category.smelting.time.seconds", seconds);
         guiGraphics.drawString(minecraft.font, timeText, 10, 50, 0xFF808080, false);
@@ -147,11 +131,9 @@ public class DistillingRecipeCategory implements IRecipeCategory<DistillingRecip
 
     @Override
     public void createRecipeExtras(@Nonnull IRecipeExtrasBuilder builder, @Nonnull DistillingRecipe recipe, @Nonnull IFocusGroup focuses) {
-        // 无需额外控件
     }
 
     @Override
     public void getTooltip(@Nonnull ITooltipBuilder tooltip, @Nonnull DistillingRecipe recipe, @Nonnull IRecipeSlotsView recipeSlotsView, double mouseX, double mouseY) {
-        // 无额外提示
     }
 }

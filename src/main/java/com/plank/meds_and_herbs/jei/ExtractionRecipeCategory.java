@@ -1,9 +1,9 @@
 package com.plank.meds_and_herbs.jei;
 
 import com.plank.meds_and_herbs.MedsAndHerbs;
-import com.plank.meds_and_herbs.init.Blocks;
-import com.plank.meds_and_herbs.init.Items;
-import com.plank.meds_and_herbs.init.Tags;
+import com.plank.meds_and_herbs.init.MHBlocks;
+import com.plank.meds_and_herbs.init.MHItems;
+import com.plank.meds_and_herbs.init.MHTags;
 import com.plank.meds_and_herbs.recipe.ExtractionRecipe;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.builder.IRecipeSlotBuilder;
@@ -19,12 +19,14 @@ import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.recipe.category.IRecipeCategory;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 
 import javax.annotation.Nonnull;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ExtractionRecipeCategory implements IRecipeCategory<ExtractionRecipe> {
 
@@ -34,7 +36,7 @@ public class ExtractionRecipeCategory implements IRecipeCategory<ExtractionRecip
     private final IDrawableAnimated arrow;
 
     public ExtractionRecipeCategory(IGuiHelper guiHelper) {
-        this.icon = guiHelper.createDrawableItemStack(new ItemStack(Blocks.EXTRACTION_APPARATUS.get()));
+        this.icon = guiHelper.createDrawableItemStack(new ItemStack(MHBlocks.EXTRACTION_APPARATUS.get()));
         this.slotBackground = guiHelper.getSlotDrawable();
         this.arrowBackground = guiHelper.getRecipeArrow();
         this.arrow = guiHelper.createAnimatedRecipeArrow(200);
@@ -69,82 +71,54 @@ public class ExtractionRecipeCategory implements IRecipeCategory<ExtractionRecip
 
     @Override
     public void setRecipe(IRecipeLayoutBuilder builder, ExtractionRecipe recipe, @Nonnull IFocusGroup focuses) {
-        // ---- 粉末（带组件） ----
-        ItemStack powderStack = JeiHelper.createItemStackWithComponents(recipe.powder().ingredient(), recipe.powder().count());
-        IRecipeSlotBuilder powderSlot = builder.addSlot(RecipeIngredientRole.INPUT, 10, 30)
-                .setBackground(slotBackground, -1, -1)
-                .addItemStack(powderStack);
+        builder.setShapeless();
 
-        // ---- 溶剂（带组件） ----
-        ItemStack solventStack = JeiHelper.createItemStackWithComponents(recipe.solvent().ingredient(), recipe.solvent().count());
-        IRecipeSlotBuilder solventSlot = builder.addSlot(RecipeIngredientRole.INPUT, 10, 52)
-                .setBackground(slotBackground, -1, -1)
-                .addItemStack(solventStack);
+        List<IRecipeSlotBuilder> linkedSlots = new ArrayList<>();
 
-        // ---- 空瓶 ----
-        IRecipeSlotBuilder emptyBottleSlot = null;
-        if (recipe.emptyBottle().isPresent()) {
-            ItemStack bottleStack = JeiHelper.createItemStackWithComponents(recipe.emptyBottle().get().ingredient(), recipe.emptyBottle().get().count());
-            emptyBottleSlot = builder.addSlot(RecipeIngredientRole.INPUT, 69, 10)
+        IRecipeSlotBuilder powderSlot = builder.addSlot(RecipeIngredientRole.INPUT, 10, 15)
+                .setBackground(slotBackground, -1, -1)
+                .addIngredients(recipe.getPowder());
+        linkedSlots.add(powderSlot);
+
+        IRecipeSlotBuilder solventSlot = builder.addSlot(RecipeIngredientRole.INPUT, 10, 40)
+                .setBackground(slotBackground, -1, -1)
+                .addIngredients(recipe.getSolvent());
+        linkedSlots.add(solventSlot);
+
+        IRecipeSlotBuilder filterSlot = builder.addSlot(RecipeIngredientRole.INPUT, 28, 40)
+                .setBackground(slotBackground, -1, -1)
+                .addIngredients(recipe.getFilter());
+        linkedSlots.add(filterSlot);
+
+        recipe.getEmptyBottle().ifPresent(ingredient -> {
+            IRecipeSlotBuilder slot = builder.addSlot(RecipeIngredientRole.INPUT, 55, 15)
                     .setBackground(slotBackground, -1, -1)
-                    .addItemStack(bottleStack);
-        }
+                    .addIngredients(ingredient);
+            linkedSlots.add(slot);
+        });
 
-        // ---- 主输出 ----
-        IRecipeSlotBuilder outputSlot = builder.addSlot(RecipeIngredientRole.OUTPUT, 96, 30)
+        IRecipeSlotBuilder outputSlot = builder.addSlot(RecipeIngredientRole.OUTPUT, 100, 25)
                 .setBackground(slotBackground, -1, -1)
-                .addItemStack(recipe.output());
+                .addItemStack(recipe.getOutput());
+        linkedSlots.add(outputSlot);
 
-        // ---- 副产物 ----
-        IRecipeSlotBuilder stillageSlot = null;
-        if (!recipe.stillage().isEmpty()) {
-            stillageSlot = builder.addSlot(RecipeIngredientRole.OUTPUT, 96, 52)
+        if (!recipe.getSpillage().isEmpty()) {
+            IRecipeSlotBuilder spillageSlot = builder.addSlot(RecipeIngredientRole.OUTPUT, 118, 25)
                     .setBackground(slotBackground, -1, -1)
-                    .addItemStack(recipe.stillage());
+                    .addItemStack(recipe.getSpillage());
+            linkedSlots.add(spillageSlot);
         }
-        // ---- 棉过滤器（从标签获取所有匹配物品） ----
-        var filterItems = net.minecraft.core.registries.BuiltInRegistries.ITEM
-                .getTag(Tags.Items.FILTER)
-                .map(holders -> holders.stream()
-                        .map(holder -> {
-                            ItemStack stack = new ItemStack(holder.value(), 1);
-                            if (stack.isDamageableItem()) {
-                                stack.set(DataComponents.DAMAGE, 1);
-                            }
-                            return stack;
-                        })
-                        .toArray(ItemStack[]::new))
-                .orElseGet(() -> new ItemStack[]{ new ItemStack(Items.COTTON_FILTER.get()) });
 
-        builder.addSlot(RecipeIngredientRole.CATALYST, 48, 20)
-                .setBackground(slotBackground, -1, -1)
-                .addItemStacks(java.util.Arrays.asList(filterItems));
-
-        // ---- 关联焦点 ----
-        if (stillageSlot != null) {
-            if (emptyBottleSlot != null) {
-                builder.createFocusLink(emptyBottleSlot, powderSlot, solventSlot, outputSlot, stillageSlot);
-            } else {
-                builder.createFocusLink(powderSlot, solventSlot, outputSlot, stillageSlot);
-            }
-        } else {
-            if (emptyBottleSlot != null) {
-                builder.createFocusLink(emptyBottleSlot, powderSlot, solventSlot, outputSlot);
-            } else {
-                builder.createFocusLink(powderSlot, solventSlot, outputSlot);
-            }
-        }
+        builder.createFocusLink(linkedSlots.toArray(new IRecipeSlotBuilder[0]));
     }
 
     @Override
     public void draw(ExtractionRecipe recipe, @Nonnull IRecipeSlotsView recipeSlotsView, @Nonnull GuiGraphics guiGraphics, double mouseX, double mouseY) {
         Minecraft minecraft = Minecraft.getInstance();
 
-        // ---- 主加工箭头 ----
         arrowBackground.draw(guiGraphics, 48, 41);
         arrow.draw(guiGraphics, 48, 41);
 
-        // ---- 棉过滤器耐久标注 ----
         guiGraphics.pose().pushPose();
         float scale = 0.8f;
         guiGraphics.pose().scale(scale, scale, 1.0f);
@@ -153,8 +127,7 @@ public class ExtractionRecipeCategory implements IRecipeCategory<ExtractionRecip
         guiGraphics.drawString(minecraft.font, Component.literal("-1"), x, y, 0xFFFF0000, true);
         guiGraphics.pose().popPose();
 
-        // ---- “需要：”文字 + 小箭头 ----
-        if (recipe.emptyBottle().isPresent()) {
+        if (recipe.getEmptyBottle().isPresent()) {
             Component requireText = Component.translatable("jei.recipe.requires");
             guiGraphics.drawString(minecraft.font, requireText, 69, 0, 0xFFFFFFFF, false);
             guiGraphics.drawString(minecraft.font, "→", 87, 15, 0xFFFFFFFF, false);
@@ -162,7 +135,6 @@ public class ExtractionRecipeCategory implements IRecipeCategory<ExtractionRecip
             guiGraphics.blit(texture, 95, 9, 0, 0, 18, 18, 18, 18);
         }
 
-        // ---- 时间文字 ----
         int seconds = ExtractionRecipe.MAX_PROGRESS / 20;
         Component timeText = Component.translatable("gui.jei.category.smelting.time.seconds", seconds);
         guiGraphics.drawString(minecraft.font, timeText, 10, 72, 0xFF808080, false);
@@ -170,11 +142,9 @@ public class ExtractionRecipeCategory implements IRecipeCategory<ExtractionRecip
 
     @Override
     public void createRecipeExtras(@Nonnull IRecipeExtrasBuilder builder, @Nonnull ExtractionRecipe recipe, @Nonnull IFocusGroup focuses) {
-        // 无需额外控件
     }
 
     @Override
     public void getTooltip(@Nonnull ITooltipBuilder tooltip, @Nonnull ExtractionRecipe recipe, @Nonnull IRecipeSlotsView recipeSlotsView, double mouseX, double mouseY) {
-        // 无额外提示
     }
 }

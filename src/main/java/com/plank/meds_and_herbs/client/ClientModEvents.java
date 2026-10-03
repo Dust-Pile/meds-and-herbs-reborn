@@ -1,7 +1,6 @@
 package com.plank.meds_and_herbs.client;
 
 import com.plank.meds_and_herbs.MedsAndHerbs;
-import com.plank.meds_and_herbs.data.MedicineData;
 import com.plank.meds_and_herbs.data.MedicineDefinition;
 import com.plank.meds_and_herbs.data.MedicineTypeLoader;
 import com.plank.meds_and_herbs.init.MHItems;
