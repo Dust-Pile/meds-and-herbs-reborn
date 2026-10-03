@@ -34,7 +34,7 @@ import java.util.Optional;
 
 public class IncubatorBlockEntity extends BlockEntity implements MenuProvider, Container {
 
-    private final ItemStackHandler itemHandler = new ItemStackHandler(8) {
+    private final ItemStackHandler itemHandler = new ItemStackHandler(16) {
         @Override
         public int getSlotLimit(int slot) {
             return 1;
@@ -53,7 +53,7 @@ public class IncubatorBlockEntity extends BlockEntity implements MenuProvider, C
     private final IncubatorRecipe[] currentRecipe = new IncubatorRecipe[8];
     private final ItemStack[] lastStacks = new ItemStack[8];
 
-    private final ContainerData data = new SimpleContainerData(6);
+    private final ContainerData data = new SimpleContainerData(8);
 
     public IncubatorBlockEntity(BlockPos pos, BlockState state) {
         super(MHBlockEntities.INCUBATOR.get(), pos, state);
@@ -209,11 +209,12 @@ public class IncubatorBlockEntity extends BlockEntity implements MenuProvider, C
     }
 
     public void updateContainerData() {
-        for (int i = 0; i < 8; i++) {
+        int slots = data.getCount() / 2;
+        for (int i = 0; i < slots; i++) {
             ItemStack stack = itemHandler.getStackInSlot(i);
             if (stack.isEmpty()) {
                 data.set(i, 0);
-                data.set(i + 8, 0);
+                data.set(i + slots, 0);
                 continue;
             }
 
@@ -228,10 +229,10 @@ public class IncubatorBlockEntity extends BlockEntity implements MenuProvider, C
 
             if (progress < 0) {
                 data.set(i, 0);
-                data.set(i + 8, 0);
+                data.set(i + slots, 0);
             } else {
                 data.set(i, progress);
-                data.set(i + 8, maxProgress);
+                data.set(i + slots, maxProgress);
             }
         }
     }
