@@ -203,6 +203,11 @@
   "jei.meds_and_herbs.bouquet_grinder.hint": "Keep the craft material data of the bouquet",
   "jei.meds_and_herbs.bouquet.hint": "The bouquet includes the IDs of four craft materials",
 
+  "config.jade.plugin_meds_and_herbs.extraction_apparatus_provider": "Extraction Apparatus",
+  "config.jade.plugin_meds_and_herbs.distillery_apparatus_provider": "Distillery Apparatus",
+  "config.jade.plugin_meds_and_herbs.incubator_provider": "Incubator",
+  "config.jade.plugin_meds_and_herbs.fermentation_barrel_provider": "Fermentation Barrel",
+
   "command.meds_and_herbs.heal.success": "%s restored %.1f health",
   "command.meds_and_herbs.heal.not_living": "Target is not a living entity, cannot heal",
   "command.meds_and_herbs.heal.full": "Target's health is full, no healing needed"
