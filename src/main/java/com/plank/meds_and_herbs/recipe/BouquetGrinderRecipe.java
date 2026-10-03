@@ -2,13 +2,11 @@ package com.plank.meds_and_herbs.recipe;
 
 import com.google.gson.JsonObject;
 import com.plank.meds_and_herbs.MedsAndHerbs;
-import com.plank.meds_and_herbs.data.BouquetFlowers;
 import com.plank.meds_and_herbs.init.MHItems;
 import com.plank.meds_and_herbs.init.MHRecipes;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.RegistryAccess;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
@@ -18,7 +16,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
@@ -31,9 +28,6 @@ import javax.annotation.Nonnull;
 public class BouquetGrinderRecipe implements Recipe<Container> {
     public static final BouquetGrinderRecipe INSTANCE = new BouquetGrinderRecipe();
     public static final ResourceLocation ID = MedsAndHerbs.id("bouquet_grinder");
-
-    public static final String NBT_KEY = "BouquetFlowers";
-    public static final String FLOWERS_KEY = "flowers";
 
     @Override
     public boolean matches(@Nonnull Container input, @Nonnull Level level) {

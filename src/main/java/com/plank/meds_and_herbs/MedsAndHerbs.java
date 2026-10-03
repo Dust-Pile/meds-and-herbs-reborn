@@ -29,8 +29,8 @@ public class MedsAndHerbs {
 //        DataComponents.REGISTRY.register(bus);
         MHBlocks.REGISTRY.register(bus);
         MHBlockEntities.REGISTRY.register(bus);
-        MHRecipeTypes.SERIALIZERS.register(bus);
-        MHRecipeTypes.TYPES.register(bus);
+        MHRecipes.SERIALIZERS.register(bus);
+        MHRecipes.TYPES.register(bus);
         MHItems.REGISTRY.register(bus);
         MHItems.ITEMS.register(bus);
         MHEffects.REGISTRY.register(bus);

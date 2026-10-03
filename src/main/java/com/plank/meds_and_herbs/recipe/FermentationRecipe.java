@@ -111,7 +111,6 @@ public class FermentationRecipe implements Recipe<Container> {
         return output;
     }
 
-    // ----- Serializer -----
     public static class Serializer implements RecipeSerializer<FermentationRecipe> {
         public static final Serializer INSTANCE = new Serializer();
 
