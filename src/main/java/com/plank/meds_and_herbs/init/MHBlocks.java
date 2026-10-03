@@ -31,12 +31,12 @@ public class MHBlocks {
     public static final RegistryObject<Block> FERMENTATION_BARREL = register("fermentation_barrel", FermentationBarrelBlock::new);
 
     // Plants
-    public static final RegistryObject<Block> VINCA = registerPlant("vinca", MHEffects.THROMBOSIS.get(), 440);
-    public static final RegistryObject<Block> BELLADONNA = registerPlant("belladonna", MHEffects.BELLADONNA_BERRY.get(), 220);
+    public static final RegistryObject<Block> VINCA = registerPlant("vinca", MHEffects.THROMBOSIS, 440);
+    public static final RegistryObject<Block> BELLADONNA = registerPlant("belladonna", MHEffects.BELLADONNA_BERRY, 220);
     public static final RegistryObject<Block> SWEET_CLOVER = register("sweet_clover", () -> new TallFlowerBlock(flowerProperties));
-    public static final RegistryObject<Block> CHAMOMILE = registerPlant("chamomile", MobEffects.MOVEMENT_SLOWDOWN, 140);
-    public static final RegistryObject<Block> ARTEMISIA = registerPlant("artemisia", MobEffects.CONFUSION, 140);
-    public static final RegistryObject<Block> OPIUM = registerPlant("opium", MHEffects.OPIUM_ADDICTION.get(), 220);
+    public static final RegistryObject<Block> CHAMOMILE = registerPlant("chamomile", () -> MobEffects.MOVEMENT_SLOWDOWN, 140);
+    public static final RegistryObject<Block> ARTEMISIA = registerPlant("artemisia", () -> MobEffects.CONFUSION, 140);
+    public static final RegistryObject<Block> OPIUM = registerPlant("opium", MHEffects.OPIUM_ADDICTION, 220);
     public static final RegistryObject<Block> ALOE = register("aloe", () -> new NonBonemealableTallGrassBlock(flowerProperties));
     public static final RegistryObject<Block> COTTON = register("cotton", () -> new NonBonemealableTallGrassBlock(flowerProperties));
     public static final RegistryObject<Block> PLANTAGO = register("plantago", () -> new NonBonemealableTallGrassBlock(flowerProperties));
@@ -56,15 +56,15 @@ public class MHBlocks {
         return REGISTRY.register(name, block);
     }
 
-    private static RegistryObject<Block> registerPlant(String name, MobEffect effect, int duration) {
+    private static RegistryObject<Block> registerPlant(String name, Supplier<MobEffect> effect, int duration) {
         return REGISTRY.register(name, () -> new FlowerBlock(effect, duration, flowerProperties));
     }
     private static RegistryObject<Block> registerPottedFlower(String name, Supplier<Block> flower) {
         return REGISTRY.register("potted_" + name,
                 () -> new FlowerPotBlock(
-                        () -> (FlowerPotBlock) net.minecraft.world.level.block.Blocks.FLOWER_POT,
+                        () -> (FlowerPotBlock) Blocks.FLOWER_POT,
                         flower,
-                        BlockBehaviour.Properties.copy(net.minecraft.world.level.block.Blocks.FLOWER_POT)
+                        BlockBehaviour.Properties.copy(Blocks.FLOWER_POT)
                 )
         );
     }
