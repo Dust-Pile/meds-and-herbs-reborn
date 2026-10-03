@@ -42,7 +42,7 @@ public class MedsAndHerbs {
     }
 
     @SubscribeEvent
-    private void clientSetup(FMLClientSetupEvent event) {
+    public void clientSetup(FMLClientSetupEvent event) {
         event.enqueueWork(
                 () -> {
                     MenuScreens.register(MHMenus.DISTILLERY_APPARATUS_GUI.get(), DistilleryApparatusGUIScreen::new);
