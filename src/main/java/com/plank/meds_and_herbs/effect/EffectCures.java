@@ -1,30 +1,45 @@
 package com.plank.meds_and_herbs.effect;
 
-import com.plank.meds_and_herbs.data.MedicineTypeLoader;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import com.plank.meds_and_herbs.init.MHItems;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
-import net.neoforged.neoforge.common.EffectCure;
+import net.minecraft.world.item.ItemStack;
 
-public class EffectCures {
-    public static final EffectCure ADDICTION =  EffectCure.get("addiction");
-    public static final EffectCure DRESSING = EffectCure.get("dressing");
-    public static final EffectCure SEWING = EffectCure.get("sewing");
-    public static final EffectCure SPLINT = EffectCure.get("splint");
-    public static void cure(LivingEntity entity, ResourceLocation id) {
-        for (MobEffectInstance effectInstance : entity.getActiveEffects()) {
-            ResourceLocation effectId = BuiltInRegistries.MOB_EFFECT.getKey(effectInstance.getEffect().value());
-            if (MedicineTypeLoader.get(id).cures().contains(effectId)) effectInstance.getCures().add(EffectCure.get(id.toString()));
-        }
-        cure(entity, EffectCure.get(id.toString()));
+import java.util.ArrayList;
+import java.util.List;
+
+public final class EffectCures {
+
+    private EffectCures() {}
+
+    public static boolean matchesType(ItemStack stack, String typeId) {
+        if (stack.isEmpty() || !stack.is(MHItems.MEDICINE.get())) return false;
+
+        CompoundTag tag = stack.getTag();
+        if (tag == null) return false;
+        if (!tag.contains("medicine_data", CompoundTag.TAG_COMPOUND)) return false;
+
+        CompoundTag data = tag.getCompound("medicine_data");
+        return typeId.equals(data.getString("type"));
     }
-    public static void cure(LivingEntity entity, EffectCure cure) {
-        entity.getPersistentData().putBoolean("meds_and_herbs:curing", true);
-        try {
-            entity.removeEffectsCuredBy(cure);
-        } finally {
-            entity.getPersistentData().remove("meds_and_herbs:curing");
+
+    public static void cure(LivingEntity entity, ItemStack cureItem) {
+        if (entity.level().isClientSide) return;
+        if (cureItem.isEmpty()) return;
+
+        List<MobEffect> toRemove = new ArrayList<>();
+        for (MobEffectInstance instance : entity.getActiveEffects()) {
+            for (ItemStack curative : instance.getEffect().getCurativeItems()) {
+                if (ItemStack.isSameItem(curative, cureItem)) {
+                    toRemove.add(instance.getEffect());
+                    break;
+                }
+            }
+        }
+        for (MobEffect effect : toRemove) {
+            entity.removeEffect(effect);
         }
     }
 }

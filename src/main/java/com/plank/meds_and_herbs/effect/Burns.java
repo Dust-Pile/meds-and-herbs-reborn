@@ -1,31 +1,29 @@
 package com.plank.meds_and_herbs.effect;
 
-import com.plank.meds_and_herbs.init.Effects;
+import com.plank.meds_and_herbs.init.MHEffects;
+import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
 
-public class Burns extends MedicalEffect {
+public class Burns extends MobEffect {
 
     public Burns() {
         super(MobEffectCategory.HARMFUL, 0xFF4500);
     }
 
     @Override
-    public boolean applyEffectTick(LivingEntity entity, int amplifier) {
-        if (entity.level().isClientSide) return true;
+    public void applyEffectTick(LivingEntity entity, int amplifier) {
+        if (entity.level().isClientSide) return;
+        if (entity.hasEffect(MobEffects.FIRE_RESISTANCE)) return;
 
-        // 有防火效果时不造成伤害
-        if (entity.hasEffect(MobEffects.FIRE_RESISTANCE)) return true;
-
-        // 只在实体着火时累积计数器
         if (entity.isOnFire()) {
             var data = entity.getPersistentData();
             String key = "burns_counter";
             int counter = data.getInt(key) + 1;
 
-            if (counter >= 20) { // 每秒触发一次
+            if (counter >= 20) {
                 float damage = (amplifier == 0) ? 1.0f : 2.0f;
                 entity.hurt(entity.damageSources().onFire(), damage);
                 data.putInt(key, 0);
@@ -34,19 +32,16 @@ public class Burns extends MedicalEffect {
             }
         }
 
-        // 等级1且剩余时间为8000 tick（400秒）时触发血栓
         if (amplifier >= 1) {
-            MobEffectInstance inst = entity.getEffect(Effects.BURNS);
+            MobEffectInstance inst = entity.getEffect(MHEffects.BURNS.get());
             if (inst != null && inst.getDuration() == 8000) {
-                entity.addEffect(new MobEffectInstance(Effects.THROMBOSIS, 24000, 0));
+                entity.addEffect(new MobEffectInstance(MHEffects.THROMBOSIS.get(), 24000, 0));
             }
         }
-
-        return true;
     }
 
     @Override
-    public boolean shouldApplyEffectTickThisTick(int duration, int amplifier) {
+    public boolean isDurationEffectTick(int duration, int amplifier) {
         return duration % 20 == 0;
     }
 }

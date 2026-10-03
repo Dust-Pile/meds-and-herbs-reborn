@@ -1,34 +1,32 @@
 package com.plank.meds_and_herbs.effect;
 
-import com.plank.meds_and_herbs.init.Effects;
+import com.plank.meds_and_herbs.init.MHEffects;
+import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
 
-public class OpiumAddiction extends MedicalEffect {
+public class OpiumAddiction extends MobEffect {
+
     public OpiumAddiction() {
         super(MobEffectCategory.HARMFUL, 0x8B4513);
     }
+
     @Override
-    public void onEffectRemoved(LivingEntity entity, int amplifier){
+    public void applyEffectTick(LivingEntity entity, int amplifier) {
         if (entity.level().isClientSide) return;
-        entity.addEffect(new MobEffectInstance(Effects.OPIUM_WITHDRAWAL, 12000, 0));
-    }
-    @Override
-    public boolean applyEffectTick(LivingEntity entity, int amplifier) {
-        if (entity.level().isClientSide) return true;
-        if (entity.hasEffect(Effects.PAINKILLER)) {
-            MobEffectInstance effectInstance = entity.getEffect(Effects.PAINKILLER);
-            if (effectInstance != null && effectInstance.getEffect().value() instanceof MedicalEffect medicalEffect) {
-                medicalEffect.onEffectRemoved(entity, effectInstance.getAmplifier());
-            }
-            EffectCures.cure(entity, EffectCures.ADDICTION);
+        if (entity.hasEffect(MHEffects.PAINKILLER.get())) {
+            entity.removeEffect(MHEffects.PAINKILLER.get());
         }
-        return true;
     }
 
     @Override
-    public boolean shouldApplyEffectTickThisTick(int duration, int amplifier) {
+    public boolean isDurationEffectTick(int duration, int amplifier) {
         return true;
+    }
+
+    public static void onEffectExpired(LivingEntity entity){
+        if (entity.level().isClientSide) return;
+        entity.addEffect(new MobEffectInstance(MHEffects.OPIUM_WITHDRAWAL.get(), 12000, 0));
     }
 }

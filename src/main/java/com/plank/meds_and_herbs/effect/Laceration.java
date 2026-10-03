@@ -1,34 +1,43 @@
 package com.plank.meds_and_herbs.effect;
 
-import com.plank.meds_and_herbs.init.Effects;
+import com.plank.meds_and_herbs.init.MHEffects;
+import com.plank.meds_and_herbs.init.MHItems;
+import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ItemStack;
 
-public class Laceration extends MedicalEffect {
+import java.util.List;
+
+public class Laceration extends MobEffect {
     public Laceration() {
-        super(MobEffectCategory.HARMFUL, 0xCC0000, EffectCures.SEWING);
+        super(MobEffectCategory.HARMFUL, 0xCC0000);
     }
 
     @Override
-    public boolean applyEffectTick(LivingEntity entity, int amplifier) {
-        if (entity.level().isClientSide) return true;
+    public void applyEffectTick(LivingEntity entity, int amplifier) {
+        if (entity.level().isClientSide) return;
 
-        // 如果有免疫或细菌感染，则不进行额外感染
-        if (entity.hasEffect(Effects.IMMUNE) || entity.hasEffect(Effects.BACTERIAL_INFECTION)) {
-            return true;
+        if (entity.hasEffect(MHEffects.IMMUNE.get()) || entity.hasEffect(MHEffects.BACTERIAL_INFECTION.get())) {
+            return;
         }
 
-        MobEffectInstance instance = entity.getEffect(Effects.LACERATION);
+        MobEffectInstance instance = entity.getEffect(MHEffects.LACERATION.get());
         if (instance != null && entity.getRandom().nextFloat() < 0.001) {
-            entity.addEffect(new MobEffectInstance(Effects.BACTERIAL_INFECTION, 24000, 0));
+            entity.addEffect(new MobEffectInstance(MHEffects.BACTERIAL_INFECTION.get(), 24000, 0));
         }
-
-        return true;
+    }
+    
+    @Override
+    public boolean isDurationEffectTick(int duration, int amplifier) {
+        return duration % 20 == 0;
     }
 
     @Override
-    public boolean shouldApplyEffectTickThisTick(int duration, int amplifier) {
-        return duration % 20 == 0;
+    public List<ItemStack> getCurativeItems() {
+        List<ItemStack> items = super.getCurativeItems();
+        items.add(new ItemStack(MHItems.SEWING_KIT.get()));
+        return items;
     }
 }
