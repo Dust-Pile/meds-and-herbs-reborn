@@ -1,7 +1,7 @@
 package com.plank.meds_and_herbs.item;
 
-import com.plank.meds_and_herbs.init.Effects;
-import com.plank.meds_and_herbs.init.Items;
+import com.plank.meds_and_herbs.init.MHEffects;
+import com.plank.meds_and_herbs.init.MHItems;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -18,28 +18,24 @@ public class WhiskeyBottle extends Item {
     public WhiskeyBottle() {
         super(new Item.Properties()
                 .stacksTo(16)
-                .craftRemainder(Items.DIRTY_MEDICINE_BOTTLE.get())
+                .craftRemainder(MHItems.DIRTY_MEDICINE_BOTTLE.get())
                 .food(new FoodProperties.Builder()
                         .nutrition(4)
-                        .saturationModifier(1.0f)
-                        .alwaysEdible()
+                        .saturationMod(1.0f)
+                        .alwaysEat()
                         .build()));
     }
 
     @Override
     @Nonnull
     public ItemStack finishUsingItem(@Nonnull ItemStack stack, @Nonnull Level level, @Nonnull LivingEntity livingEntity) {
-        // 先应用原版食物效果（恢复饥饿、饱和度）
         ItemStack result = super.finishUsingItem(stack, level, livingEntity);
         if (!level.isClientSide && livingEntity instanceof Player player) {
-            // 给予饮料效果 30 秒
-            player.addEffect(new MobEffectInstance(Effects.BEVERAGE_DRINK, 600, 0));
-            // 返回玻璃瓶（前提：非创造模式且物品被消耗）
-            if (!player.hasInfiniteMaterials()) {
-                return new ItemStack(Items.DIRTY_MEDICINE_BOTTLE.get());
+            player.addEffect(new MobEffectInstance(MHEffects.BEVERAGE_DRINK.get(), 600, 0));
+            if (!player.isCreative()) {
+                return new ItemStack(MHItems.DIRTY_MEDICINE_BOTTLE.get());
             }
         }
-        // 如果玩家是创造模式，返回剩下的 stack（可能为空）
         return result;
     }
 

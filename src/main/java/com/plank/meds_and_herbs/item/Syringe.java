@@ -1,22 +1,23 @@
 package com.plank.meds_and_herbs.item;
 
-import com.plank.meds_and_herbs.data.*;
-import com.plank.meds_and_herbs.init.DamageTypes;
-import com.plank.meds_and_herbs.init.DataComponents;
-import com.plank.meds_and_herbs.init.Effects;
-import com.plank.meds_and_herbs.init.Items;
+import com.plank.meds_and_herbs.data.MedicineDefinition;
+import com.plank.meds_and_herbs.data.MedicineTypeLoader;
+import com.plank.meds_and_herbs.data.MedsType;
+import com.plank.meds_and_herbs.data.UseMedicine;
+import com.plank.meds_and_herbs.init.MHDamageTypes;
+import com.plank.meds_and_herbs.init.MHEffects;
+import com.plank.meds_and_herbs.init.MHItems;
+import com.plank.meds_and_herbs.util.MHUtils;
 import net.minecraft.ChatFormatting;
-import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
-import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -32,7 +33,6 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 public class Syringe extends Item {
     private static final double REACH_DISTANCE = 5.0;
@@ -74,26 +74,12 @@ public class Syringe extends Item {
         return InteractionResultHolder.consume(player.getItemInHand(hand));
     }
 
-    // ---------- 辅助：获取效果的 Holder ----------
-    private static Optional<Holder.Reference<MobEffect>> getEffectHolder(ResourceLocation id) {
-        return BuiltInRegistries.MOB_EFFECT.getHolder(id);
-    }
-
-    private static boolean hasEffect(LivingEntity target, Holder<MobEffect> effect) {
-        if(effect.getKey() != null) return getEffectHolder(effect.getKey().location())
-                .map(target::hasEffect)
-                .orElse(false);
-        else return false;
-    }
-
-    // ---------- 核心注射逻辑 ----------
     private void performInjection(Player player, LivingEntity target, InteractionHand hand) {
         if (player.level().isClientSide) return;
 
         ItemStack syringe = player.getItemInHand(hand);
         ItemStack otherHand = hand == InteractionHand.MAIN_HAND ? player.getOffhandItem() : player.getMainHandItem();
 
-        // 1. 副手是医疗箱
         if (otherHand.getItem() instanceof Medkit) {
             if (!tryAutoTreatFromMedkit(player, target, syringe, otherHand)) {
                 player.displayClientMessage(Component.translatable("message.meds_and_herbs.no_medicine_in_kit"), true);
@@ -101,20 +87,18 @@ public class Syringe extends Item {
             return;
         }
 
-        // 2. 副手是空瓶 → 抽血
-        if (otherHand.getItem() == Items.MEDICINE_BOTTLE.get()) {
-            // 收集可用的血液类型（使用辅助方法检查效果）
+        if (otherHand.getItem() == MHItems.MEDICINE_BOTTLE.get()) {
             List<ResourceLocation> availableBloodTypes = new ArrayList<>();
-            if (hasEffect(target, Effects.ADRENALINE)) {
+            if (target.hasEffect(MHEffects.ADRENALINE.get())) {
                 availableBloodTypes.add(MedsType.ADRENALINE_BLOOD);
             }
-            if (hasEffect(target, MobEffects.POISON)) {
+            if (target.hasEffect(MobEffects.POISON)) {
                 availableBloodTypes.add(MedsType.POISON_BLOOD);
             }
-            if (hasEffect(target, Effects.BELLADONNA_BERRY)) {
+            if (target.hasEffect(MHEffects.BELLADONNA_BERRY.get())) {
                 availableBloodTypes.add(MedsType.BELLADONNA_POISON_BLOOD);
             }
-            if (hasEffect(target, Effects.HIGH_POTENCY_POISON)) {
+            if (target.hasEffect(MHEffects.HIGH_POTENCY_POISON.get())) {
                 availableBloodTypes.add(MedsType.HIGH_POTENCY_POISON_BLOOD);
             }
 
@@ -126,79 +110,80 @@ public class Syringe extends Item {
             player.setItemInHand(hand == InteractionHand.MAIN_HAND ? InteractionHand.OFF_HAND : InteractionHand.MAIN_HAND, bloodBottle);
             player.displayClientMessage(Component.translatable("message.meds_and_herbs.converted_to_blood"), true);
 
-            DamageSource source = target.level().damageSources().source(DamageTypes.BLEEDING, player);
-            target.hurt(source, 0.001f);
-            target.setHealth(target.getHealth() - 6);
-            syringe.hurtAndBreak(1, (ServerLevel) player.level(), (ServerPlayer) player, item -> {});
+            MHUtils.hurtWithCustomType(target, MHDamageTypes.BLEEDING, 6.0f);
+            syringe.hurtAndBreak(1, player, item -> {});
             return;
         }
 
-        // 3. 副手是药瓶（含药品）→ 注射
         if (Medicine.isMedicineBottle(otherHand)) {
-            MedicineData bottleData = Medicine.getMedicineData(otherHand);
-            if (bottleData.uses() <= 0) {
+            var uses = Medicine.getUses(otherHand);
+            if (uses <= 0) {
                 player.displayClientMessage(Component.translatable("message.meds_and_herbs.bottle_empty"), true);
                 return;
             }
 
-            ResourceLocation typeId = bottleData.typeId();
-            if (!UseMedicine.isInternalMedicine(typeId)) {
+            ResourceLocation typeId = Medicine.getType(otherHand);
+            var def = MedicineTypeLoader.get(typeId);
+            if (def != null && !def.isInternal()) {
                 player.displayClientMessage(Component.translatable("message.meds_and_herbs.external_meds"), true);
                 return;
             }
 
-            // 直接注射：不检查 cures，直接使用
             UseMedicine.use(target, typeId);
             player.setItemInHand(hand == InteractionHand.MAIN_HAND ? InteractionHand.OFF_HAND : InteractionHand.MAIN_HAND,
                     Medicine.consume(otherHand, player));
-            syringe.hurtAndBreak(1, (ServerLevel) player.level(), (ServerPlayer) player, item -> {});
+            syringe.hurtAndBreak(1, player, item -> {});
 
-            Component medicineName = Medicine.name(otherHand);
+            var medicineName = Medicine.getTypeName(otherHand);
             player.displayClientMessage(Component.translatable("message.meds_and_herbs.injected",
                     target.getDisplayName(), medicineName), true);
             return;
         }
 
-        // 4. 其他情况
         player.displayClientMessage(Component.translatable("message.meds_and_herbs.need_bottle_or_medkit"), true);
     }
 
-    // ---------- 医疗箱自动取药 ----------
     private boolean tryAutoTreatFromMedkit(Player player, LivingEntity target, ItemStack syringe, ItemStack medkitStack) {
-        MedkitContents contents = medkitStack.get(DataComponents.MEDKIT_CONTENTS);
-        if (contents == null || contents.isEmpty()) return false;
+        CompoundTag medkitTag = medkitStack.getTag();
+        if (medkitTag == null || !medkitTag.contains("MedkitContents", Tag.TAG_LIST)) return false;
 
-        List<ItemStack> items = new ArrayList<>();
-        contents.itemsCopy().forEach(items::add);
+        ListTag contentList = medkitTag.getList("MedkitContents", Tag.TAG_COMPOUND);
+        List<ItemStack> items = new ArrayList<>(contentList.size());
+        for (int i = 0; i < contentList.size(); i++) {
+            ItemStack s = ItemStack.of(contentList.getCompound(i));
+            if (!s.isEmpty()) items.add(s);
+        }
+        if (items.isEmpty()) return false;
 
         for (int i = 0; i < items.size(); i++) {
             ItemStack stack = items.get(i);
             if (!Medicine.isMedicineBottle(stack)) continue;
 
-            MedicineData data = Medicine.getMedicineData(stack);
-            if (data.uses() <= 0) continue;
+            int uses = Medicine.getUses(stack);
+            if (uses <= 0) continue;
 
-            ResourceLocation typeId = data.typeId();
-
-            // 只取内用药物
-            if (!UseMedicine.isInternalMedicine(typeId)) continue;
-
+            ResourceLocation typeId = Medicine.getType(stack);
             MedicineDefinition def = MedicineTypeLoader.get(typeId);
-            if (def == null) continue;
+            if (def == null || !def.isInternal()) continue;
 
-            // 检查是否可治愈
             boolean canCure = def.cures().stream()
-                    .map(id -> getEffectHolder(id).orElse(null))
+                    .map(BuiltInRegistries.MOB_EFFECT::get)
                     .filter(Objects::nonNull)
                     .anyMatch(target::hasEffect);
             if (!canCure) continue;
 
+            Component medicineName = Medicine.getTypeName(stack);
             UseMedicine.use(target, typeId);
             items.set(i, Medicine.consume(stack, player));
-            medkitStack.set(DataComponents.MEDKIT_CONTENTS, new MedkitContents(items));
-            syringe.hurtAndBreak(1, (ServerLevel) player.level(), (ServerPlayer) player, item -> {});
 
-            Component medicineName = Medicine.name(stack);
+            ListTag newContents = new ListTag();
+            for (ItemStack s : items) {
+                if (!s.isEmpty()) newContents.add(s.save(new CompoundTag()));
+            }
+            medkitStack.getOrCreateTag().put("MedkitContents", newContents);
+
+            syringe.hurtAndBreak(1, player, item -> {});
+
             player.displayClientMessage(Component.translatable("message.meds_and_herbs.auto_treat",
                     target.getDisplayName(), medicineName), true);
             return true;
@@ -206,7 +191,6 @@ public class Syringe extends Item {
         return false;
     }
 
-    // ---------- 射线检测 ----------
     @Nullable
     private LivingEntity getTargetEntity(Player player) {
         double reach = REACH_DISTANCE;
@@ -233,10 +217,10 @@ public class Syringe extends Item {
         return result;
     }
 
-    // ---------- 提示 ----------
     @Override
-    public void appendHoverText(@Nonnull ItemStack stack, @Nonnull TooltipContext context,
-                                @Nonnull List<Component> tooltip, @Nonnull TooltipFlag flag) {
+    public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag isAdvanced) {
+        super.appendHoverText(stack, level, tooltip, isAdvanced);
+
         tooltip.add(Component.translatable("tooltip.meds_and_herbs.use").withStyle(ChatFormatting.GRAY));
         tooltip.add(Component.translatable("tooltip.meds_and_herbs.sneak").withStyle(ChatFormatting.GRAY));
     }

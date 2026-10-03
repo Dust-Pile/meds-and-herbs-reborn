@@ -1,17 +1,19 @@
 package com.plank.meds_and_herbs.item;
 
 import com.plank.meds_and_herbs.effect.EffectCures;
-import com.plank.meds_and_herbs.init.Effects;
+import com.plank.meds_and_herbs.init.MHEffects;
+import com.plank.meds_and_herbs.init.MHItems;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ItemStack;
 
 public class CottonDressing extends Dressing {
     @Override
     protected boolean healBleeding(LivingEntity target) {
-        MobEffectInstance inst = target.getEffect(Effects.BLEEDING);
+        MobEffectInstance inst = target.getEffect(MHEffects.BLEEDING.get());
         if (inst == null) return false;
         else {
-            EffectCures.cure(target, EffectCures.DRESSING);
+            EffectCures.cure(target, new ItemStack(MHItems.COTTON_DRESSING.get()));
             return true;
         }
     }

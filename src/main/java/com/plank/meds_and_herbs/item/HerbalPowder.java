@@ -1,26 +1,26 @@
 package com.plank.meds_and_herbs.item;
 
-import com.plank.meds_and_herbs.data.BouquetFlowers;
-import com.plank.meds_and_herbs.init.DataComponents;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
 import java.util.List;
 
 public class HerbalPowder extends Item {
     public HerbalPowder() {
-        super(new Item.Properties().component(DataComponents.BOUQUET_FLOWERS.get(), BouquetFlowers.EMPTY));
+        super(new Item.Properties());
     }
-    @Override
-    public void appendHoverText(@Nonnull ItemStack stack, @Nonnull TooltipContext context, @Nonnull List<Component> tooltip, @Nonnull TooltipFlag flag) {
-        super.appendHoverText(stack, context, tooltip, flag);
 
-        BouquetFlowers flowers = stack.get(DataComponents.BOUQUET_FLOWERS.get());
-        if (flowers == null || flowers.flowers().isEmpty()) {
+    @Override
+    public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
+        super.appendHoverText(stack, level, tooltip, flag);
+        List<ItemStack> flowers = Bouquet.getFlowerItems(stack);
+
+        if (flowers.isEmpty()) {
             tooltip.add(Component.translatable("tooltip.meds_and_herbs.bouquet.empty")
                     .withStyle(ChatFormatting.GRAY));
             return;
@@ -29,7 +29,7 @@ public class HerbalPowder extends Item {
         tooltip.add(Component.translatable("tooltip.meds_and_herbs.bouquet.contains")
                 .withStyle(ChatFormatting.GOLD));
 
-        for (ItemStack flower : flowers.getFlowerItems()) {
+        for (ItemStack flower : flowers) {
             Component flowerName = flower.getHoverName().copy().withStyle(ChatFormatting.WHITE);
             tooltip.add(Component.literal("  • ").withStyle(ChatFormatting.GRAY).append(flowerName));
         }

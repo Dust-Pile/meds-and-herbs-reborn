@@ -1,9 +1,11 @@
 package com.plank.meds_and_herbs.item;
 
-import com.plank.meds_and_herbs.init.DataComponents;
-import com.plank.meds_and_herbs.init.Tags;
-import com.plank.meds_and_herbs.data.MedkitContents;
+import com.plank.meds_and_herbs.init.MHTags;
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.NonNullList;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.InteractionHand;
@@ -17,7 +19,6 @@ import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.BundleItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.component.BundleContents;
 import net.minecraft.world.level.Level;
 
 import javax.annotation.Nonnull;
@@ -33,7 +34,6 @@ public class Medkit extends BundleItem {
         super(new Properties().stacksTo(1));
     }
 
-    // ==================== 右键使用（潜行→丢弃所有，否则无动作） ====================
     @Override
     @Nonnull
     public InteractionResultHolder<ItemStack> use(@Nonnull Level level, @Nonnull Player player, @Nonnull InteractionHand hand) {
@@ -49,21 +49,16 @@ public class Medkit extends BundleItem {
             return InteractionResultHolder.sidedSuccess(medkit, level.isClientSide());
         }
 
-        // 非潜行：无动作
         return InteractionResultHolder.sidedSuccess(medkit, level.isClientSide());
     }
 
-    // ==================== 丢弃所有物品 ====================
     private void dropAllItems(Player player, ItemStack medkit) {
-        MedkitContents contents = getContents(medkit);
+        List<ItemStack> contents = getContents(medkit);
         if (contents.isEmpty()) return;
 
-        // 复制物品列表，清空医疗包后再抛出
-        List<ItemStack> items = new ArrayList<>();
-        contents.itemsCopy().forEach(items::add);
-        setContents(medkit, MedkitContents.EMPTY);
+        setContents(medkit, List.of());
 
-        for (ItemStack stack : items) {
+        for (ItemStack stack : contents) {
             if (!stack.isEmpty()) {
                 player.drop(stack, false, false);
             }
@@ -72,16 +67,65 @@ public class Medkit extends BundleItem {
         player.playSound(SoundEvents.BUNDLE_DROP_CONTENTS, 1.0F, 1.0F);
     }
 
-    // ==================== 组件操作 ====================
-    private MedkitContents getContents(ItemStack stack) {
-        return stack.getOrDefault(DataComponents.MEDKIT_CONTENTS, MedkitContents.EMPTY);
+    private List<ItemStack> getContents(ItemStack stack) {
+        CompoundTag tag = stack.getTag();
+        if (tag == null || !tag.contains("MedkitContents", Tag.TAG_LIST)) {
+            return new ArrayList<>();
+        }
+        ListTag list = tag.getList("MedkitContents", Tag.TAG_COMPOUND);
+        List<ItemStack> out = new ArrayList<>(list.size());
+        for (int i = 0; i < list.size(); i++) {
+            ItemStack s = ItemStack.of(list.getCompound(i));
+            if (!s.isEmpty()) out.add(s);
+        }
+        return out;
     }
 
-    private void setContents(ItemStack stack, MedkitContents contents) {
-        stack.set(DataComponents.MEDKIT_CONTENTS, contents);
+    private void setContents(ItemStack stack, List<ItemStack> contents) {
+        ListTag list = new ListTag();
+        for (ItemStack s : contents) {
+            if (!s.isEmpty()) list.add(s.save(new CompoundTag()));
+        }
+        stack.getOrCreateTag().put("MedkitContents", list);
     }
 
-    // ==================== 交互：右键点击其他槽位（鼠标上有医疗包时） ====================
+    private static int totalCount(List<ItemStack> contents) {
+        int total = 0;
+        for (ItemStack s : contents) total += s.getCount();
+        return total;
+    }
+
+    private static ItemStack removeOneFromContents(List<ItemStack> contents) {
+        for (int i = contents.size() - 1; i >= 0; i--) {
+            ItemStack s = contents.get(i);
+            if (s.isEmpty()) continue;
+            ItemStack removed = s.copyWithCount(1);
+            s.shrink(1);
+            if (s.isEmpty()) contents.remove(i);
+            return removed;
+        }
+        return ItemStack.EMPTY;
+    }
+
+    private static boolean tryInsertIntoContents(List<ItemStack> contents, ItemStack toInsert, int maxItems) {
+        if (totalCount(contents) >= maxItems) return false;
+        if (toInsert.isEmpty()) return false;
+
+        for (ItemStack existing : contents) {
+            if (ItemStack.isSameItemSameTags(existing, toInsert)
+                    && existing.getCount() < existing.getMaxStackSize()) {
+                existing.grow(1);
+                toInsert.shrink(1);
+                return true;
+            }
+        }
+
+        contents.add(toInsert.copyWithCount(1));
+        toInsert.shrink(1);
+        return true;
+    }
+
+
     @Override
     public boolean overrideStackedOnOther(ItemStack medkit, @Nonnull Slot slot, @Nonnull ClickAction action, @Nonnull Player player) {
         if (medkit.getCount() != 1) return false;
@@ -89,15 +133,12 @@ public class Medkit extends BundleItem {
 
         ItemStack stackInSlot = slot.getItem();
         if (stackInSlot.isEmpty()) {
-            // 从医疗包中取出一个物品到鼠标
             return tryExtractOne(medkit, slot, player);
         } else {
-            // 尝试将槽位中的物品放入医疗包
             return tryInsertOne(medkit, stackInSlot, player);
         }
     }
 
-    // ==================== 交互：右键点击医疗包槽位（鼠标上有物品时） ====================
     @Override
     public boolean overrideOtherStackedOnMe(ItemStack medkit, @Nonnull ItemStack other, @Nonnull Slot slot, @Nonnull ClickAction action, @Nonnull Player player, @Nonnull SlotAccess access) {
         if (medkit.getCount() != 1) return false;
@@ -112,80 +153,71 @@ public class Medkit extends BundleItem {
         }
     }
 
-    // ==================== 核心操作 ====================
-
-    // 从医疗包中取出一个物品，放入鼠标（原槽位为空）
     private boolean tryExtractOne(ItemStack medkit, Slot slot, Player player) {
-        MedkitContents contents = getContents(medkit);
+        List<ItemStack> contents = getContents(medkit);
         if (contents.isEmpty()) return false;
 
-        MedkitContents.Mutable mutable = new MedkitContents.Mutable(contents);
-        ItemStack extracted = mutable.removeOne();
+        ItemStack extracted = removeOneFromContents(contents);
         if (extracted.isEmpty()) return false;
 
-        // 尝试放入槽位（如果放不下，则剩余部分放回）
         ItemStack leftover = slot.safeInsert(extracted);
         if (!leftover.isEmpty()) {
-            mutable.tryInsert(leftover);
+            tryInsertIntoContents(contents, leftover, 16);
         }
-        setContents(medkit, mutable.toImmutable());
+
+        setContents(medkit, contents);
         playRemoveOneSound(player);
         return true;
     }
 
-    // 从医疗包中取出一个物品，放入指定槽位（用于 overrideOtherStackedOnMe）
     private boolean tryExtractOneToSlot(ItemStack medkit, Player player, SlotAccess access) {
-        MedkitContents contents = getContents(medkit);
+        List<ItemStack> contents = getContents(medkit);
         if (contents.isEmpty()) return false;
 
-        MedkitContents.Mutable mutable = new MedkitContents.Mutable(contents);
-        ItemStack extracted = mutable.removeOne();
+        ItemStack extracted = removeOneFromContents(contents);
         if (extracted.isEmpty()) return false;
 
         access.set(extracted);
-        setContents(medkit, mutable.toImmutable());
+        setContents(medkit, contents);
         playRemoveOneSound(player);
         return true;
     }
 
-    // 尝试将一个物品放入医疗包
     private boolean tryInsertOne(ItemStack medkit, ItemStack toInsert, Player player) {
-        // 检查物品是否允许放入医疗包（通过标签）
-        if (!toInsert.is(Tags.Items.MEDKIT_ITEMS)) return false;
+        if (!toInsert.is(MHTags.Items.MEDKIT_ITEMS)) return false;
 
-        MedkitContents contents = getContents(medkit);
-        if (contents.totalCount() >= MAX_ITEMS) return false;
+        List<ItemStack> contents = getContents(medkit);
+        if (totalCount(contents) >= MAX_ITEMS) return false;
 
-        MedkitContents.Mutable mutable = new MedkitContents.Mutable(contents);
-        if (!mutable.tryInsert(toInsert)) return false;
+        if (!tryInsertIntoContents(contents, toInsert, MAX_ITEMS)) return false;
 
-        setContents(medkit, mutable.toImmutable());
+        setContents(medkit, contents);
         playInsertSound(player);
         return true;
     }
 
-    // ==================== 工具提示 ====================
     @Override
-    public void appendHoverText(@Nonnull ItemStack stack, @Nonnull TooltipContext context, List<Component> tooltip, @Nonnull TooltipFlag flag) {
-        MedkitContents contents = getContents(stack);
-        int filled = contents.totalCount();
+    public void appendHoverText(@Nonnull ItemStack stack, @Nonnull Level level, List<Component> tooltip, @Nonnull TooltipFlag flag) {
+        List<ItemStack> contents = getContents(stack);
+        int filled = totalCount(contents);
         tooltip.add(Component.translatable("item.minecraft.bundle.fullness", filled, MAX_ITEMS)
                 .withStyle(ChatFormatting.GRAY));
     }
 
-    // ==================== 悬浮显示物品列表 ====================
     @Override
     @Nonnull
     public Optional<TooltipComponent> getTooltipImage(@Nonnull ItemStack stack) {
-        if (stack.has(net.minecraft.core.component.DataComponents.HIDE_TOOLTIP)) {
+        var tag = stack.getTag();
+        if (tag != null && (tag.getInt("HideFlags") & 32) != 0) {
             return Optional.empty();
         }
-        List<ItemStack> items = new ArrayList<>();
-        getContents(stack).itemsCopy().forEach(items::add);
-        return Optional.of(new BundleTooltip(new BundleContents(items)));
+        NonNullList<ItemStack> items = NonNullList.create();
+        for (ItemStack s : getContents(stack)) {
+            if (!s.isEmpty()) items.add(s);
+        }
+        return Optional.of(new BundleTooltip(items, totalCount(items)));
     }
 
-    // ==================== 耐久条（显示填充度） ====================
     @Override
     public boolean isBarVisible(@Nonnull ItemStack stack) {
         return !getContents(stack).isEmpty();
@@ -193,16 +225,15 @@ public class Medkit extends BundleItem {
 
     @Override
     public int getBarWidth(@Nonnull ItemStack stack) {
-        int filled = getContents(stack).totalCount();
+        int filled = totalCount(getContents(stack));
         return Math.round(13.0f * filled / MAX_ITEMS);
     }
 
     @Override
     public int getBarColor(@Nonnull ItemStack stack) {
-        return 0x4C6A9B; // 蓝色
+        return 0x4C6A9B;
     }
 
-    // ==================== 音效 ====================
     private void playRemoveOneSound(Player player) {
         player.playSound(SoundEvents.BUNDLE_REMOVE_ONE, 0.8F,
                 0.8F + player.level().getRandom().nextFloat() * 0.4F);

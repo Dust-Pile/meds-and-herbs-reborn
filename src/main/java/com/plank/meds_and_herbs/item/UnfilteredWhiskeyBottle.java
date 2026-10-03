@@ -1,7 +1,7 @@
 package com.plank.meds_and_herbs.item;
 
-import com.plank.meds_and_herbs.init.Effects;
-import com.plank.meds_and_herbs.init.Items;
+import com.plank.meds_and_herbs.init.MHEffects;
+import com.plank.meds_and_herbs.init.MHItems;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -18,11 +18,11 @@ public class UnfilteredWhiskeyBottle extends Item {
     public UnfilteredWhiskeyBottle() {
         super(new Item.Properties()
                 .stacksTo(16)
-                .craftRemainder(Items.DIRTY_MEDICINE_BOTTLE.get())
+                .craftRemainder(MHItems.DIRTY_MEDICINE_BOTTLE.get())
                 .food(new FoodProperties.Builder()
                         .nutrition(4)
-                        .saturationModifier(0.5f)
-                        .alwaysEdible()
+                        .saturationMod(0.5f)
+                        .alwaysEat()
                         .build()));
     }
 
@@ -31,14 +31,13 @@ public class UnfilteredWhiskeyBottle extends Item {
     public ItemStack finishUsingItem(@Nonnull ItemStack stack, @Nonnull Level level, @Nonnull LivingEntity livingEntity) {
         ItemStack result = super.finishUsingItem(stack, level, livingEntity);
         if (!level.isClientSide && livingEntity instanceof Player player) {
-            // 20% 概率甲醇中毒，否则给予饮料效果 15 秒
             if (player.getRandom().nextFloat() < 0.2f) {
-                player.addEffect(new MobEffectInstance(Effects.METHANOL_POISONING, 12000, 0));
+                player.addEffect(new MobEffectInstance(MHEffects.METHANOL_POISONING.get(), 12000, 0));
             } else {
-                player.addEffect(new MobEffectInstance(Effects.BEVERAGE_DRINK, 300, 0));
+                player.addEffect(new MobEffectInstance(MHEffects.BEVERAGE_DRINK.get(), 300, 0));
             }
-            if (!player.hasInfiniteMaterials()) {
-                return new ItemStack(Items.DIRTY_MEDICINE_BOTTLE.get());
+            if (!player.isCreative()) {
+                return new ItemStack(MHItems.DIRTY_MEDICINE_BOTTLE.get());
             }
         }
         return result;

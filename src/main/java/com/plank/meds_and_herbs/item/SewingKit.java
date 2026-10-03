@@ -1,14 +1,15 @@
 package com.plank.meds_and_herbs.item;
 
 import com.plank.meds_and_herbs.effect.EffectCures;
-import com.plank.meds_and_herbs.init.Effects;
+import com.plank.meds_and_herbs.init.MHEffects;
+import com.plank.meds_and_herbs.init.MHItems;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -30,13 +31,13 @@ public class SewingKit extends Item {
     }
 
     @Override
-    public void appendHoverText(@Nonnull ItemStack stack, @Nonnull TooltipContext context, List<Component> tooltip, @Nonnull TooltipFlag flag) {
+    public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag isAdvanced) {
+        super.appendHoverText(stack, level, tooltip, isAdvanced);
         tooltip.add(Component.translatable("tooltip.meds_and_herbs.use").withStyle(ChatFormatting.GRAY));
         tooltip.add(Component.translatable("tooltip.meds_and_herbs.sneak").withStyle(ChatFormatting.GRAY));
         tooltip.add(Component.translatable("tooltip.meds_and_herbs.sewing_kit.desc").withStyle(ChatFormatting.GRAY));
     }
 
-    // 右键点击实体直接使用
     @Override
     public @Nonnull InteractionResult interactLivingEntity(@Nonnull ItemStack stack, @Nonnull Player player,
                                                            @Nonnull LivingEntity target, @Nonnull InteractionHand hand) {
@@ -48,7 +49,6 @@ public class SewingKit extends Item {
         return InteractionResult.SUCCESS;
     }
 
-    // 右键空气使用（支持主副手）
     @Override
     public @Nonnull InteractionResultHolder<ItemStack> use(@Nonnull Level level, @Nonnull Player player, @Nonnull InteractionHand hand) {
         if (level.isClientSide) {
@@ -75,29 +75,22 @@ public class SewingKit extends Item {
         return InteractionResultHolder.consume(player.getItemInHand(hand));
     }
 
-    // ---------- 核心治疗逻辑 ----------
     private void performSewing(Player player, LivingEntity target, InteractionHand hand) {
         if (player.level().isClientSide) return;
 
         ItemStack kit = player.getItemInHand(hand);
 
-        // 检查是否有撕裂伤
-        if (!target.hasEffect(Effects.LACERATION)) {
+        if (!target.hasEffect(MHEffects.LACERATION.get())) {
             player.displayClientMessage(Component.translatable("message.meds_and_herbs.no_laceration"), true);
             return;
         }
 
-        // 执行治愈
-        EffectCures.cure(target, EffectCures.SEWING);
-        // 消耗耐久
-        kit.hurtAndBreak(1, (ServerLevel) player.level(), (ServerPlayer) player, item -> {});
-        // 挥臂动画
+        EffectCures.cure(target, new ItemStack(MHItems.SEWING_KIT.get()));
+        kit.hurtAndBreak(1, player, item -> {});
         player.swing(hand, true);
-        // 消息
         player.displayClientMessage(Component.translatable("message.meds_and_herbs.laceration_healed"), true);
     }
 
-    // ---------- 射线检测目标实体 ----------
     @Nullable
     private LivingEntity getTargetEntity(Player player) {
         double reach = 4.0;
@@ -109,7 +102,7 @@ public class SewingKit extends Item {
         LivingEntity result = null;
         double closestDist = reach + 1.0;
 
-        for (net.minecraft.world.entity.Entity entity : player.level().getEntities(player, searchBox,
+        for (Entity entity : player.level().getEntities(player, searchBox,
                 e -> e instanceof LivingEntity && e != player && e.isAlive())) {
             AABB entityBox = entity.getBoundingBox().inflate(0.3);
             var hit = entityBox.clip(eyePos, endPos);

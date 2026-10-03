@@ -18,22 +18,19 @@ public class AloeJuiceBottle extends Item {
                 .craftRemainder(Items.GLASS_BOTTLE)
                 .food(new FoodProperties.Builder()
                         .nutrition(1)
-                        .saturationModifier(1.0f)
-                        .alwaysEdible()
+                        .saturationMod(1.0f)
+                        .alwaysEat()
                         .build()));
     }
     @Override
     @Nonnull
     public ItemStack finishUsingItem(@Nonnull ItemStack stack, @Nonnull Level level, @Nonnull LivingEntity livingEntity) {
-        // 先应用原版食物效果（恢复饥饿、饱和度）
         ItemStack result = super.finishUsingItem(stack, level, livingEntity);
         if (!level.isClientSide && livingEntity instanceof Player player) {
-            // 返回玻璃瓶（前提：非创造模式且物品被消耗）
-            if (!player.hasInfiniteMaterials()) {
+            if (!player.isCreative()) {
                 return new ItemStack(Items.GLASS_BOTTLE);
             }
         }
-        // 如果玩家是创造模式，返回剩下的 stack（可能为空）
         return result;
     }
 
