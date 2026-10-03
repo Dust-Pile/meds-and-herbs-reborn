@@ -1,6 +1,9 @@
 package com.plank.meds_and_herbs.data;
 
-import com.google.gson.*;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.plank.meds_and_herbs.MedsAndHerbs;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -24,18 +27,17 @@ public class MedicineTypeLoader extends SimpleJsonResourceReloadListener {
         parseEntries(entries);
     }
 
-    // 抽取解析逻辑，供 apply 和 loadFromResourceManager 共用
     private static void parseEntries(Map<ResourceLocation, JsonElement> entries) {
         for (var entry : entries.entrySet()) {
             try {
                 var json = entry.getValue().getAsJsonObject();
                 var id = entry.getKey();
                 var nameKey = json.get("name").getAsString();
-                var type = json.get("type").getAsString();
+                MedicineDefinition.Type type = MedicineDefinition.Type.valueOf(json.get("type").getAsString().toUpperCase(Locale.ROOT));
                 var color = json.has("color") ? parseColor(json.get("color").getAsString()) : 0xFFFFFFFF;
                 var functionPath = ResourceLocation.parse(json.get("function").getAsString());
-                var cures = parseCures(json.getAsJsonArray("cures"));
-                var def = new MedicineDefinition(id, nameKey, MedicineDefinition.Type.valueOf(type.toUpperCase()), color, functionPath, cures);
+                List<ResourceLocation> cures = parseCures(json.getAsJsonArray("cures"));
+                var def = new MedicineDefinition(id, nameKey, type, color, functionPath, cures);
                 definitions.put(id, def);
             } catch (Exception e) {
                 MedsAndHerbs.LOGGER.error("Failed to load medicine type {}", entry.getKey(), e);
@@ -52,7 +54,7 @@ public class MedicineTypeLoader extends SimpleJsonResourceReloadListener {
     }
 
     private static List<ResourceLocation> parseCures(JsonArray array) {
-        List<ResourceLocation> list = new ArrayList<>();
+        List<ResourceLocation> list = new ArrayList<>(array.size());
         for (var elem : array) {
             list.add(ResourceLocation.parse(elem.getAsString()));
         }

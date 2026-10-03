@@ -13,4 +13,7 @@ public record MedicineDefinition(
         List<ResourceLocation> cures   // 可治愈的效果 ID 列表
 ) {
     protected enum Type { INTERNAL, EXTERNAL }
+    public boolean isInternal() {
+        return type == Type.INTERNAL;
+    }
 }
