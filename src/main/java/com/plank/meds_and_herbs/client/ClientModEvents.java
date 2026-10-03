@@ -4,44 +4,38 @@ import com.plank.meds_and_herbs.MedsAndHerbs;
 import com.plank.meds_and_herbs.data.MedicineData;
 import com.plank.meds_and_herbs.data.MedicineDefinition;
 import com.plank.meds_and_herbs.data.MedicineTypeLoader;
-import com.plank.meds_and_herbs.init.Items;
+import com.plank.meds_and_herbs.init.MHItems;
 import com.plank.meds_and_herbs.item.Medicine;
 import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.resources.ResourceLocation;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
-import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.event.RegisterColorHandlersEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 
-@EventBusSubscriber(modid = MedsAndHerbs.MODID, value = Dist.CLIENT)
+@Mod.EventBusSubscriber(modid = MedsAndHerbs.MODID, value = Dist.CLIENT)
 public class ClientModEvents {
 
-    // 1. 注册颜色叠加层（原事件）
     @SubscribeEvent
     public static void registerItemColors(RegisterColorHandlersEvent.Item event) {
         event.register((stack, tintIndex) -> {
             if (tintIndex == 0) return 0xFFFFFFFF;
             else if (tintIndex == 1) {
-                MedicineData data = Medicine.getMedicineData(stack);
-                MedicineDefinition def = MedicineTypeLoader.get(data.typeId());
+                ResourceLocation typeId = Medicine.getType(stack);
+                MedicineDefinition def = MedicineTypeLoader.get(typeId);
                 return def != null ? def.color() : 0xFFFFFFFF;
             }
             return 0xFFFFFFFF;
-        }, Items.MEDICINE.get());
+        }, MHItems.MEDICINE.get());
     }
 
-    // 2. 注册模型覆写属性（用于根据使用次数切换模型）
     @SubscribeEvent
     public static void onClientSetup(FMLClientSetupEvent event) {
-        event.enqueueWork(() -> { // 务必用 enqueueWork 确保线程安全
-            ItemProperties.register(Items.MEDICINE.get(),
+        event.enqueueWork(() -> {
+            ItemProperties.register(MHItems.MEDICINE.get(),
                     ResourceLocation.parse("meds_and_herbs:uses"),
-                    (stack, level, entity, seed) -> {
-                        MedicineData data = Medicine.getMedicineData(stack);
-                        // 返回当前剩余使用次数，需与模型 json 里的 predicate 值匹配
-                        return data.uses();
-                    }
+                    (stack, level, entity, seed) -> Medicine.getUses(stack)
             );
         });
     }
