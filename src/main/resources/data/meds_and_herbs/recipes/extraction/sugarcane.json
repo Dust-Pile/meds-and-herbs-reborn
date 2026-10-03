@@ -2,9 +2,9 @@
   "type": "meds_and_herbs:extraction",
   "powder": {
     "ingredient": {
-      "item": "meds_and_herbs:powder_herbal"
+      "item": "meds_and_herbs:powder_sugarcane"
     },
-    "count": 4
+    "count": 16
   },
   "solvent": {
     "ingredient": {
@@ -30,12 +30,12 @@
     "id": "meds_and_herbs:medicine",
     "components": {
       "meds_and_herbs:medicine_data": {
-        "type": "meds_and_herbs:herbal",
+        "type": "meds_and_herbs:glucose",
         "uses": 3
       }
     }
   },
-  "stillage": {
+  "spillage": {
     "id": "meds_and_herbs:distilled_leftovers"
   }
 }

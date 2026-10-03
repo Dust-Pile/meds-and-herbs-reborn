@@ -2,7 +2,7 @@
   "type": "meds_and_herbs:extraction",
   "powder": {
     "ingredient": {
-      "item": "meds_and_herbs:powder_sugarcane"
+      "item": "meds_and_herbs:powder_shrooms"
     },
     "count": 16
   },
@@ -30,12 +30,12 @@
     "id": "meds_and_herbs:medicine",
     "components": {
       "meds_and_herbs:medicine_data": {
-        "type": "meds_and_herbs:glucose",
+        "type": "meds_and_herbs:mushroom",
         "uses": 3
       }
     }
   },
-  "stillage": {
+  "spillage": {
     "id": "meds_and_herbs:distilled_leftovers"
   }
 }

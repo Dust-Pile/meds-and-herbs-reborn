@@ -2,26 +2,15 @@
   "type": "meds_and_herbs:extraction",
   "powder": {
     "ingredient": {
-      "type": "neoforge:components",
-      "items": "meds_and_herbs:powder_herbal",
-      "components": {
-        "meds_and_herbs:bouquet_flowers": {
-          "flowers": [
-            "meds_and_herbs:chamomile",
-            "meds_and_herbs:chamomile",
-            "meds_and_herbs:chamomile",
-            "meds_and_herbs:chamomile"
-          ]
-        }
-      },
-      "strict": false
+      "item": "meds_and_herbs:powder_cocoa"
     },
-    "count": 4
+    "count": 16
   },
   "solvent": {
     "ingredient": {
       "type": "neoforge:components",
       "items": "meds_and_herbs:medicine",
+      "count": 1,
       "components": {
         "meds_and_herbs:medicine_data": {
           "type": "meds_and_herbs:ethanol",
@@ -29,8 +18,7 @@
         }
       },
       "strict": false
-    },
-    "count": 1
+    }
   },
   "emptyBottle": {
     "ingredient": {
@@ -42,12 +30,12 @@
     "id": "meds_and_herbs:medicine",
     "components": {
       "meds_and_herbs:medicine_data": {
-        "type": "meds_and_herbs:chamomile",
+        "type": "meds_and_herbs:caffeine",
         "uses": 3
       }
     }
   },
-  "stillage": {
+  "spillage": {
     "id": "meds_and_herbs:distilled_leftovers"
   }
 }

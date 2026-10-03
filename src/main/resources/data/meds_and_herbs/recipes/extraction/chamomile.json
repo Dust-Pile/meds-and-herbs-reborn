@@ -2,15 +2,26 @@
   "type": "meds_and_herbs:extraction",
   "powder": {
     "ingredient": {
-      "item": "meds_and_herbs:powder_shrooms"
+      "type": "neoforge:components",
+      "items": "meds_and_herbs:powder_herbal",
+      "components": {
+        "meds_and_herbs:bouquet_flowers": {
+          "flowers": [
+            "meds_and_herbs:chamomile",
+            "meds_and_herbs:chamomile",
+            "meds_and_herbs:chamomile",
+            "meds_and_herbs:chamomile"
+          ]
+        }
+      },
+      "strict": false
     },
-    "count": 16
+    "count": 4
   },
   "solvent": {
     "ingredient": {
       "type": "neoforge:components",
       "items": "meds_and_herbs:medicine",
-      "count": 1,
       "components": {
         "meds_and_herbs:medicine_data": {
           "type": "meds_and_herbs:ethanol",
@@ -18,7 +29,8 @@
         }
       },
       "strict": false
-    }
+    },
+    "count": 1
   },
   "emptyBottle": {
     "ingredient": {
@@ -30,12 +42,12 @@
     "id": "meds_and_herbs:medicine",
     "components": {
       "meds_and_herbs:medicine_data": {
-        "type": "meds_and_herbs:mushroom",
+        "type": "meds_and_herbs:chamomile",
         "uses": 3
       }
     }
   },
-  "stillage": {
+  "spillage": {
     "id": "meds_and_herbs:distilled_leftovers"
   }
 }

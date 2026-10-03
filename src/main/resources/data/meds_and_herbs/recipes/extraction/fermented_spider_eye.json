@@ -2,7 +2,7 @@
   "type": "meds_and_herbs:extraction",
   "powder": {
     "ingredient": {
-      "item": "meds_and_herbs:powder_kelp"
+      "item": "minecraft:fermented_spider_eye"
     },
     "count": 16
   },
@@ -27,9 +27,15 @@
     "count": 1
   },
   "output": {
-    "id": "meds_and_herbs:agar_bottle"
+    "id": "meds_and_herbs:medicine",
+    "components": {
+      "meds_and_herbs:medicine_data": {
+        "type": "meds_and_herbs:poison",
+        "uses": 3
+      }
+    }
   },
-  "stillage": {
+  "spillage": {
     "id": "meds_and_herbs:distilled_leftovers"
   }
 }

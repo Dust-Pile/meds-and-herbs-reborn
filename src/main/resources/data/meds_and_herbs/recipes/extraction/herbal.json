@@ -2,7 +2,7 @@
   "type": "meds_and_herbs:extraction",
   "powder": {
     "ingredient": {
-      "item": "meds_and_herbs:penicillium_and_coal"
+      "item": "meds_and_herbs:powder_herbal"
     },
     "count": 4
   },
@@ -30,12 +30,12 @@
     "id": "meds_and_herbs:medicine",
     "components": {
       "meds_and_herbs:medicine_data": {
-        "type": "meds_and_herbs:penicillin",
+        "type": "meds_and_herbs:herbal",
         "uses": 3
       }
     }
   },
-  "stillage": {
+  "spillage": {
     "id": "meds_and_herbs:distilled_leftovers"
   }
 }

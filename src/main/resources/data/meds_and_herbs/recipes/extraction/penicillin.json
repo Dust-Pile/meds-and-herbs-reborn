@@ -2,19 +2,7 @@
   "type": "meds_and_herbs:extraction",
   "powder": {
     "ingredient": {
-      "type": "neoforge:components",
-      "items": "meds_and_herbs:powder_herbal",
-      "components": {
-        "meds_and_herbs:bouquet_flowers": {
-          "flowers": [
-            "meds_and_herbs:artemisia",
-            "meds_and_herbs:artemisia",
-            "meds_and_herbs:artemisia",
-            "meds_and_herbs:artemisia"
-          ]
-        }
-      },
-      "strict": false
+      "item": "meds_and_herbs:penicillium_and_coal"
     },
     "count": 4
   },
@@ -22,6 +10,7 @@
     "ingredient": {
       "type": "neoforge:components",
       "items": "meds_and_herbs:medicine",
+      "count": 1,
       "components": {
         "meds_and_herbs:medicine_data": {
           "type": "meds_and_herbs:ethanol",
@@ -29,8 +18,7 @@
         }
       },
       "strict": false
-    },
-    "count": 1
+    }
   },
   "emptyBottle": {
     "ingredient": {
@@ -42,12 +30,12 @@
     "id": "meds_and_herbs:medicine",
     "components": {
       "meds_and_herbs:medicine_data": {
-        "type": "meds_and_herbs:artemisia",
+        "type": "meds_and_herbs:penicillin",
         "uses": 3
       }
     }
   },
-  "stillage": {
+  "spillage": {
     "id": "meds_and_herbs:distilled_leftovers"
   }
 }

@@ -7,10 +7,10 @@
       "components": {
         "meds_and_herbs:bouquet_flowers": {
           "flowers": [
-            "meds_and_herbs:vinca",
-            "meds_and_herbs:vinca",
-            "meds_and_herbs:vinca",
-            "meds_and_herbs:vinca"
+            "meds_and_herbs:sweet_clover",
+            "meds_and_herbs:sweet_clover",
+            "meds_and_herbs:sweet_clover",
+            "meds_and_herbs:sweet_clover"
           ]
         }
       },
@@ -42,12 +42,12 @@
     "id": "meds_and_herbs:medicine",
     "components": {
       "meds_and_herbs:medicine_data": {
-        "type": "meds_and_herbs:vinca",
+        "type": "meds_and_herbs:sweet_clover",
         "uses": 3
       }
     }
   },
-  "stillage": {
+  "spillage": {
     "id": "meds_and_herbs:distilled_leftovers"
   }
 }
