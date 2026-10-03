@@ -13,6 +13,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.slf4j.Logger;
 
 @Mod("meds_and_herbs")
@@ -24,9 +25,10 @@ public class MedsAndHerbs {
         return ResourceLocation.fromNamespaceAndPath(MODID, path);
     }
 
-    public MedsAndHerbs(IEventBus bus) {
+    public MedsAndHerbs() {
+        IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
+
         MHSounds.REGISTRY.register(bus);
-//        DataComponents.REGISTRY.register(bus);
         MHBlocks.REGISTRY.register(bus);
         MHBlockEntities.REGISTRY.register(bus);
         MHRecipes.SERIALIZERS.register(bus);
