@@ -47,7 +47,7 @@ public class IncubatorRecipe implements Recipe<Container> {
     public boolean matches(@Nonnull Container container, @Nonnull Level level) {
         ItemStack stack = container.getItem(0);
         if (stack.isEmpty()) return false;
-        return ItemStack.isSameItemSameTags(stack, input) && stack.getCount() >= input.getCount();
+        return ItemStack.isSameItem(stack, input) && stack.getCount() >= input.getCount();
     }
 
     @Override

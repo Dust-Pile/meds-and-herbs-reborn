@@ -33,11 +33,37 @@ import javax.annotation.Nullable;
 import java.util.Optional;
 
 public class IncubatorBlockEntity extends BlockEntity implements MenuProvider, Container {
+    private int tickCounter = 0;
 
-    private final ItemStackHandler itemHandler = new ItemStackHandler(16) {
+    private final ItemStackHandler itemHandler = new ItemStackHandler(8) {
         @Override
         public int getSlotLimit(int slot) {
             return 1;
+        }
+
+        @Override
+        public boolean isItemValid(int slot, @Nonnull ItemStack stack) {
+            if (level == null) return false;
+            var container = new SimpleContainer(stack);
+            return level.getRecipeManager()
+                    .getRecipeFor(MHRecipes.INCUBATOR_TYPE.get(), container, level)
+                    .isPresent();
+        }
+
+        @Override
+        @Nonnull
+        public ItemStack extractItem(int slot, int amount, boolean simulate) {
+            var stack = getStackInSlot(slot);
+            if (stack.isEmpty() || level == null) return ItemStack.EMPTY;
+
+            var container = new SimpleContainer(stack);
+            var isInput = level.getRecipeManager()
+                    .getRecipeFor(MHRecipes.INCUBATOR_TYPE.get(), container, level)
+                    .isPresent();
+
+            if (isInput) return ItemStack.EMPTY;
+
+            return super.extractItem(slot, amount, simulate);
         }
 
         @Override
@@ -128,6 +154,9 @@ public class IncubatorBlockEntity extends BlockEntity implements MenuProvider, C
     public void tick(Level level, BlockPos pos, BlockState state) {
         if (level.isClientSide) return;
 
+        if (++tickCounter < 20) return;
+        tickCounter = 0;
+
         boolean dirty = false;
 
         for (int slot = 0; slot < 8; slot++) {
@@ -187,7 +216,7 @@ public class IncubatorBlockEntity extends BlockEntity implements MenuProvider, C
             }
 
             CompoundTag petri = new CompoundTag();
-            petri.putInt("progress", progress + 1);
+            petri.putInt("progress", progress + 20);
             petri.putInt("maxProgress", maxProgress);
             stack.getOrCreateTag().put("PetriDishData", petri);
 

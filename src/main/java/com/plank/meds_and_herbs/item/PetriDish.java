@@ -4,6 +4,7 @@ import com.plank.meds_and_herbs.init.MHItems;
 import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.Mth;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
@@ -22,7 +23,7 @@ public class PetriDish extends Item {
         CompoundTag tag = stack.getTag();
         if (tag == null) return false;
 
-        return tag.getCompound("petri_dish_data").getInt("maxProgress") > 0;
+        return tag.getCompound("PetriDishData").getInt("progress") > 0;
     }
 
     @Override
@@ -30,8 +31,8 @@ public class PetriDish extends Item {
         CompoundTag tag = stack.getTag();
 
         if (tag != null) {
-            int progress = tag.getCompound("petri_dish_data").getInt("maxProgress");
-            int maxProgress = tag.getCompound("petri_dish_data").getInt("maxProgress");
+            int progress = tag.getCompound("PetriDishData").getInt("progress");
+            int maxProgress = tag.getCompound("PetriDishData").getInt("maxProgress");
 
             if (maxProgress > 0) {
                 float progressPercentage = (float) progress / maxProgress;
@@ -48,8 +49,8 @@ public class PetriDish extends Item {
         CompoundTag tag = stack.getTag();
 
         if (tag != null) {
-            int progress = tag.getCompound("petri_dish_data").getInt("maxProgress");
-            int maxProgress = tag.getCompound("petri_dish_data").getInt("maxProgress");
+            int progress = tag.getCompound("PetriDishData").getInt("progress");
+            int maxProgress = tag.getCompound("PetriDishData").getInt("maxProgress");
 
             if (maxProgress > 0) {
                 float progressPercentage = (float) progress / maxProgress;
@@ -66,18 +67,16 @@ public class PetriDish extends Item {
         CompoundTag tag = stack.getTag();
 
         if (tag != null) {
-            int progress = tag.getCompound("petri_dish_data").getInt("maxProgress");
-            int maxProgress = tag.getCompound("petri_dish_data").getInt("maxProgress");
+            int progress = tag.getCompound("PetriDishData").getInt("progress");
+            int maxProgress = tag.getCompound("PetriDishData").getInt("maxProgress");
 
             if (maxProgress > 0) {
-                tooltip.add(Component.translatable("tooltip.meds_and_herbs.progress",
-                        progress, maxProgress).withStyle(ChatFormatting.GRAY));
+//                tooltip.add(Component.translatable("tooltip.meds_and_herbs.progress",
+//                        progress, maxProgress).withStyle(ChatFormatting.GRAY));
 
-                /* todo make this a config option
-                tooltip.add(Component.translatable("tooltip.meds_and_herbs.progress",
-                        progress * (100 / maxProgress), 100).withStyle(ChatFormatting.GRAY));
-
-                 */
+                // todo make this a config option
+                tooltip.add(Component.translatable("tooltip.meds_and_herbs.progress_percentage",
+                        Math.round((progress / (float) maxProgress) * 10000f) / 100f).withStyle(ChatFormatting.GRAY));
             }
         }
         super.appendHoverText(stack, level, tooltip, isAdvanced);

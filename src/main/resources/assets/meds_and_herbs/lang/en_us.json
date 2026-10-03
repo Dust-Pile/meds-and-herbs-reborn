@@ -133,6 +133,7 @@
   "tooltip.meds_and_herbs.bouquet.contains": "Contains:",
   "tooltip.meds_and_herbs.bouquet.empty": "Empty",
   "tooltip.meds_and_herbs.progress": "Progress: %d/%d",
+  "tooltip.meds_and_herbs.progress_percentage": "Progress: %d%%",
   "tooltip.medicine.internal": "Internal",
   "tooltip.medicine.external": "External",
   "tooltip.medicine.treat": "Could treat:",
