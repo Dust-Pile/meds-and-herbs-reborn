@@ -13,11 +13,13 @@ import net.minecraft.core.Holder;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.damagesource.DamageTypes;
+import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.entity.living.LivingDamageEvent;
@@ -27,6 +29,9 @@ import net.minecraftforge.event.entity.living.MobEffectEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.ForgeRegistries;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Mod.EventBusSubscriber(modid = MedsAndHerbs.MODID)
 public class CommonEvents {
@@ -164,14 +169,17 @@ public class CommonEvents {
     @SubscribeEvent
     public static void onEffectAdded(MobEffectEvent.Added event) {
         MobEffectInstance instance = event.getEffectInstance();
-        if (instance == null) return;
+
+        // remove milk from cures
+        if (instance.getEffect().getCategory() == MobEffectCategory.HARMFUL) {
+            List<ItemStack> cures = new ArrayList<>(instance.getCurativeItems());
+            cures.removeIf(stack -> stack.is(Items.MILK_BUCKET));
+            instance.setCurativeItems(cures);
+        }
 
         var entity = event.getEntity();
         if (entity.level().isClientSide) return;
         if (!entity.isAlive()) return;
-
-        var effect = instance.getEffect();
-        int amplifier = instance.getAmplifier();
 
         var id = ForgeRegistries.MOB_EFFECTS.getKey(instance.getEffect());
 

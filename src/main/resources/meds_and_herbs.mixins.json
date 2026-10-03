@@ -4,8 +4,7 @@
   "package": "com.plank.meds_and_herbs.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
-    "LivingEntityMixin",
-    "IForgeMobEffectMixin"
+    "LivingEntityMixin"
   ],
   "client": [
   ],
