@@ -17,6 +17,7 @@ public class MHTags {
         public static final TagKey<Item> POWDERS = tag("powders");
         public static final TagKey<Item> FILTER = tag("filter");
         public static final TagKey<Item> EMPTY_BOTTLE = tag("empty_bottle");
+        public static final TagKey<Item> DRESSINGS = tag("dressings");
 
         private static TagKey<Item> tag(String name) {
             return TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath(MedsAndHerbs.MODID, name));
