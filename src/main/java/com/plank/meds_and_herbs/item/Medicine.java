@@ -64,8 +64,8 @@ public class Medicine extends Item {
     public static void setMedicineData(ItemStack stack, ResourceLocation typeId, int uses) {
         CompoundTag data = new CompoundTag();
         data.putString("type", typeId.toString());
-        data.putInt("MedicineData", uses);
-        stack.getOrCreateTag().put("key", data);
+        data.putInt("uses", uses);
+        stack.getOrCreateTag().put("MedicineData", data);
     }
 
     public static boolean isMedicineBottle(ItemStack stack) {

@@ -5,7 +5,6 @@ import com.plank.meds_and_herbs.data.MedicineDefinition;
 import com.plank.meds_and_herbs.data.MedicineTypeLoader;
 import com.plank.meds_and_herbs.item.Medicine;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
@@ -46,12 +45,7 @@ public class MHCreativeTabs {
                                 output.accept(MHItems.PETRI_DISH_PENICILLIUM.get());
 
                                 for (MedicineDefinition def : MedicineTypeLoader.getAllDefinitions()) {
-                                    ItemStack stack = new ItemStack(MHItems.MEDICINE.get());
-                                    CompoundTag medicineData = new CompoundTag();
-                                    medicineData.putString("id", def.id().toString());
-                                    medicineData.putInt("uses", Medicine.MAX_USES);
-                                    stack.setTag(medicineData);
-                                    output.accept(stack);
+                                    output.accept(Medicine.create(def.id(), Medicine.MAX_USES));
                                 }
 
                                 output.accept(MHItems.SYRINGE.get());
