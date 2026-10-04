@@ -1,12 +1,10 @@
 package com.plank.meds_and_herbs.block.entity;
 
 import com.plank.meds_and_herbs.client.gui.menu.ExtractApparatusGUIMenu;
-import com.plank.meds_and_herbs.init.MHBlockEntities;
-import com.plank.meds_and_herbs.init.MHRecipes;
-import com.plank.meds_and_herbs.init.MHSounds;
-import com.plank.meds_and_herbs.init.MHTags;
+import com.plank.meds_and_herbs.init.*;
 import com.plank.meds_and_herbs.procedures.LoadItemList;
 import com.plank.meds_and_herbs.recipe.ExtractionRecipe;
+import com.plank.meds_and_herbs.util.MHUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -213,6 +211,13 @@ public class ExtractionApparatusBlockEntity extends BlockEntity implements MenuP
     }
 
     private boolean canStartProcess(ExtractionRecipe recipe) {
+        ItemStack filter = internalHandler.getStackInSlot(4);
+        if (!filter.is(MHTags.Items.FILTER)) return false;
+        if (filter.getDamageValue() >= filter.getMaxDamage()) return false;
+
+        ItemStack powder = internalHandler.getStackInSlot(0);
+        if (!recipe.getPowder().test(powder) || powder.getCount() < recipe.getPowderCount()) return false;
+
         ItemStack bottle = internalHandler.getStackInSlot(2);
 
         if (recipe.getEmptyBottle().isPresent()) {
@@ -236,7 +241,7 @@ public class ExtractionApparatusBlockEntity extends BlockEntity implements MenuP
         ItemStack solventCopy = internalHandler.getStackInSlot(1).copy();
         ItemStack bottleCopy  = internalHandler.getStackInSlot(2).copy();
 
-        internalHandler.extractItem(0,  1, false);
+        internalHandler.extractItem(0,  recipe.getPowderCount(), false);
         internalHandler.extractItem(1, 1, false);
         if (recipe.getEmptyBottle().isPresent()) {
             internalHandler.extractItem(2, 1, false);
@@ -244,11 +249,12 @@ public class ExtractionApparatusBlockEntity extends BlockEntity implements MenuP
 
         // hurt or break filter
         ItemStack filter = internalHandler.getStackInSlot(4);
-        if (!filter.isEmpty() && filter.isDamageableItem()) {
-            filter.hurtAndBreak(1, null, ignored -> { });
-            internalHandler.setStackInSlot(4, filter);
-        } else if (!filter.isEmpty()) {
-            internalHandler.extractItem(4, 1, false);
+        if (filter.is(MHItems.COTTON_FILTER.get())) {
+            if (!filter.isEmpty() && filter.isDamageableItem()) {
+                MHUtils.hurtAndBreak(filter, 1, level.getRandom());
+            } else if (!filter.isEmpty()) {
+                internalHandler.extractItem(4, 1, false);
+            }
         }
 
         processRemainderAndRecord(0,  powderCopy);

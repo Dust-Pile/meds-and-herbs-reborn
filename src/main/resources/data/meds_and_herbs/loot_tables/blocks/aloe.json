@@ -15,7 +15,9 @@
           "term": {
             "condition": "minecraft:match_tool",
             "predicate": {
-              "items": "minecraft:shears"
+              "items": [
+                "minecraft:shears"
+              ]
             }
           }
         },
@@ -24,14 +26,6 @@
         }
       ],
       "functions": [
-        {
-          "function": "minecraft:apply_bonus",
-          "enchantment": "minecraft:fortune",
-          "formula": "minecraft:uniform_bonus_count",
-          "parameters": {
-            "bonusMultiplier": 2
-          }
-        },
         {
           "function": "minecraft:set_count",
           "count": {
@@ -56,7 +50,9 @@
           "term": {
             "condition": "minecraft:match_tool",
             "predicate": {
-              "items": "minecraft:shears"
+              "items": [
+                "minecraft:shears"
+              ]
             }
           }
         },
@@ -95,7 +91,9 @@
         {
           "condition": "minecraft:match_tool",
           "predicate": {
-            "items": "minecraft:shears"
+            "items": [
+              "minecraft:shears"
+            ]
           }
         },
         {

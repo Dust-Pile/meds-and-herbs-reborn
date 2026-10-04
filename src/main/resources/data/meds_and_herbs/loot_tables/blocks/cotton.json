@@ -6,7 +6,7 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "meds_and_herbs:plantago_leaf"
+          "name": "meds_and_herbs:cotton_fiber"
         }
       ],
       "conditions": [
@@ -15,7 +15,9 @@
           "term": {
             "condition": "minecraft:match_tool",
             "predicate": {
-              "items": "minecraft:shears"
+              "items": [
+                "minecraft:shears"
+              ]
             }
           }
         },
@@ -47,14 +49,16 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "meds_and_herbs:plantago"
+          "name": "meds_and_herbs:cotton"
         }
       ],
       "conditions": [
         {
           "condition": "minecraft:match_tool",
           "predicate": {
-            "items": "minecraft:shears"
+            "items": [
+              "minecraft:shears"
+            ]
           }
         },
         {

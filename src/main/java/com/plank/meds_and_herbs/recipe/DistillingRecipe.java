@@ -23,20 +23,17 @@ public class DistillingRecipe implements Recipe<Container> {
     private final ResourceLocation id;
     private final Optional<Ingredient> inputA;
     private final Optional<Ingredient> inputB;
-    private final Optional<Ingredient> emptyBottle;
     private final ItemStack output;
     private final ItemStack spillage;
 
     public DistillingRecipe(ResourceLocation id,
-                            Optional<Ingredient> inputA,
-                            Optional<Ingredient> inputB,
-                            Optional<Ingredient> emptyBottle,
-                            ItemStack output,
-                            ItemStack spillage) {
+                            Optional<Ingredient> inputA, // slot 0
+                            Optional<Ingredient> inputB, // slot 1
+                            ItemStack output, // slot 3 (slot 2 is empty bottle)
+                            ItemStack spillage) { // slot 4
         this.id = id;
         this.inputA = inputA;
         this.inputB = inputB;
-        this.emptyBottle = emptyBottle;
         this.output = output;
         this.spillage = spillage;
     }
@@ -71,10 +68,6 @@ public class DistillingRecipe implements Recipe<Container> {
         return output.copy();
     }
 
-    public boolean matchesEmptyBottle(ItemStack bottle) {
-        return emptyBottle.isEmpty() || emptyBottle.get().test(bottle);
-    }
-
     @Override
     public boolean canCraftInDimensions(int width, int height) {
         return true;
@@ -91,7 +84,6 @@ public class DistillingRecipe implements Recipe<Container> {
         NonNullList<Ingredient> list = NonNullList.create();
         inputA.ifPresent(list::add);
         inputB.ifPresent(list::add);
-        emptyBottle.ifPresent(list::add);
         return list;
     }
 
@@ -120,10 +112,6 @@ public class DistillingRecipe implements Recipe<Container> {
         return inputB;
     }
 
-    public Optional<Ingredient> getEmptyBottle() {
-        return emptyBottle;
-    }
-
     public ItemStack getOutput() {
         return output;
     }
@@ -140,14 +128,13 @@ public class DistillingRecipe implements Recipe<Container> {
         public DistillingRecipe fromJson(@Nonnull ResourceLocation id, @Nonnull JsonObject json) {
             Optional<Ingredient> inputA = readJsonIngredient(json, "inputA");
             Optional<Ingredient> inputB = readJsonIngredient(json, "inputB");
-            Optional<Ingredient> emptyBottle = readJsonIngredient(json, "emptyBottle");
 
             ItemStack output = ShapedRecipe.itemStackFromJson(GsonHelper.getAsJsonObject(json, "output"));
             ItemStack spillage = json.has("spillage")
                     ? ShapedRecipe.itemStackFromJson(GsonHelper.getAsJsonObject(json, "spillage"))
                     : ItemStack.EMPTY;
 
-            return new DistillingRecipe(id, inputA, inputB, emptyBottle, output, spillage);
+            return new DistillingRecipe(id, inputA, inputB, output, spillage);
         }
 
         private static Optional<Ingredient> readJsonIngredient(JsonObject json, String key) {
@@ -161,10 +148,9 @@ public class DistillingRecipe implements Recipe<Container> {
         public DistillingRecipe fromNetwork(@Nonnull ResourceLocation id, @Nonnull FriendlyByteBuf buf) {
             Optional<Ingredient> inputA = readOptional(buf);
             Optional<Ingredient> inputB = readOptional(buf);
-            Optional<Ingredient> emptyBottle = readOptional(buf);
             ItemStack output = buf.readItem();
             ItemStack spillage = buf.readItem();
-            return new DistillingRecipe(id, inputA, inputB, emptyBottle, output, spillage);
+            return new DistillingRecipe(id, inputA, inputB, output, spillage);
         }
 
         private static Optional<Ingredient> readOptional(FriendlyByteBuf buf) {
@@ -177,7 +163,6 @@ public class DistillingRecipe implements Recipe<Container> {
         public void toNetwork(@Nonnull FriendlyByteBuf buf, @Nonnull DistillingRecipe recipe) {
             writeOptional(buf, recipe.inputA);
             writeOptional(buf, recipe.inputB);
-            writeOptional(buf, recipe.emptyBottle);
             buf.writeItem(recipe.output);
             buf.writeItem(recipe.spillage);
         }

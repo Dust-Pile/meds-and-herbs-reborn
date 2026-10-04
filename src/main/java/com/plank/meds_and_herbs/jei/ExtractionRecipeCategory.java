@@ -23,6 +23,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
@@ -75,9 +76,12 @@ public class ExtractionRecipeCategory implements IRecipeCategory<ExtractionRecip
 
         List<IRecipeSlotBuilder> linkedSlots = new ArrayList<>();
 
+        var powderStack = new ItemStack(recipe.getPowder().getItems()[0].getItem());
+        powderStack.setCount(recipe.getPowderCount());
+
         IRecipeSlotBuilder powderSlot = builder.addSlot(RecipeIngredientRole.INPUT, 10, 15)
                 .setBackground(slotBackground, -1, -1)
-                .addIngredients(recipe.getPowder());
+                .addIngredients(Ingredient.of(powderStack));
         linkedSlots.add(powderSlot);
 
         IRecipeSlotBuilder solventSlot = builder.addSlot(RecipeIngredientRole.INPUT, 10, 40)
@@ -87,7 +91,7 @@ public class ExtractionRecipeCategory implements IRecipeCategory<ExtractionRecip
 
         IRecipeSlotBuilder filterSlot = builder.addSlot(RecipeIngredientRole.INPUT, 28, 40)
                 .setBackground(slotBackground, -1, -1)
-                .addIngredients(recipe.getFilter());
+                .addIngredients(Ingredient.of(MHItems.COTTON_FILTER.get()));
         linkedSlots.add(filterSlot);
 
         recipe.getEmptyBottle().ifPresent(ingredient -> {

@@ -1,5 +1,9 @@
 {
   "type": "meds_and_herbs:bouquet_grinder",
-  "ingredients": [ { "item": "meds_and_herbs:bouquet" } ],
-  "result": { "item": "meds_and_herbs:powder_herbal" }
+  "ingredients": [
+    { "item": "meds_and_herbs:bouquet" }
+  ],
+  "result": {
+    "item": "meds_and_herbs:powder_herbal"
+  }
 }

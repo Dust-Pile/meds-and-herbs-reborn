@@ -4,7 +4,7 @@
     "item": "minecraft:sugar_cane"
   },
   "output": {
-    "id": "meds_and_herbs:powder_sugarcane",
+    "item": "meds_and_herbs:powder_sugarcane",
     "count": 1
   }
 }

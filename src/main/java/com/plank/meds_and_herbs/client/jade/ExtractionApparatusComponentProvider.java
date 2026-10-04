@@ -2,7 +2,6 @@ package com.plank.meds_and_herbs.client.jade;
 
 import com.plank.meds_and_herbs.MedsAndHerbs;
 import com.plank.meds_and_herbs.block.entity.ExtractionApparatusBlockEntity;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.phys.Vec2;
 import snownee.jade.api.BlockAccessor;
@@ -19,34 +18,26 @@ public enum ExtractionApparatusComponentProvider implements IBlockComponentProvi
 
     @Override
     public void appendTooltip(ITooltip tooltip, BlockAccessor accessor, IPluginConfig config) {
-        if (!(accessor.getBlockEntity() instanceof ExtractionApparatusBlockEntity be)) {
+        if (!(accessor.getBlockEntity() instanceof ExtractionApparatusBlockEntity)) {
             return;
         }
 
-        var handler = be.getItemHandler();
-        IElementHelper helper = IElementHelper.get();
-
-        tooltip.add(helper.item(handler.getStackInSlot(0)));
-        tooltip.append(helper.item(handler.getStackInSlot(1)));
-        tooltip.append(helper.item(handler.getStackInSlot(4)));
-
-        tooltip.append(helper.spacer(4, 0));
-
         var data = accessor.getServerData();
+        if (!data.getBoolean("running")) return;
+
         var progress = data.getInt("progress");
         var maxProgress = data.getInt("maxProgress");
-        float ratio = maxProgress > 0 ? (float) progress / maxProgress : 0f;
+        if (maxProgress <= 0) return;
+
+        IElementHelper helper = IElementHelper.get();
+        float ratio = (float) progress / maxProgress;
 
         IProgressStyle style = helper.progressStyle();
         IBoxStyle box = IBoxStyle.Empty.INSTANCE;
 
         IElement progressElement = helper.progress(ratio, null, style, box, false)
                 .translate(new Vec2(-2.0F, 0.0F));
-        tooltip.append(progressElement);
-        tooltip.append(helper.spacer(4, 0));
-
-        tooltip.append(helper.item(handler.getStackInSlot(2)));
-        tooltip.append(helper.item(handler.getStackInSlot(3)));
+        tooltip.add(progressElement);
     }
 
     @Override

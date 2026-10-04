@@ -45,7 +45,7 @@ public class FermentationBarrelBlockEntity extends BlockEntity implements Contai
 
     private final Map<Integer, ItemStack> pendingSlots = new HashMap<>();
 
-    private final ItemStackHandler itemHandler = new ItemStackHandler(9) {
+    private final ItemStackHandler itemHandler = new ItemStackHandler(10) {
         @Override
         protected void onContentsChanged(int slot) {
             setChanged();
@@ -53,7 +53,7 @@ public class FermentationBarrelBlockEntity extends BlockEntity implements Contai
                 level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
             }
 
-            if (slot < 8) {
+            if (slot < 9) {
                 progress = 0;
                 currentRecipe = null;
             }
@@ -66,7 +66,7 @@ public class FermentationBarrelBlockEntity extends BlockEntity implements Contai
 
         @Override
         public boolean isItemValid(int slot, @NotNull ItemStack stack) {
-            return slot < 8;
+            return slot < 9;
         }
 
         @Override
@@ -92,11 +92,11 @@ public class FermentationBarrelBlockEntity extends BlockEntity implements Contai
         return super.getCapability(cap, side);
     }
 
-    @Override public int getContainerSize() { return 8; }
+    @Override public int getContainerSize() { return 9; }
 
     @Override
     public boolean isEmpty() {
-        for (int i = 0; i < 8; i++) {
+        for (int i = 0; i < 9; i++) {
             if (!itemHandler.getStackInSlot(i).isEmpty()) return false;
         }
         return true;
@@ -106,13 +106,13 @@ public class FermentationBarrelBlockEntity extends BlockEntity implements Contai
 
     @Override @Nonnull
     public ItemStack removeItem(int slot, int amount) {
-        if (slot < 0 || slot >= 8) return ItemStack.EMPTY;
+        if (slot < 0 || slot >= 9) return ItemStack.EMPTY;
         return itemHandler.extractItem(slot, amount, false);
     }
 
     @Override @Nonnull
     public ItemStack removeItemNoUpdate(int slot) {
-        if (slot < 0 || slot >= 8) return ItemStack.EMPTY;
+        if (slot < 0 || slot >= 9) return ItemStack.EMPTY;
         ItemStack stack = itemHandler.getStackInSlot(slot);
         itemHandler.setStackInSlot(slot, ItemStack.EMPTY);
         return stack;
@@ -120,7 +120,7 @@ public class FermentationBarrelBlockEntity extends BlockEntity implements Contai
 
     @Override
     public void setItem(int slot, @Nonnull ItemStack stack) {
-        if (slot < 0 || slot >= 8) return;
+        if (slot < 0 || slot >= 9) return;
         itemHandler.setStackInSlot(slot, stack);
     }
 
@@ -135,7 +135,7 @@ public class FermentationBarrelBlockEntity extends BlockEntity implements Contai
 
     @Override
     public void clearContent() {
-        for (int i = 0; i < 9; i++) {
+        for (int i = 0; i < 10; i++) {
             itemHandler.setStackInSlot(i, ItemStack.EMPTY);
         }
         pendingSlots.clear();
@@ -157,7 +157,9 @@ public class FermentationBarrelBlockEntity extends BlockEntity implements Contai
             }
         }
 
-        if (!currentRecipe.matches(this, level)) {
+        FermentationRecipe cachedRecipe = currentRecipe;
+
+        if (!cachedRecipe.matches(this, level)) {
             progress = 0;
             currentRecipe = null;
             setChanged();
@@ -167,7 +169,7 @@ public class FermentationBarrelBlockEntity extends BlockEntity implements Contai
         if (progress < MAX_PROGRESS) {
             progress++;
             setChanged();
-            if (level instanceof ServerLevel serverLevel) {
+            if (progress % 40 == 0 && level instanceof ServerLevel serverLevel) {
                 serverLevel.sendParticles(ParticleTypes.HAPPY_VILLAGER,
                         pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5,
                         5, 0.5, 0.5, 0.5, 0.0);
@@ -175,12 +177,12 @@ public class FermentationBarrelBlockEntity extends BlockEntity implements Contai
             return;
         }
 
-        if (!itemHandler.getStackInSlot(8).isEmpty()) {
+        if (!itemHandler.getStackInSlot(9).isEmpty()) {
             return;
         }
 
-        List<Ingredient> remaining = new ArrayList<>(currentRecipe.getIngredients());
-        for (int i = 0; i < 8; i++) {
+        List<Ingredient> remaining = new ArrayList<>(cachedRecipe.getIngredients());
+        for (int i = 0; i < 9; i++) {
             ItemStack stack = itemHandler.getStackInSlot(i);
             if (stack.isEmpty()) continue;
             Iterator<Ingredient> it = remaining.iterator();
@@ -194,17 +196,17 @@ public class FermentationBarrelBlockEntity extends BlockEntity implements Contai
         }
 
         RegistryAccess access = level.registryAccess();
-        ItemStack output = currentRecipe.getResultItem(access).copy();
-        itemHandler.setStackInSlot(8, output);
+        ItemStack output = cachedRecipe.getResultItem(access).copy();
+        itemHandler.setStackInSlot(9, output);
 
         pendingSlots.clear();
-        pendingSlots.put(8, output.copy());
+        pendingSlots.put(9, output.copy());
 
         level.playSound(null, worldPosition, MHSounds.FERMENTATION_BARREL.get(),
                 SoundSource.BLOCKS, 1.0f, 1.0f);
 
         progress = 0;
-        currentRecipe = null;
+        cachedRecipe = null;
         setChanged();
         level.sendBlockUpdated(pos, state, state, 3);
     }

@@ -124,5 +124,31 @@ public class Medicine extends Item {
                 tooltip.add(Component.literal("  ").append(name).withStyle(ChatFormatting.GRAY));
             }
         }
+
+        var uses = Medicine.getUses(stack);
+        tooltip.add(Component.literal("Uses: " + uses).withStyle(ChatFormatting.GRAY));
+    }
+
+    @Override
+    public boolean isBarVisible(ItemStack stack) {
+        return getUses(stack) < MAX_USES;
+    }
+
+    @Override
+    public int getBarWidth(ItemStack stack) {
+        int uses = getUses(stack);
+        if (uses >= MAX_USES) return super.getBarWidth(stack);
+        return Math.min(Math.round(13.0f * uses / MAX_USES), 13);
+    }
+
+    @Override
+    public int getBarColor(ItemStack stack) {
+        int uses = getUses(stack);
+        if (uses >= MAX_USES) return super.getBarColor(stack);
+
+        float ratio = (float) uses / MAX_USES;
+        int r = (int) (255 * (1 - ratio));
+        int g = (int) (255 * ratio);
+        return (r << 16) | (g << 8);
     }
 }

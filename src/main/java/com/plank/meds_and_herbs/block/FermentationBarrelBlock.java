@@ -144,7 +144,7 @@ public class FermentationBarrelBlock extends Block implements EntityBlock {
 
         if (level.isClientSide) {
             if (stack.isEmpty()) {
-                for (int i = 8; i >= 0; i--) {
+                for (int i = 9; i >= 0; i--) {
                     if (!barrel.getItemInSlot(i).isEmpty()) {
                         return InteractionResult.SUCCESS;
                     }
@@ -160,7 +160,7 @@ public class FermentationBarrelBlock extends Block implements EntityBlock {
         }
 
         if (stack.isEmpty()) {
-            for (int i = 8; i >= 0; i--) {
+            for (int i = 9; i >= 0; i--) {
                 ItemStack stored = barrel.getItemInSlot(i);
                 if (!stored.isEmpty()) {
                     ItemStack item = stored.copy();

@@ -109,8 +109,8 @@ public class FermentationRecipeCategory implements IRecipeCategory<FermentationR
         arrowBackground.draw(guiGraphics, arrowX, arrowY);
         arrow.draw(guiGraphics, arrowX, arrowY);
 
-        int seconds = FermentationRecipe.DEFAULT_COOKING_TIME;
-        Component timeText = Component.translatable("gui.jei.category.smelting.time.seconds", seconds);
+        int duration = FermentationRecipe.DEFAULT_COOKING_TIME;
+        Component timeText = Component.translatable("gui.jei.category.smelting.time.seconds", duration / 20);
         guiGraphics.drawString(minecraft.font, timeText, 10, getHeight() - 15, 0xFF808080, false);
     }
 

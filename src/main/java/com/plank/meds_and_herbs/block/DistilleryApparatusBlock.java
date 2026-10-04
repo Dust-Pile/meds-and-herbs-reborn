@@ -100,13 +100,16 @@ public class DistilleryApparatusBlock extends Block implements EntityBlock {
 
     @Override
     public boolean canSurvive(@Nonnull BlockState state, @Nonnull LevelReader level, @Nonnull BlockPos pos) {
-        BlockPos above = pos.above();
-        BlockPos below = pos.below();
-
-        return level.isEmptyBlock(above) &&
-                !level.isEmptyBlock(below) &&
-                !level.getBlockState(below).is(MHTags.Blocks.STATIONS);
+        return super.canSurvive(state, level, pos);
+//
+//        BlockPos above = pos.above();
+//        BlockPos below = pos.below();
+//
+//        return level.isEmptyBlock(above) &&
+//                !level.isEmptyBlock(below) &&
+//                !level.getBlockState(below).is(MHTags.Blocks.STATIONS);
     }
+
     @Override
     @Nonnull
     public BlockState updateShape(BlockState state, @Nonnull Direction direction, @Nonnull BlockState neighborState, @Nonnull LevelAccessor level, @Nonnull BlockPos pos, @Nonnull BlockPos neighborPos) {

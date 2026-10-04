@@ -26,49 +26,17 @@ public enum IncubatorComponentProvider implements IBlockComponentProvider {
             return;
         }
 
-        IElementHelper elements = IElementHelper.get();
-
-        List<ItemStack> slotStacks = new ArrayList<>();
-        for (int i = 0; i < 8; i++) {
-            slotStacks.add(incubator.getItemInSlot(i));
-        }
-
-        var hasAny = slotStacks.stream().anyMatch(s -> !s.isEmpty());
-        if (!hasAny) {
-            return;
-        }
-
-        for (int i = 0; i < 4; i++) {
-            var stack = slotStacks.get(i);
-            var display = stack.isEmpty() ? new ItemStack(Items.STRUCTURE_VOID) : stack;
-            var element = elements.smallItem(display);
-            if (i == 0) {
-                tooltip.add(element);
-            } else {
-                tooltip.append(element);
-            }
-        }
-
-        for (int i = 0; i < 4; i++) {
-            var stack = slotStacks.get(i + 4);
-            var display = stack.isEmpty() ? new ItemStack(Items.STRUCTURE_VOID) : stack;
-            var element = elements.smallItem(display);
-            if (i == 0) {
-                tooltip.add(element);
-            } else {
-                tooltip.append(element);
-            }
-        }
-
         var data = accessor.getServerData();
         int[] progress = data.getIntArray("progress");
         int[] maxProgress = data.getIntArray("maxProgress");
 
-        for (int i = 0; i < 8; i++) {
-            if (i >= progress.length || i >= maxProgress.length) break;
+        IElementHelper elements = IElementHelper.get();
+        boolean any = false;
+        for (int i = 0; i < progress.length && i < maxProgress.length; i++) {
             if (maxProgress[i] <= 0) continue;
             int percent = progress[i] * 100 / maxProgress[i];
             tooltip.add(elements.text(Component.literal("Slot " + (i + 1) + ": " + percent + "%")));
+            any = true;
         }
     }
 

@@ -8,12 +8,7 @@
     { "item": "meds_and_herbs:medicine_bottle" }
   ],
   "result": {
-    "id": "meds_and_herbs:medicine",
-    "components": {
-      "meds_and_herbs:medicine_data": {
-        "type": "meds_and_herbs:aloe",
-        "uses": 3
-      }
-    }
+    "item": "meds_and_herbs:medicine",
+    "nbt": "{\"MedicineData\":{type:\"meds_and_herbs:aloe\",uses:3}}"
   }
 }

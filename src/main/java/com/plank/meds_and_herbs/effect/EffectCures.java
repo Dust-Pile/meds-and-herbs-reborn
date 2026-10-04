@@ -19,9 +19,9 @@ public final class EffectCures {
 
         CompoundTag tag = stack.getTag();
         if (tag == null) return false;
-        if (!tag.contains("medicine_data", CompoundTag.TAG_COMPOUND)) return false;
+        if (!tag.contains("MedicineData", CompoundTag.TAG_COMPOUND)) return false;
 
-        CompoundTag data = tag.getCompound("medicine_data");
+        CompoundTag data = tag.getCompound("MedicineData");
         return typeId.equals(data.getString("type"));
     }
 

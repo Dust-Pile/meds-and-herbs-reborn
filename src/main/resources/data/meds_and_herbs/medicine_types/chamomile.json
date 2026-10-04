@@ -10,9 +10,6 @@
     "minecraft:instant_damage",
     "minecraft:nausea",
     "minecraft:blindness",
-    "minecraft:hunger",
-    "minecraft:infested",
-    "minecraft:oozing",
-    "minecraft:weaving"
+    "minecraft:hunger"
   ]
 }

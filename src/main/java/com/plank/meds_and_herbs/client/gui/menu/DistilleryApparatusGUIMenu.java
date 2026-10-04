@@ -43,7 +43,7 @@ public class DistilleryApparatusGUIMenu extends AbstractContainerMenu {
         addSlot(new SlotItemHandler(handler, 0, 44, 17)); // input a
         addSlot(new SlotItemHandler(handler, 1, 62, 17)); // input b
         addSlot(new SlotItemHandler(handler, 2, 116, 17)); // bottle
-        addSlot(new SlotItemHandler(handler, 3, 53, 62) { // output
+        addSlot(new SlotItemHandler(handler, 3, 62, 62) { // output
             @Override
             public boolean mayPlace(@Nonnull ItemStack stack) {
                 return false;

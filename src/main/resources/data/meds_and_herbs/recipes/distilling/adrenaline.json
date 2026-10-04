@@ -3,18 +3,15 @@
   "inputA": {
     "type": "forge:partial_nbt",
     "item": "meds_and_herbs:medicine",
-    "nbt": "{\"meds_and_herbs:medicine_data\":{type:\"meds_and_herbs:adrenaline_blood\",uses:3}}"
+    "nbt": "{\"MedicineData\":{type:\"meds_and_herbs:adrenaline_blood\",uses:3}}"
   },
   "inputB": {
     "type": "forge:partial_nbt",
     "item": "meds_and_herbs:medicine",
-    "nbt": "{\"meds_and_herbs:medicine_data\":{type:\"meds_and_herbs:ethanol\",uses:3}}"
-  },
-  "emptyBottle": {
-    "item": "meds_and_herbs:medicine_bottle"
+    "nbt": "{\"MedicineData\":{type:\"meds_and_herbs:ethanol\",uses:3}}"
   },
   "output": {
     "item": "meds_and_herbs:medicine",
-    "nbt": "{\"meds_and_herbs:medicine_data\":{type:\"meds_and_herbs:adrenaline\",uses:3}}"
+    "nbt": "{\"MedicineData\":{type:\"meds_and_herbs:adrenaline\",uses:3}}"
   }
 }

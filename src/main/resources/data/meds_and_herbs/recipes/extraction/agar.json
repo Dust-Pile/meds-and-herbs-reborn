@@ -1,35 +1,21 @@
 {
   "type": "meds_and_herbs:extraction",
   "powder": {
-    "ingredient": {
-      "item": "meds_and_herbs:powder_kelp"
-    },
+    "item": "meds_and_herbs:powder_kelp",
     "count": 16
   },
   "solvent": {
-    "ingredient": {
-      "type": "neoforge:components",
-      "items": "meds_and_herbs:medicine",
-      "count": 1,
-      "components": {
-        "meds_and_herbs:medicine_data": {
-          "type": "meds_and_herbs:ethanol",
-          "uses": 3
-        }
-      },
-      "strict": false
-    }
+    "type": "forge:partial_nbt",
+    "item": "meds_and_herbs:medicine",
+    "nbt": "{\"MedicineData\":{type:\"meds_and_herbs:ethanol\",uses:3}}"
   },
-  "emptyBottle": {
-    "ingredient": {
-      "item": "meds_and_herbs:medicine_bottle"
-    },
-    "count": 1
+  "empty_bottle": {
+    "item": "meds_and_herbs:medicine_bottle"
   },
   "output": {
-    "id": "meds_and_herbs:agar_bottle"
+    "item": "meds_and_herbs:agar_bottle"
   },
   "spillage": {
-    "id": "meds_and_herbs:distilled_leftovers"
+    "item": "meds_and_herbs:distilled_leftovers"
   }
 }

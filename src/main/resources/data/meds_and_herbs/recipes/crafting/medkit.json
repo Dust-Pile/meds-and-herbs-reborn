@@ -18,7 +18,6 @@
     }
   },
   "result": {
-    "id": "meds_and_herbs:medkit",
-    "count": 1
+    "item": "meds_and_herbs:medkit"
   }
 }

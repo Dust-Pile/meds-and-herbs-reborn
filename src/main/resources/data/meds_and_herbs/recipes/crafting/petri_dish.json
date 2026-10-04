@@ -14,7 +14,6 @@
     }
   },
   "result": {
-    "id": "meds_and_herbs:petri_dish_empty",
-    "count": 4
+    "item": "meds_and_herbs:petri_dish_empty"
   }
 }

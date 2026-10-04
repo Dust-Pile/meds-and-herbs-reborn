@@ -1,53 +1,24 @@
 {
   "type": "meds_and_herbs:extraction",
   "powder": {
-    "ingredient": {
-      "type": "neoforge:components",
-      "items": "meds_and_herbs:powder_herbal",
-      "components": {
-        "meds_and_herbs:bouquet_flowers": {
-          "flowers": [
-            "meds_and_herbs:sweet_clover",
-            "meds_and_herbs:sweet_clover",
-            "meds_and_herbs:sweet_clover",
-            "meds_and_herbs:sweet_clover"
-          ]
-        }
-      },
-      "strict": false
-    },
+    "type": "forge:partial_nbt",
+    "item": "meds_and_herbs:powder_herbal",
+    "nbt": "{\"BouquetFlowers\":{flowers:[\"meds_and_herbs:sweet_clover\",\"meds_and_herbs:sweet_clover\",\"meds_and_herbs:sweet_clover\",\"meds_and_herbs:sweet_clover\"]}}",
     "count": 4
   },
   "solvent": {
-    "ingredient": {
-      "type": "neoforge:components",
-      "items": "meds_and_herbs:medicine",
-      "components": {
-        "meds_and_herbs:medicine_data": {
-          "type": "meds_and_herbs:ethanol",
-          "uses": 3
-        }
-      },
-      "strict": false
-    },
-    "count": 1
+    "type": "forge:partial_nbt",
+    "item": "meds_and_herbs:medicine",
+    "nbt": "{\"MedicineData\":{type:\"meds_and_herbs:ethanol\",uses:3}}"
   },
-  "emptyBottle": {
-    "ingredient": {
-      "item": "meds_and_herbs:medicine_bottle"
-    },
-    "count": 1
+  "empty_bottle": {
+    "item": "meds_and_herbs:medicine_bottle"
   },
   "output": {
-    "id": "meds_and_herbs:medicine",
-    "components": {
-      "meds_and_herbs:medicine_data": {
-        "type": "meds_and_herbs:sweet_clover",
-        "uses": 3
-      }
-    }
+    "item": "meds_and_herbs:medicine",
+    "nbt": "{\"MedicineData\":{type:\"meds_and_herbs:sweet_clover\",uses:3}}"
   },
   "spillage": {
-    "id": "meds_and_herbs:distilled_leftovers"
+    "item": "meds_and_herbs:distilled_leftovers"
   }
 }

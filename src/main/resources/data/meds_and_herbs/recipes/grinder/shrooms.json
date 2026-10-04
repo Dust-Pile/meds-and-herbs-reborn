@@ -4,7 +4,7 @@
     "tag": "meds_and_herbs:shrooms"
   },
   "output": {
-    "id": "meds_and_herbs:powder_shrooms",
+    "item": "meds_and_herbs:powder_shrooms",
     "count": 1
   }
 }

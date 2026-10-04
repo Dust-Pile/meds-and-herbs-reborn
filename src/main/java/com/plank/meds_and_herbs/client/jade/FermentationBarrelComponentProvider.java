@@ -26,37 +26,6 @@ public enum FermentationBarrelComponentProvider implements IBlockComponentProvid
         }
 
         IElementHelper elements = IElementHelper.get();
-
-        List<ItemStack> items = new ArrayList<>();
-        for (int i = 0; i < 9; i++) {
-            ItemStack stack = barrel.getItemInSlot(i);
-            if (!stack.isEmpty()) {
-                items.add(stack);
-            }
-        }
-
-        if (items.isEmpty()) {
-            return;
-        }
-
-        if (items.size() < 5) {
-            for (ItemStack stack : items) {
-                tooltip.add(elements.smallItem(stack));
-                tooltip.append(elements.text(
-                        stack.getHoverName().plainCopy().withStyle(ChatFormatting.GRAY)));
-            }
-        } else {
-            boolean first = true;
-            for (ItemStack stack : items) {
-                if (first) {
-                    tooltip.add(elements.item(stack));
-                    first = false;
-                } else {
-                    tooltip.append(elements.item(stack));
-                }
-            }
-        }
-
         var data = accessor.getServerData();
         if (data.getBoolean("running")) {
             var progress = data.getInt("progress");

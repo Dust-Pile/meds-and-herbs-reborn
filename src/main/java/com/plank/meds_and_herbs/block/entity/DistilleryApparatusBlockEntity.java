@@ -66,11 +66,6 @@ public class DistilleryApparatusBlockEntity extends BlockEntity implements MenuP
                 pendingSlots.remove(slot);
             }
         }
-
-        @Override
-        public int getSlotLimit(int slot) {
-            return slot == 2 ? 1 : 64; // allow ONLY 1 bottle
-        }
     };
 
     private final IItemHandler upHandler = new FilteredItemHandler(
@@ -215,12 +210,7 @@ public class DistilleryApparatusBlockEntity extends BlockEntity implements MenuP
     private boolean canStartProcess(DistillingRecipe recipe) {
         ItemStack bottle = internalHandler.getStackInSlot(2);
 
-        // does recipe need bottle
-        if (recipe.getEmptyBottle().isPresent()) {
-            if (!recipe.matchesEmptyBottle(bottle)) return false; // not am empty bottle
-        } else if (!bottle.isEmpty()) {  // recipe doesnt need bottle but bottle is present
-            return false;
-        }
+        if (!bottle.is(MHTags.Items.EMPTY_BOTTLE) || bottle.isEmpty()) return false;
 
         if (!canFit(3, recipe.getOutput())) return false;
         if (!recipe.getSpillage().isEmpty() && !canFit(4, recipe.getSpillage())) return false;
@@ -241,12 +231,7 @@ public class DistilleryApparatusBlockEntity extends BlockEntity implements MenuP
             internalHandler.extractItem(1, 1, false);
         }
 
-        if (recipe.getEmptyBottle().isPresent()) {
-            internalHandler.extractItem(2, 1, false);
-            ItemStack dirty = new ItemStack(MHItems.DIRTY_MEDICINE_BOTTLE.get());
-            internalHandler.setStackInSlot(2, dirty);
-            pendingSlots.put(2, dirty.copy());
-        }
+        internalHandler.extractItem(2, 1, false);
 
         processRemainderAndRecord(0, inputACopy);
         processRemainderAndRecord(1, inputBCopy);

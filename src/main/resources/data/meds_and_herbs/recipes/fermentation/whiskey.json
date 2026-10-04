@@ -12,6 +12,6 @@
     { "item": "minecraft:wheat" }
   ],
   "output": {
-    "id": "meds_and_herbs:unfiltered_whiskey_bucket"
+    "item": "meds_and_herbs:unfiltered_whiskey_bucket"
   }
 }

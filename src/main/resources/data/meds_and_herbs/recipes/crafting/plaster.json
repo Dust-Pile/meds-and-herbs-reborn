@@ -22,7 +22,6 @@
     }
   ],
   "result": {
-    "id": "meds_and_herbs:plaster",
-    "count": 1
+    "item": "meds_and_herbs:plaster"
   }
 }

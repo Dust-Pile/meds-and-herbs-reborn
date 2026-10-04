@@ -24,38 +24,38 @@ public class ExtractionRecipe implements Recipe<Container> {
 
     private final ResourceLocation id;
     private final Ingredient powder;
+    private final int powderCount;
     private final Ingredient solvent;
     private final Optional<Ingredient> emptyBottle;
-    private final Ingredient filter;
     private final ItemStack output;
     private final ItemStack spillage;
 
     public ExtractionRecipe(ResourceLocation id,
                             Ingredient powder,
+                            int powderCount,
                             Ingredient solvent,
                             Optional<Ingredient> emptyBottle,
-                            Ingredient filter,
                             ItemStack output,
                             ItemStack spillage) {
         this.id = id;
         this.powder = powder;
+        this.powderCount = powderCount;
         this.solvent = solvent;
         this.emptyBottle = emptyBottle;
-        this.filter = filter;
         this.output = output;
         this.spillage = spillage;
     }
 
     public Ingredient getPowder() { return powder; }
+    public int getPowderCount() { return powderCount; }
     public Ingredient getSolvent() { return solvent; }
     public Optional<Ingredient> getEmptyBottle() { return emptyBottle; }
-    public Ingredient getFilter() { return filter; }
     public ItemStack getOutput() { return output; }
     public ItemStack getSpillage() { return spillage; }
 
     @Override
     public boolean matches(@NotNull Container container, @NotNull Level level) {
-        if (!powder.test(container.getItem(0))) return false;
+        if (!powder.test(container.getItem(0)) || container.getItem(0).getCount() < powderCount) return false;
         if (!solvent.test(container.getItem(1))) return false;
 
         ItemStack bottle = container.getItem(2);
@@ -65,7 +65,7 @@ public class ExtractionRecipe implements Recipe<Container> {
             return false;
         }
 
-        return filter.test(container.getItem(3));
+        return true;
     }
 
     @Override
@@ -89,7 +89,6 @@ public class ExtractionRecipe implements Recipe<Container> {
         list.add(powder);
         list.add(solvent);
         emptyBottle.ifPresent(list::add);
-        list.add(filter);
         return list;
     }
 
@@ -115,14 +114,13 @@ public class ExtractionRecipe implements Recipe<Container> {
         public @NotNull ExtractionRecipe fromJson(@NotNull ResourceLocation recipeId,
                                                   @NotNull JsonObject json) {
             Ingredient powder = Ingredient.fromJson(GsonHelper.getAsJsonObject(json, "powder"));
+            int powderCount = GsonHelper.getAsInt(GsonHelper.getAsJsonObject(json, "powder"), "count", 1);
             Ingredient solvent = Ingredient.fromJson(GsonHelper.getAsJsonObject(json, "solvent"));
 
             Optional<Ingredient> emptyBottle = Optional.empty();
             if (json.has("empty_bottle")) {
                 emptyBottle = Optional.of(Ingredient.fromJson(GsonHelper.getAsJsonObject(json, "empty_bottle")));
             }
-
-            Ingredient filter = Ingredient.fromJson(GsonHelper.getAsJsonObject(json, "filter"));
 
             ItemStack output = CraftingHelper.getItemStack(
                     GsonHelper.getAsJsonObject(json, "output"), true);
@@ -133,18 +131,18 @@ public class ExtractionRecipe implements Recipe<Container> {
                         GsonHelper.getAsJsonObject(json, "spillage"), true);
             }
 
-            return new ExtractionRecipe(recipeId, powder, solvent, emptyBottle, filter, output, spillage);
+            return new ExtractionRecipe(recipeId, powder, powderCount, solvent, emptyBottle, output, spillage);
         }
 
         @Override
         public void toNetwork(@NotNull FriendlyByteBuf buf, @NotNull ExtractionRecipe recipe) {
             recipe.powder.toNetwork(buf);
+            buf.writeVarInt(recipe.powderCount);
             recipe.solvent.toNetwork(buf);
 
             buf.writeBoolean(recipe.emptyBottle.isPresent());
             recipe.emptyBottle.ifPresent(ing -> ing.toNetwork(buf));
 
-            recipe.filter.toNetwork(buf);
             buf.writeItem(recipe.output);
             buf.writeItem(recipe.spillage);
         }
@@ -153,6 +151,7 @@ public class ExtractionRecipe implements Recipe<Container> {
         public @NotNull ExtractionRecipe fromNetwork(@NotNull ResourceLocation recipeId,
                                                      @NotNull FriendlyByteBuf buf) {
             Ingredient powder = Ingredient.fromNetwork(buf);
+            int powderCount = buf.readVarInt();
             Ingredient solvent = Ingredient.fromNetwork(buf);
 
             Optional<Ingredient> emptyBottle = Optional.empty();
@@ -160,11 +159,10 @@ public class ExtractionRecipe implements Recipe<Container> {
                 emptyBottle = Optional.of(Ingredient.fromNetwork(buf));
             }
 
-            Ingredient filter = Ingredient.fromNetwork(buf);
             ItemStack output = buf.readItem();
             ItemStack spillage = buf.readItem();
 
-            return new ExtractionRecipe(recipeId, powder, solvent, emptyBottle, filter, output, spillage);
+            return new ExtractionRecipe(recipeId, powder, powderCount, solvent, emptyBottle, output, spillage);
         }
     }
 }

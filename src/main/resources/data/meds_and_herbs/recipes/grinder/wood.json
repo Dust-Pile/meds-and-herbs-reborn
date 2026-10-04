@@ -4,7 +4,7 @@
     "item": "meds_and_herbs:bark"
   },
   "output": {
-    "id": "meds_and_herbs:powder_wood",
+    "item": "meds_and_herbs:powder_wood",
     "count": 1
   }
 }

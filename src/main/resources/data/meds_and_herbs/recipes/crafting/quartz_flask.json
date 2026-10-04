@@ -15,7 +15,6 @@
     }
   },
   "result": {
-    "id": "meds_and_herbs:quartz_flask",
-    "count": 1
+    "item": "meds_and_herbs:quartz_flask"
   }
 }

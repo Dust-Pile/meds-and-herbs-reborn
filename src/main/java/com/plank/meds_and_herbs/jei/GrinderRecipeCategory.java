@@ -1,6 +1,8 @@
 package com.plank.meds_and_herbs.jei;
 
+import com.plank.meds_and_herbs.MedsAndHerbs;
 import com.plank.meds_and_herbs.init.MHItems;
+import com.plank.meds_and_herbs.item.Bouquet;
 import com.plank.meds_and_herbs.recipe.GrinderRecipe;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.builder.ITooltipBuilder;
@@ -16,7 +18,9 @@ import mezz.jei.api.recipe.category.IRecipeCategory;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 
 import javax.annotation.Nonnull;
@@ -66,8 +70,24 @@ public class GrinderRecipeCategory implements IRecipeCategory<GrinderRecipe> {
     @Override
     public void setRecipe(@Nonnull IRecipeLayoutBuilder builder, GrinderRecipe recipe, @Nonnull IFocusGroup focuses) {
         var ingredients = recipe.getIngredients();
+
+        if (recipe.getId().equals(MedsAndHerbs.id("bouquet_grinding"))) {
+            ItemStack bouquet = new ItemStack(MHItems.POWDER_HERBAL.get());
+            List<ResourceLocation> flowers = Bouquet.createFlowersList(Items.ORANGE_TULIP, Items.DANDELION, Items.CORNFLOWER, Items.LILY_OF_THE_VALLEY);
+            Bouquet.setFlowerData(bouquet, flowers);
+        }
+
+
         if (!ingredients.isEmpty()) {
-            Ingredient inputIng = ingredients.get(0);
+            var inputIng = ingredients.get(0);
+
+            if (recipe.getId().equals(MedsAndHerbs.id("bouquet_grinding"))) {
+                ItemStack bouquet = new ItemStack(MHItems.POWDER_HERBAL.get());
+                List<ResourceLocation> flowers = Bouquet.createFlowersList(Items.ORANGE_TULIP, Items.DANDELION, Items.CORNFLOWER, Items.LILY_OF_THE_VALLEY);
+                Bouquet.setFlowerData(bouquet, flowers);
+                inputIng = Ingredient.of(bouquet);
+            }
+
             if (!inputIng.isEmpty()) {
                 builder.addSlot(RecipeIngredientRole.INPUT, 10, 25)
                         .setBackground(slotBackground, -1, -1)

@@ -18,33 +18,19 @@ public enum DistilleryApparatusComponentProvider implements IBlockComponentProvi
 
     @Override
     public void appendTooltip(ITooltip tooltip, BlockAccessor accessor, IPluginConfig config) {
-        if (!(accessor.getBlockEntity() instanceof DistilleryApparatusBlockEntity distillery)) {
+        if (!(accessor.getBlockEntity() instanceof DistilleryApparatusBlockEntity)) {
             return;
         }
 
-        var handler = distillery.getItemHandler();
-        IElementHelper helper = IElementHelper.get();
-
-        tooltip.add(helper.item(handler.getStackInSlot(0)));
-        tooltip.append(helper.item(handler.getStackInSlot(1)));
-        tooltip.append(helper.item(handler.getStackInSlot(2)));
-
-        tooltip.append(helper.spacer(4, 0));
-
         var data = accessor.getServerData();
+        if (!data.getBoolean("running")) return;
+
         var progress = data.getInt("progress");
         var maxProgress = data.getInt("maxProgress");
         float ratio = maxProgress > 0 ? (float) progress / maxProgress : 0f;
 
-        IElement progressElement = helper
-                .progress(ratio, null, helper.progressStyle(), IBoxStyle.Empty.INSTANCE, false) //todo test this
-                .translate(new Vec2(-2.0F, 0.0F));
-        tooltip.append(progressElement);
-
-        tooltip.append(helper.spacer(4, 0));
-
-        tooltip.append(helper.item(handler.getStackInSlot(3)));
-        tooltip.append(helper.item(handler.getStackInSlot(4)));
+        IElement bar = IElementHelper.get().progress(ratio, null, IElementHelper.get().progressStyle(), IBoxStyle.Empty.INSTANCE, false);
+        tooltip.add(bar);
     }
 
     @Override

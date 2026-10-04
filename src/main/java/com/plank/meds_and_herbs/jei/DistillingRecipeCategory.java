@@ -1,7 +1,7 @@
 package com.plank.meds_and_herbs.jei;
 
-import com.plank.meds_and_herbs.MedsAndHerbs;
 import com.plank.meds_and_herbs.init.MHBlocks;
+import com.plank.meds_and_herbs.init.MHItems;
 import com.plank.meds_and_herbs.recipe.DistillingRecipe;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.builder.IRecipeSlotBuilder;
@@ -18,8 +18,8 @@ import mezz.jei.api.recipe.category.IRecipeCategory;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
@@ -29,13 +29,11 @@ public class DistillingRecipeCategory implements IRecipeCategory<DistillingRecip
 
     private final IDrawable icon;
     private final IDrawable slotBackground;
-    private final IDrawable arrowBackground;
     private final IDrawableAnimated arrow;
 
     public DistillingRecipeCategory(IGuiHelper guiHelper) {
         this.icon = guiHelper.createDrawableItemStack(new ItemStack(MHBlocks.DISTILLERY_APPARATUS.get()));
         this.slotBackground = guiHelper.getSlotDrawable();
-        this.arrowBackground = guiHelper.getRecipeArrow();
         this.arrow = guiHelper.createAnimatedRecipeArrow(200);
     }
 
@@ -72,36 +70,34 @@ public class DistillingRecipeCategory implements IRecipeCategory<DistillingRecip
 
         List<IRecipeSlotBuilder> linkedSlots = new ArrayList<>();
 
+        IRecipeSlotBuilder inputASlot = builder.addSlot(RecipeIngredientRole.INPUT, 10, 25)
+                .setBackground(slotBackground, -1, -1);
         recipe.getInputA().ifPresent(ingredient -> {
-            IRecipeSlotBuilder slot = builder.addSlot(RecipeIngredientRole.INPUT, 10, 25)
-                    .setBackground(slotBackground, -1, -1)
-                    .addIngredients(ingredient);
-            linkedSlots.add(slot);
+            inputASlot.addIngredients(ingredient);
+            linkedSlots.add(inputASlot);
         });
 
+        IRecipeSlotBuilder inputBSlot = builder.addSlot(RecipeIngredientRole.INPUT, 28, 25)
+                .setBackground(slotBackground, -1, -1);
         recipe.getInputB().ifPresent(ingredient -> {
-            IRecipeSlotBuilder slot = builder.addSlot(RecipeIngredientRole.INPUT, 28, 25)
-                    .setBackground(slotBackground, -1, -1)
-                    .addIngredients(ingredient);
-            linkedSlots.add(slot);
+            inputBSlot.addIngredients(ingredient);
+            linkedSlots.add(inputBSlot);
         });
 
-        recipe.getEmptyBottle().ifPresent(ingredient -> {
-            IRecipeSlotBuilder slot = builder.addSlot(RecipeIngredientRole.INPUT, 69, 6)
-                    .setBackground(slotBackground, -1, -1)
-                    .addIngredients(ingredient);
-            linkedSlots.add(slot);
-        });
+        IRecipeSlotBuilder bottleSlot = builder.addSlot(RecipeIngredientRole.INPUT, 10, 6)
+                .setBackground(slotBackground, -1, -1)
+                .addIngredients(Ingredient.of(MHItems.MEDICINE_BOTTLE.get()));
+        linkedSlots.add(bottleSlot);
 
         IRecipeSlotBuilder outputSlot = builder.addSlot(RecipeIngredientRole.OUTPUT, 96, 25)
                 .setBackground(slotBackground, -1, -1)
                 .addItemStack(recipe.getOutput());
         linkedSlots.add(outputSlot);
 
+        IRecipeSlotBuilder spillageSlot = builder.addSlot(RecipeIngredientRole.OUTPUT, 114, 25)
+                .setBackground(slotBackground, -1, -1);
         if (!recipe.getSpillage().isEmpty()) {
-            IRecipeSlotBuilder spillageSlot = builder.addSlot(RecipeIngredientRole.OUTPUT, 114, 25)
-                    .setBackground(slotBackground, -1, -1)
-                    .addItemStack(recipe.getSpillage());
+            spillageSlot.addIngredients(Ingredient.of(recipe.getSpillage()));
             linkedSlots.add(spillageSlot);
         }
 
@@ -112,21 +108,11 @@ public class DistillingRecipeCategory implements IRecipeCategory<DistillingRecip
     public void draw(DistillingRecipe recipe, @Nonnull IRecipeSlotsView recipeSlotsView, @Nonnull GuiGraphics guiGraphics, double mouseX, double mouseY) {
         Minecraft minecraft = Minecraft.getInstance();
 
-        arrowBackground.draw(guiGraphics, 48, 25);
-        arrow.draw(guiGraphics, 48, 25);
-
-        ResourceLocation texture = ResourceLocation.fromNamespaceAndPath(MedsAndHerbs.MODID, "textures/jei/empty_bottle_slot.png");
-        guiGraphics.blit(texture, 95, 5, 0, 0, 18, 18, 18, 18);
-
-        if (recipe.getEmptyBottle().isPresent()) {
-            Component requireText = Component.translatable("jei.recipe.requires");
-            guiGraphics.drawString(minecraft.font, requireText, 40, 9, 0xFFFFFFFF, false);
-            guiGraphics.drawString(minecraft.font, "→", 87, 12, 0xFFFFFFFF, false);
-        }
+        arrow.draw(guiGraphics, 60, 25);
 
         int seconds = DistillingRecipe.MAX_PROGRESS / 20;
         Component timeText = Component.translatable("gui.jei.category.smelting.time.seconds", seconds);
-        guiGraphics.drawString(minecraft.font, timeText, 10, 50, 0xFF808080, false);
+        guiGraphics.drawString(minecraft.font, timeText, 60, 40, 0xFF808080, false);
     }
 
     @Override

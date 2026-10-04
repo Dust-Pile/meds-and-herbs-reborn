@@ -201,7 +201,7 @@
 
   "jei.recipe.requires": "Requires:",
   "jei.recipe.other": "…and other: %d%%",
-  "jei.meds_and_herbs.bouquet_grinder.hint": "Keep the craft material data of the bouquet",
+  "jei.meds_and_herbs.bouquet_grinder.hint": "Keeps the flower data of the bouquet",
   "jei.meds_and_herbs.bouquet.hint": "The bouquet includes the IDs of four craft materials",
 
   "config.jade.plugin_meds_and_herbs.extraction_apparatus_provider": "Extraction Apparatus",

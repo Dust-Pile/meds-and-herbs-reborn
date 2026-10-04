@@ -24,7 +24,7 @@ import java.util.Iterator;
 import java.util.List;
 
 public class FermentationRecipe implements Recipe<Container> {
-    public static final int DEFAULT_COOKING_TIME = 1200;
+    public static final int DEFAULT_COOKING_TIME = 1200 * 20;
 
     private final ResourceLocation id;
     private final NonNullList<Ingredient> ingredients;

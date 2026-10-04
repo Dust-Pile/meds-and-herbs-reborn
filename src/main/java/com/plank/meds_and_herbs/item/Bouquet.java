@@ -10,6 +10,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.Nullable;
@@ -24,7 +25,7 @@ public class Bouquet extends Item {
         super(new Item.Properties());
     }
 
-    public static void setFlowers(ItemStack stack, List<ResourceLocation> flowers) {
+    public static void setFlowerData(ItemStack stack, List<ResourceLocation> flowers) {
         if (flowers == null || flowers.size() != 4) return;
 
         var list = new ListTag();
@@ -35,6 +36,15 @@ public class Bouquet extends Item {
         var bouquet = new CompoundTag();
         bouquet.put("flowers", list);
         stack.getOrCreateTag().put("BouquetFlowers", bouquet);
+    }
+
+    public static List<ResourceLocation> createFlowersList(Item... items) {
+        List<ResourceLocation> flowers = new ArrayList<>();
+        for (Item item : items) {
+            var id = ForgeRegistries.ITEMS.getKey(item);
+            flowers.add(id);
+        }
+        return flowers;
     }
 
     @Nonnull

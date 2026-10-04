@@ -4,6 +4,7 @@ import com.google.gson.JsonObject;
 import com.plank.meds_and_herbs.MedsAndHerbs;
 import com.plank.meds_and_herbs.init.MHItems;
 import com.plank.meds_and_herbs.init.MHRecipes;
+import com.plank.meds_and_herbs.item.Bouquet;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.RegistryAccess;
@@ -16,18 +17,24 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nonnull;
+import java.util.ArrayList;
+import java.util.List;
 
-public class BouquetGrinderRecipe implements Recipe<Container> {
+public class BouquetGrinderRecipe extends GrinderRecipe {
     public static final BouquetGrinderRecipe INSTANCE = new BouquetGrinderRecipe();
     public static final ResourceLocation ID = MedsAndHerbs.id("bouquet_grinder");
+
+    public BouquetGrinderRecipe() {
+        super(ID, Ingredient.of(MHItems.BOUQUET.get()), new ItemStack(MHItems.POWDER_HERBAL.get()));
+    }
 
     @Override
     public boolean matches(@Nonnull Container input, @Nonnull Level level) {
@@ -83,7 +90,10 @@ public class BouquetGrinderRecipe implements Recipe<Container> {
 
     @Override
     public ItemStack getResultItem(RegistryAccess registryAccess) {
-        ItemStack result = new ItemStack(MHItems.POWDER_HERBAL.get());
+        ItemStack powder = new ItemStack(MHItems.POWDER_HERBAL.get());
+        List<ResourceLocation> flowers = Bouquet.createFlowersList(Items.ORANGE_TULIP, Items.DANDELION, Items.CORNFLOWER, Items.LILY_OF_THE_VALLEY);
+        Bouquet.setFlowerData(powder, flowers);
+
         Component hint = Component.translatable("jei.meds_and_herbs.bouquet_grinder.hint")
                 .withStyle(ChatFormatting.GOLD);
 
@@ -92,14 +102,19 @@ public class BouquetGrinderRecipe implements Recipe<Container> {
         lore.add(StringTag.valueOf(Component.Serializer.toJson(hint)));
         display.put("Lore", lore);
 
-        result.getOrCreateTag().put("display", display);
-        return result;    }
+        powder.getOrCreateTag().put("display", display);
+        return powder;
+    }
 
     @Override
     @Nonnull
     public NonNullList<Ingredient> getIngredients() {
+        ItemStack bouquet = new ItemStack(MHItems.BOUQUET.get());
+        List<ResourceLocation> flowers = Bouquet.createFlowersList(Items.ORANGE_TULIP, Items.DANDELION, Items.CORNFLOWER, Items.LILY_OF_THE_VALLEY);
+        Bouquet.setFlowerData(bouquet, flowers);
+        
         NonNullList<Ingredient> list = NonNullList.create();
-        list.add(Ingredient.of(MHItems.BOUQUET.get()));
+        list.add(Ingredient.of(bouquet));
         return list;
     }
 

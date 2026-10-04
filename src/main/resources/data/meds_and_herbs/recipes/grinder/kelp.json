@@ -4,7 +4,7 @@
     "item": "minecraft:kelp"
   },
   "output": {
-    "id": "meds_and_herbs:powder_kelp",
+    "item": "meds_and_herbs:powder_kelp",
     "count": 1
   }
 }

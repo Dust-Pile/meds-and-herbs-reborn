@@ -3,7 +3,7 @@
   "inputA": {
     "type": "forge:partial_nbt",
     "item": "meds_and_herbs:medicine",
-    "nbt": "{\"MedicineData\":{type:\"meds_and_herbs:poison_blood\",uses:3}}"
+    "nbt": "{\"MedicineData\":{type:\"meds_and_herbs:belladonna_poison_blood\",uses:3}}"
   },
   "inputB": {
     "type": "forge:partial_nbt",
@@ -11,7 +11,8 @@
     "nbt": "{\"MedicineData\":{type:\"meds_and_herbs:ethanol\",uses:3}}"
   },
   "output": {
+    "type": "forge:partial_nbt",
     "item": "meds_and_herbs:medicine",
-    "nbt": "{\"MedicineData\":{type:\"meds_and_herbs:antidote\",uses:3}}"
+    "nbt": "{\"MedicineData\":{type:\"meds_and_herbs:belladonna_poison\",uses:3}}"
   }
 }

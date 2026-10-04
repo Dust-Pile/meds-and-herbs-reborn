@@ -1,5 +1,5 @@
 {
-  "type": "meds_and_herbs:bouquet_crafting",
+  "type": "meds_and_herbs:bouquet",
   "ingredients": [
     { "tag": "forge:flowers" },
     { "tag": "forge:flowers" },

@@ -4,7 +4,7 @@
     "item": "minecraft:charcoal"
   },
   "output": {
-    "id": "meds_and_herbs:powder_charcoal",
+    "item": "meds_and_herbs:powder_charcoal",
     "count": 1
   }
 }
