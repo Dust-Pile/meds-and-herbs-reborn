@@ -25,8 +25,8 @@ Adds a big variety of medicine, poison and new in-game mechanics to the game!
 [[mixins]]
 config="meds_and_herbs.mixins.json"
 
-#[[accessTransformers]]
-#file="META-INF/accesstransformer.cfg"
+[[accessTransformers]]
+file="META-INF/accesstransformer.cfg"
 
 [[dependencies.${mod_id}]]
 modId="forge"

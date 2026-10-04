@@ -5,12 +5,15 @@ import com.plank.meds_and_herbs.item.CottonDressing;
 import com.plank.meds_and_herbs.item.SewingKit;
 import com.plank.meds_and_herbs.item.*;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.data.tags.DamageTypeTagsProvider;
+import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.DoubleHighBlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
+import net.minecraftforge.common.Tags;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.RegistryObject;
 
@@ -67,7 +70,7 @@ public class MHItems {
     public static final RegistryObject<Item> PENICILLIUM = register("penicillium");
     public static final RegistryObject<Item> PENICILLIUM_COAL = register("penicillium_and_coal");
     public static final RegistryObject<Item> DISTILLED_LEFTOVERS = register("distilled_leftovers");
-    public static final RegistryObject<Item> BARK = register("bark");
+    public static final RegistryObject<Item> BARK = register("bark", Bark::new);
     public static final RegistryObject<Item> COTTON_CLOTH = register("cotton_cloth");
     public static final RegistryObject<Item> COTTON_FIBER = register("cotton_fiber");
     public static final RegistryObject<Item> PLANTAGO_LEAF = register("plantago_leaf");

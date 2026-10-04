@@ -4,10 +4,7 @@ import com.plank.meds_and_herbs.MedsAndHerbs;
 import com.plank.meds_and_herbs.command.HealCommand;
 import com.plank.meds_and_herbs.data.MedicineTypeLoader;
 import com.plank.meds_and_herbs.effect.*;
-import com.plank.meds_and_herbs.init.MHDamageTypes;
-import com.plank.meds_and_herbs.init.MHEffects;
-import com.plank.meds_and_herbs.init.MHEntityTypeTags;
-import com.plank.meds_and_herbs.init.MHTags;
+import com.plank.meds_and_herbs.init.*;
 import com.plank.meds_and_herbs.util.MHUtils;
 import net.minecraft.core.Holder;
 import net.minecraft.world.damagesource.DamageSource;
@@ -17,9 +14,11 @@ import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.behavior.GiveGiftToHero;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.ComposterBlock;
 import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.entity.living.LivingDamageEvent;
@@ -28,6 +27,7 @@ import net.minecraftforge.event.entity.living.LivingHealEvent;
 import net.minecraftforge.event.entity.living.MobEffectEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.ArrayList;
@@ -223,5 +223,33 @@ public class CommonEvents {
     @SubscribeEvent
     public static void onRegisterCommands(RegisterCommandsEvent event) {
         HealCommand.register(event.getDispatcher());
+    }
+
+    @SubscribeEvent
+    public static void registerCompostables(FMLCommonSetupEvent event) {
+        event.enqueueWork(() -> {
+            ComposterBlock.COMPOSTABLES.put(MHItems.PLANTAGO.get(), 0.5f);
+            ComposterBlock.COMPOSTABLES.put(MHItems.BELLADONNA.get(), 0.65f);
+            ComposterBlock.COMPOSTABLES.put(MHItems.VINCA.get(), 0.65f);
+            ComposterBlock.COMPOSTABLES.put(MHItems.CHAMOMILE.get(), 0.65f);
+            ComposterBlock.COMPOSTABLES.put(MHItems.ARTEMISIA.get(), 0.65f);
+            ComposterBlock.COMPOSTABLES.put(MHItems.OPIUM.get(), 0.65f);
+            ComposterBlock.COMPOSTABLES.put(MHItems.ALOE.get(), 0.65f);
+            ComposterBlock.COMPOSTABLES.put(MHItems.COTTON.get(), 0.65f);
+            ComposterBlock.COMPOSTABLES.put(MHItems.DISTILLED_LEFTOVERS.get(), 0.65f);
+            ComposterBlock.COMPOSTABLES.put(MHItems.SWEET_CLOVER.get(), 0.85f);
+            ComposterBlock.COMPOSTABLES.put(MHItems.BOUQUET.get(), 1.0f);
+            ComposterBlock.COMPOSTABLES.put(MHItems.BELLADONNA_PIE.get(), 1.0f);
+        });
+    }
+
+    @SubscribeEvent
+    public static void registerRaidGifts(FMLCommonSetupEvent event) {
+        event.enqueueWork(() -> {
+            GiveGiftToHero.GIFTS.put(
+                    MHVillagerProfessions.HERBALIST.get(),
+                    MedsAndHerbs.id("gameplay/hero_of_the_village/herbalist_gift")
+            );
+        });
     }
 }
