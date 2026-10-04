@@ -1,5 +1,6 @@
 package com.plank.meds_and_herbs.init;
 
+import com.plank.meds_and_herbs.MedsAndHerbs;
 import com.plank.meds_and_herbs.data.MedsType;
 import com.plank.meds_and_herbs.item.Medicine;
 import net.minecraft.resources.ResourceLocation;
@@ -9,9 +10,11 @@ import net.minecraft.world.item.Items;
 import net.minecraftforge.common.BasicItemListing;
 import net.minecraftforge.event.village.VillagerTradesEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 
 import java.util.List;
 
+@Mod.EventBusSubscriber(modid = MedsAndHerbs.MODID)
 public class MHVillagerTrades {
     static Item EMERALD = Items.EMERALD;
 
