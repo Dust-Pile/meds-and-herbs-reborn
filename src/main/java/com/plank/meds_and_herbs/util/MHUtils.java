@@ -19,22 +19,28 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.DigDurabilityEnchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.registries.ForgeRegistries;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
 public class MHUtils {
     public static boolean hurtWithCustomType(Entity entity, ResourceKey<DamageType> damageType, float amount) {
-        return entity.hurt(new DamageSource(entity.level().registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(damageType)), amount);
+        return entity.hurt(getDamageSourceFromType(entity.level(), damageType), amount);
     }
 
-    public static void killWithDamageType(LivingEntity entity, ResourceKey<DamageType> type) {
-        if (!(entity instanceof Player player && player.isCreative()) && entity.getHealth() > 0) {
-            hurtWithCustomType(entity, type, entity.getHealth());
+    public static void killWithDamageType(LivingEntity entity, ResourceKey<DamageType> damageType) {
+        if (!(entity instanceof Player player && player.isCreative()) && entity.isAlive()) {
+            hurtWithCustomType(entity, damageType, Float.MAX_VALUE);
         }
+    }
+
+    private static @NotNull DamageSource getDamageSourceFromType(Level entity, ResourceKey<DamageType> damageType) {
+        return new DamageSource(entity.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(damageType));
     }
 
     public static List<Item> getItemsFromTag(TagKey<Item> tag) {
