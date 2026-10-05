@@ -218,17 +218,16 @@ public class ExtractionApparatusBlockEntity extends BlockEntity implements MenuP
         ItemStack powder = internalHandler.getStackInSlot(0);
         if (!recipe.getPowder().test(powder) || powder.getCount() < recipe.getPowderCount()) return false;
 
-        ItemStack bottle = internalHandler.getStackInSlot(2);
+        ItemStack solvent = internalHandler.getStackInSlot(1);
+        if (!recipe.getSolvent().test(solvent)) return false;
 
+        ItemStack bottle = internalHandler.getStackInSlot(2);
         if (recipe.getEmptyBottle().isPresent()) {
             if (!recipe.getEmptyBottle().get().test(bottle)) return false;
         } else if (!bottle.isEmpty()) {
             return false;
         }
 
-        if (internalHandler.getStackInSlot(4).isEmpty()) return false;
-
-        if (!canFit(2, recipe.getOutput())) return false;
         if (!recipe.getSpillage().isEmpty() && !canFit(3, recipe.getSpillage())) return false;
 
         return true;
