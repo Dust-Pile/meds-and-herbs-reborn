@@ -211,5 +211,10 @@
 
   "command.meds_and_herbs.heal.success": "%s restored %.1f health",
   "command.meds_and_herbs.heal.not_living": "Target is not a living entity, cannot heal",
-  "command.meds_and_herbs.heal.full": "Target's health is full, no healing needed"
+  "command.meds_and_herbs.heal.full": "Target's health is full, no healing needed",
+
+  "commands.random.error.range_too_large": "The range of the random value must be at most 2147483646",
+  "commands.random.error.range_too_small": "The range of the random value must be at least 2",
+  "commands.random.roll": "%s rolled %s (from %s to %s)",
+  "commands.random.sample.success": "Randomized value: %s"
 }

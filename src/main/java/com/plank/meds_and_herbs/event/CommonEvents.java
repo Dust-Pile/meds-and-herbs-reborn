@@ -2,6 +2,7 @@ package com.plank.meds_and_herbs.event;
 
 import com.plank.meds_and_herbs.MedsAndHerbs;
 import com.plank.meds_and_herbs.command.HealCommand;
+import com.plank.meds_and_herbs.command.RandomCommand;
 import com.plank.meds_and_herbs.data.MedicineTypeLoader;
 import com.plank.meds_and_herbs.effect.*;
 import com.plank.meds_and_herbs.init.*;
@@ -221,6 +222,7 @@ public class CommonEvents {
         @SubscribeEvent
         public static void onRegisterCommands(RegisterCommandsEvent event) {
             HealCommand.register(event.getDispatcher());
+            RandomCommand.register(event.getDispatcher());
         }
     }
 
