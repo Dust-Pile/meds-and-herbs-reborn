@@ -1,7 +1,5 @@
-# 生成 0~11 的随机数并存入 @s 的 random 分数
 execute store result score @s random run random value 0..11
 
-# 效果分配（同上）
 execute if score @s random matches 0 run effect give @s minecraft:speed 60 0
 execute if score @s random matches 1 run effect give @s minecraft:slowness 60 0
 execute if score @s random matches 2 run effect give @s minecraft:mining_fatigue 60 0
