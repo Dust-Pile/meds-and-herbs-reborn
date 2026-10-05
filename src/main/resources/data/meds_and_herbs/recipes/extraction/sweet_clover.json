@@ -11,9 +11,6 @@
     "item": "meds_and_herbs:medicine",
     "nbt": "{\"MedicineData\":{type:\"meds_and_herbs:ethanol\",uses:3}}"
   },
-  "empty_bottle": {
-    "item": "meds_and_herbs:medicine_bottle"
-  },
   "output": {
     "item": "meds_and_herbs:medicine",
     "nbt": "{\"MedicineData\":{type:\"meds_and_herbs:sweet_clover\",uses:3}}"

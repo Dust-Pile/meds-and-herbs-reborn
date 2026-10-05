@@ -4,9 +4,6 @@
     "item": "meds_and_herbs:powder_wood",
     "count": 16
   },
-  "solvent": {
-    "item": "meds_and_herbs:medicine_bottle"
-  },
   "output": {
     "item": "meds_and_herbs:medicine",
     "nbt": "{\"MedicineData\":{type:\"meds_and_herbs:methanol\",uses:3}}"

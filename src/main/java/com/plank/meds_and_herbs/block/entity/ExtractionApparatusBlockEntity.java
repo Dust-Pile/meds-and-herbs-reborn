@@ -219,14 +219,14 @@ public class ExtractionApparatusBlockEntity extends BlockEntity implements MenuP
         if (!recipe.getPowder().test(powder) || powder.getCount() < recipe.getPowderCount()) return false;
 
         ItemStack solvent = internalHandler.getStackInSlot(1);
-        if (!recipe.getSolvent().test(solvent)) return false;
-
-        ItemStack bottle = internalHandler.getStackInSlot(2);
-        if (recipe.getEmptyBottle().isPresent()) {
-            if (!recipe.getEmptyBottle().get().test(bottle)) return false;
-        } else if (!bottle.isEmpty()) {
+        if (recipe.getSolvent().isPresent()) {
+            if (!recipe.getSolvent().get().test(solvent)) return false;
+        } else if (!solvent.isEmpty()) {
             return false;
         }
+
+        ItemStack bottle = internalHandler.getStackInSlot(2);
+        if (!recipe.getEmptyBottle().test(bottle)) return false;
 
         if (!recipe.getSpillage().isEmpty() && !canFit(3, recipe.getSpillage())) return false;
 
@@ -241,12 +241,11 @@ public class ExtractionApparatusBlockEntity extends BlockEntity implements MenuP
         ItemStack bottleCopy  = internalHandler.getStackInSlot(2).copy();
 
         internalHandler.extractItem(0,  recipe.getPowderCount(), false);
-        internalHandler.extractItem(1, 1, false);
-        if (recipe.getEmptyBottle().isPresent()) {
-            internalHandler.extractItem(2, 1, false);
+        if (recipe.getSolvent().isPresent()) {
+            internalHandler.extractItem(1, 1, false);
         }
+        internalHandler.extractItem(2, 1, false);
 
-        // hurt or break filter
         ItemStack filter = internalHandler.getStackInSlot(4);
         if (filter.is(MHItems.COTTON_FILTER.get())) {
             if (!filter.isEmpty() && filter.isDamageableItem()) {

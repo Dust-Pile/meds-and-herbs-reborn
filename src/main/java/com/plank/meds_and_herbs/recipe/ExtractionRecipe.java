@@ -1,7 +1,9 @@
 package com.plank.meds_and_herbs.recipe;
 
 import com.google.gson.JsonObject;
+import com.plank.meds_and_herbs.init.MHItems;
 import com.plank.meds_and_herbs.init.MHRecipes;
+import com.plank.meds_and_herbs.init.MHTags;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.FriendlyByteBuf;
@@ -22,48 +24,47 @@ import java.util.Optional;
 public class ExtractionRecipe implements Recipe<Container> {
     public static final int MAX_PROGRESS = 200;
 
+    private static final Ingredient EMPTY_BOTTLE = Ingredient.of(MHTags.Items.EMPTY_BOTTLE);
+
     private final ResourceLocation id;
     private final Ingredient powder;
     private final int powderCount;
-    private final Ingredient solvent;
-    private final Optional<Ingredient> emptyBottle;
+    private final Optional<Ingredient> solvent;
     private final ItemStack output;
     private final ItemStack spillage;
 
     public ExtractionRecipe(ResourceLocation id,
                             Ingredient powder,
                             int powderCount,
-                            Ingredient solvent,
-                            Optional<Ingredient> emptyBottle,
+                            Optional<Ingredient> solvent,
                             ItemStack output,
                             ItemStack spillage) {
         this.id = id;
         this.powder = powder;
         this.powderCount = powderCount;
         this.solvent = solvent;
-        this.emptyBottle = emptyBottle;
         this.output = output;
         this.spillage = spillage;
     }
 
     public Ingredient getPowder() { return powder; }
     public int getPowderCount() { return powderCount; }
-    public Ingredient getSolvent() { return solvent; }
-    public Optional<Ingredient> getEmptyBottle() { return emptyBottle; }
+    public Optional<Ingredient> getSolvent() { return solvent; }
+    public Ingredient getEmptyBottle() { return EMPTY_BOTTLE; }
     public ItemStack getOutput() { return output; }
     public ItemStack getSpillage() { return spillage; }
 
     @Override
     public boolean matches(@NotNull Container container, @NotNull Level level) {
         if (!powder.test(container.getItem(0)) || container.getItem(0).getCount() < powderCount) return false;
-        if (!solvent.test(container.getItem(1))) return false;
 
-        ItemStack bottle = container.getItem(2);
-        if (emptyBottle.isPresent()) {
-            if (!emptyBottle.get().test(bottle)) return false;
-        } else if (!bottle.isEmpty()) {
+        if (solvent.isPresent()) {
+            if (!solvent.get().test(container.getItem(1))) return false;
+        } else if (!container.getItem(1).isEmpty()) {
             return false;
         }
+
+        if (!EMPTY_BOTTLE.test(container.getItem(2))) return false;
 
         return true;
     }
@@ -87,8 +88,8 @@ public class ExtractionRecipe implements Recipe<Container> {
     public @NotNull NonNullList<Ingredient> getIngredients() {
         NonNullList<Ingredient> list = NonNullList.create();
         list.add(powder);
-        list.add(solvent);
-        emptyBottle.ifPresent(list::add);
+        solvent.ifPresent(list::add);
+        list.add(EMPTY_BOTTLE);
         return list;
     }
 
@@ -115,11 +116,10 @@ public class ExtractionRecipe implements Recipe<Container> {
                                                   @NotNull JsonObject json) {
             Ingredient powder = Ingredient.fromJson(GsonHelper.getAsJsonObject(json, "powder"));
             int powderCount = GsonHelper.getAsInt(GsonHelper.getAsJsonObject(json, "powder"), "count", 1);
-            Ingredient solvent = Ingredient.fromJson(GsonHelper.getAsJsonObject(json, "solvent"));
 
-            Optional<Ingredient> emptyBottle = Optional.empty();
-            if (json.has("empty_bottle")) {
-                emptyBottle = Optional.of(Ingredient.fromJson(GsonHelper.getAsJsonObject(json, "empty_bottle")));
+            Optional<Ingredient> solvent = Optional.empty();
+            if (json.has("solvent")) {
+                solvent = Optional.of(Ingredient.fromJson(GsonHelper.getAsJsonObject(json, "solvent")));
             }
 
             ItemStack output = CraftingHelper.getItemStack(
@@ -131,17 +131,16 @@ public class ExtractionRecipe implements Recipe<Container> {
                         GsonHelper.getAsJsonObject(json, "spillage"), true);
             }
 
-            return new ExtractionRecipe(recipeId, powder, powderCount, solvent, emptyBottle, output, spillage);
+            return new ExtractionRecipe(recipeId, powder, powderCount, solvent, output, spillage);
         }
 
         @Override
         public void toNetwork(@NotNull FriendlyByteBuf buf, @NotNull ExtractionRecipe recipe) {
             recipe.powder.toNetwork(buf);
             buf.writeVarInt(recipe.powderCount);
-            recipe.solvent.toNetwork(buf);
 
-            buf.writeBoolean(recipe.emptyBottle.isPresent());
-            recipe.emptyBottle.ifPresent(ing -> ing.toNetwork(buf));
+            buf.writeBoolean(recipe.solvent.isPresent());
+            recipe.solvent.ifPresent(ing -> ing.toNetwork(buf));
 
             buf.writeItem(recipe.output);
             buf.writeItem(recipe.spillage);
@@ -152,17 +151,16 @@ public class ExtractionRecipe implements Recipe<Container> {
                                                      @NotNull FriendlyByteBuf buf) {
             Ingredient powder = Ingredient.fromNetwork(buf);
             int powderCount = buf.readVarInt();
-            Ingredient solvent = Ingredient.fromNetwork(buf);
 
-            Optional<Ingredient> emptyBottle = Optional.empty();
+            Optional<Ingredient> solvent = Optional.empty();
             if (buf.readBoolean()) {
-                emptyBottle = Optional.of(Ingredient.fromNetwork(buf));
+                solvent = Optional.of(Ingredient.fromNetwork(buf));
             }
 
             ItemStack output = buf.readItem();
             ItemStack spillage = buf.readItem();
 
-            return new ExtractionRecipe(recipeId, powder, powderCount, solvent, emptyBottle, output, spillage);
+            return new ExtractionRecipe(recipeId, powder, powderCount, solvent, output, spillage);
         }
     }
 }
