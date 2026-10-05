@@ -20,6 +20,6 @@ public class MHDamageTypes {
 
     private static ResourceKey<DamageType> createKey(String name) {
         return ResourceKey.create(Registries.DAMAGE_TYPE,
-                ResourceLocation.fromNamespaceAndPath(MedsAndHerbs.MODID, name));
+                MedsAndHerbs.id(name));
     }
 }

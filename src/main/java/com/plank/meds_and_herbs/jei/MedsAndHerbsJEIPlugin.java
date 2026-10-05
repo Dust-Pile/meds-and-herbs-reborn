@@ -28,7 +28,7 @@ import java.util.List;
 @JeiPlugin
 public class MedsAndHerbsJEIPlugin implements IModPlugin {
     public static final ResourceLocation PLUGIN_UID =
-            ResourceLocation.fromNamespaceAndPath(MedsAndHerbs.MODID, "jei_plugin");
+            MedsAndHerbs.id("jei_plugin");
 
     public static final RecipeType<ExtractionRecipe> EXTRACTION_TYPE =
             RecipeType.create(MedsAndHerbs.MODID, "extraction", ExtractionRecipe.class);
@@ -110,7 +110,7 @@ public class MedsAndHerbsJEIPlugin implements IModPlugin {
 //            List<RecipeHolder<CraftingRecipe>> bouquetHolders = new ArrayList<>();
 //
 //            bouquetHolders.add(new RecipeHolder<>(
-//                    ResourceLocation.fromNamespaceAndPath(MedsAndHerbs.MODID, "bouquet"),
+//                    MedsAndHerbs.id("bouquet"),
 //                    BouquetRecipe.INSTANCE
 //            ));
 //
@@ -132,7 +132,7 @@ public class MedsAndHerbsJEIPlugin implements IModPlugin {
 //                        .sorted()
 //                        .reduce((a, b) -> a + "_" + b)
 //                        .orElse("bouquet");
-//                ResourceLocation recipeId = ResourceLocation.fromNamespaceAndPath(MedsAndHerbs.MODID, "bouquet_display_" + id);
+//                ResourceLocation recipeId = MedsAndHerbs.id("bouquet_display_" + id);
 //                bouquetHolders.add(new RecipeHolder<>(recipeId, new VirtualBouquetRecipe(flowerItems, bouquet)));
 //            }
 //            registration.addRecipes(craftingType, bouquetHolders);

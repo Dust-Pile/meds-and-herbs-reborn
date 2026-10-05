@@ -17,31 +17,31 @@ public class MHRecipes {
             DeferredRegister.create(Registries.RECIPE_TYPE, MedsAndHerbs.MODID);
 
     public static final Supplier<RecipeType<DistillingRecipe>> DISTILLING_TYPE =
-            TYPES.register("distilling", () -> RecipeType.simple(ResourceLocation.fromNamespaceAndPath(MedsAndHerbs.MODID, "distilling")));
+            TYPES.register("distilling", () -> RecipeType.simple(MedsAndHerbs.id("distilling")));
 
     public static final Supplier<RecipeSerializer<DistillingRecipe>> DISTILLING_SERIALIZER =
             SERIALIZERS.register("distilling", () -> DistillingRecipe.Serializer.INSTANCE);
 
     public static final Supplier<RecipeType<ExtractionRecipe>> EXTRACTION_TYPE =
-            TYPES.register("extraction", () -> RecipeType.simple(ResourceLocation.fromNamespaceAndPath(MedsAndHerbs.MODID, "extraction")));
+            TYPES.register("extraction", () -> RecipeType.simple(MedsAndHerbs.id("extraction")));
 
     public static final Supplier<RecipeSerializer<ExtractionRecipe>> EXTRACTION_SERIALIZER =
             SERIALIZERS.register("extraction", () -> ExtractionRecipe.Serializer.INSTANCE);
 
     public static final Supplier<RecipeType<FermentationRecipe>> FERMENTATION_TYPE =
-            TYPES.register("fermentation", () -> RecipeType.simple(ResourceLocation.fromNamespaceAndPath(MedsAndHerbs.MODID, "fermentation")));
+            TYPES.register("fermentation", () -> RecipeType.simple(MedsAndHerbs.id("fermentation")));
 
     public static final Supplier<RecipeSerializer<FermentationRecipe>> FERMENTATION_SERIALIZER =
             SERIALIZERS.register("fermentation", () -> FermentationRecipe.Serializer.INSTANCE);
 
     public static final Supplier<RecipeType<GrinderRecipe>> GRINDER_TYPE =
-            TYPES.register("grinder", () -> RecipeType.simple(ResourceLocation.fromNamespaceAndPath(MedsAndHerbs.MODID, "grinder")));
+            TYPES.register("grinder", () -> RecipeType.simple(MedsAndHerbs.id("grinder")));
 
     public static final Supplier<RecipeSerializer<GrinderRecipe>> GRINDER_SERIALIZER =
             SERIALIZERS.register("grinder", () -> GrinderRecipe.Serializer.INSTANCE);
 
     public static final Supplier<RecipeType<IncubatorRecipe>> INCUBATOR_TYPE =
-            TYPES.register("incubator", () -> RecipeType.simple(ResourceLocation.fromNamespaceAndPath(MedsAndHerbs.MODID, "incubator")));
+            TYPES.register("incubator", () -> RecipeType.simple(MedsAndHerbs.id("incubator")));
 
     public static final Supplier<RecipeSerializer<IncubatorRecipe>> INCUBATOR_SERIALIZER =
             SERIALIZERS.register("incubator", () -> IncubatorRecipe.Serializer.INSTANCE);

@@ -19,6 +19,6 @@ public class MHSounds {
 
     private static RegistryObject<SoundEvent> register(String name) {
         return REGISTRY.register(name, () -> SoundEvent.createVariableRangeEvent(
-                ResourceLocation.fromNamespaceAndPath(MedsAndHerbs.MODID, name)));
+                MedsAndHerbs.id(name)));
     }
 }

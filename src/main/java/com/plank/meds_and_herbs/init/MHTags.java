@@ -20,14 +20,14 @@ public class MHTags {
         public static final TagKey<Item> DRESSINGS = tag("dressings");
 
         private static TagKey<Item> tag(String name) {
-            return TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath(MedsAndHerbs.MODID, name));
+            return TagKey.create(Registries.ITEM, MedsAndHerbs.id(name));
         }
     }
 
     public static final class Blocks {
         public static final TagKey<Block> STATIONS = tag("stations");
         private static TagKey<Block> tag(String name) {
-            return TagKey.create(Registries.BLOCK, ResourceLocation.fromNamespaceAndPath(MedsAndHerbs.MODID, name));
+            return TagKey.create(Registries.BLOCK, MedsAndHerbs.id(name));
         }
     }
 
@@ -36,7 +36,7 @@ public class MHTags {
         public  static final TagKey<DamageType> PHYSICAL = tag("physical");
 
         private static TagKey<DamageType> tag(String name) {
-            return TagKey.create(Registries.DAMAGE_TYPE, ResourceLocation.fromNamespaceAndPath(MedsAndHerbs.MODID, name));
+            return TagKey.create(Registries.DAMAGE_TYPE, MedsAndHerbs.id(name));
         }
     }
 }

@@ -26,7 +26,7 @@ public class MHVillagerProfessions {
 
     public static final ResourceKey<PoiType> HERBALIST_POI_KEY =
             ResourceKey.create(Registries.POINT_OF_INTEREST_TYPE,
-                    ResourceLocation.fromNamespaceAndPath(MedsAndHerbs.MODID, "herbalist"));
+                    MedsAndHerbs.id("herbalist"));
 
     public static final RegistryObject<PoiType> HERBALIST_POI = POI_TYPES.register("herbalist",
             () -> {
