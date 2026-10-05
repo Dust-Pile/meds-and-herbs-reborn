@@ -3,13 +3,11 @@ package com.plank.meds_and_herbs.jei;
 import com.plank.meds_and_herbs.MedsAndHerbs;
 import com.plank.meds_and_herbs.init.MHBlocks;
 import com.plank.meds_and_herbs.init.MHItems;
-import com.plank.meds_and_herbs.init.MHTags;
 import com.plank.meds_and_herbs.recipe.ExtractionRecipe;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.builder.IRecipeSlotBuilder;
 import mezz.jei.api.gui.builder.ITooltipBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
-import mezz.jei.api.gui.drawable.IDrawableAnimated;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.gui.widgets.IRecipeExtrasBuilder;
 import mezz.jei.api.helpers.IGuiHelper;
@@ -19,7 +17,6 @@ import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.recipe.category.IRecipeCategory;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
@@ -33,14 +30,12 @@ public class ExtractionRecipeCategory implements IRecipeCategory<ExtractionRecip
 
     private final IDrawable icon;
     private final IDrawable slotBackground;
-    private final IDrawable arrowBackground;
-    private final IDrawableAnimated arrow;
+    private final ResourceLocation PROGRESS_ARROW = MedsAndHerbs.id("textures/jei/extraction_progress_arrow.png");
+    private final ResourceLocation SPILLAGE_ARROW = MedsAndHerbs.id("textures/jei/extraction_spillage_arrow.png");
 
     public ExtractionRecipeCategory(IGuiHelper guiHelper) {
         this.icon = guiHelper.createDrawableItemStack(new ItemStack(MHBlocks.EXTRACTION_APPARATUS.get()));
         this.slotBackground = guiHelper.getSlotDrawable();
-        this.arrowBackground = guiHelper.getRecipeArrow();
-        this.arrow = guiHelper.createAnimatedRecipeArrow(200);
     }
 
     @Override
@@ -76,38 +71,38 @@ public class ExtractionRecipeCategory implements IRecipeCategory<ExtractionRecip
 
         List<IRecipeSlotBuilder> linkedSlots = new ArrayList<>();
 
-        var powderStack = new ItemStack(recipe.getPowder().getItems()[0].getItem());
+        ItemStack powderStack = recipe.getPowder().getItems()[0].copy();
         powderStack.setCount(recipe.getPowderCount());
 
-        IRecipeSlotBuilder powderSlot = builder.addSlot(RecipeIngredientRole.INPUT, 10, 15)
+        IRecipeSlotBuilder powderSlot = builder.addSlot(RecipeIngredientRole.INPUT, 80, 18)
                 .setBackground(slotBackground, -1, -1)
                 .addIngredients(Ingredient.of(powderStack));
         linkedSlots.add(powderSlot);
 
-        IRecipeSlotBuilder solventSlot = builder.addSlot(RecipeIngredientRole.INPUT, 10, 40)
-                .setBackground(slotBackground, -1, -1)
-                .addIngredients(recipe.getSolvent());
-        linkedSlots.add(solventSlot);
+        recipe.getSolvent().ifPresent(solvent -> {
+            IRecipeSlotBuilder slot = builder.addSlot(RecipeIngredientRole.INPUT, 80, 36)
+                    .setBackground(slotBackground, -1, -1)
+                    .addIngredients(solvent);
+            linkedSlots.add(slot);
+        });
 
-        IRecipeSlotBuilder filterSlot = builder.addSlot(RecipeIngredientRole.INPUT, 28, 40)
+        IRecipeSlotBuilder filterSlot = builder.addSlot(RecipeIngredientRole.INPUT, 28, 36)
                 .setBackground(slotBackground, -1, -1)
                 .addIngredients(Ingredient.of(MHItems.COTTON_FILTER.get()));
         linkedSlots.add(filterSlot);
 
-        recipe.getEmptyBottle().ifPresent(ingredient -> {
-            IRecipeSlotBuilder slot = builder.addSlot(RecipeIngredientRole.INPUT, 55, 15)
-                    .setBackground(slotBackground, -1, -1)
-                    .addIngredients(ingredient);
-            linkedSlots.add(slot);
-        });
+        IRecipeSlotBuilder bottleSlot = builder.addSlot(RecipeIngredientRole.INPUT, 4, 36)
+                .setBackground(slotBackground, -1, -1)
+                .addIngredients(recipe.getEmptyBottle());
+        linkedSlots.add(bottleSlot);
 
-        IRecipeSlotBuilder outputSlot = builder.addSlot(RecipeIngredientRole.OUTPUT, 100, 25)
+        IRecipeSlotBuilder outputSlot = builder.addSlot(RecipeIngredientRole.OUTPUT, 28, 54)
                 .setBackground(slotBackground, -1, -1)
                 .addItemStack(recipe.getOutput());
         linkedSlots.add(outputSlot);
 
         if (!recipe.getSpillage().isEmpty()) {
-            IRecipeSlotBuilder spillageSlot = builder.addSlot(RecipeIngredientRole.OUTPUT, 118, 25)
+            IRecipeSlotBuilder spillageSlot = builder.addSlot(RecipeIngredientRole.OUTPUT, 112, 54)
                     .setBackground(slotBackground, -1, -1)
                     .addItemStack(recipe.getSpillage());
             linkedSlots.add(spillageSlot);
@@ -120,28 +115,21 @@ public class ExtractionRecipeCategory implements IRecipeCategory<ExtractionRecip
     public void draw(ExtractionRecipe recipe, @Nonnull IRecipeSlotsView recipeSlotsView, @Nonnull GuiGraphics guiGraphics, double mouseX, double mouseY) {
         Minecraft minecraft = Minecraft.getInstance();
 
-        arrowBackground.draw(guiGraphics, 48, 41);
-        arrow.draw(guiGraphics, 48, 41);
 
         guiGraphics.pose().pushPose();
         float scale = 0.8f;
         guiGraphics.pose().scale(scale, scale, 1.0f);
-        int x = (int) (48 / scale) + 16;
-        int y = (int) (20 / scale) + 16;
+        int x = (int) (30 / scale) + 16;
+        int y = (int) (16 / scale) + 16;
         guiGraphics.drawString(minecraft.font, Component.literal("-1"), x, y, 0xFFFF0000, true);
         guiGraphics.pose().popPose();
 
-        if (recipe.getEmptyBottle().isPresent()) {
-            Component requireText = Component.translatable("jei.recipe.requires");
-            guiGraphics.drawString(minecraft.font, requireText, 69, 0, 0xFFFFFFFF, false);
-            guiGraphics.drawString(minecraft.font, "→", 87, 15, 0xFFFFFFFF, false);
-            ResourceLocation texture = ResourceLocation.fromNamespaceAndPath(MedsAndHerbs.MODID, "textures/jei/empty_bottle_slot.png");
-            guiGraphics.blit(texture, 95, 9, 0, 0, 18, 18, 18, 18);
-        }
+        guiGraphics.blit(SPILLAGE_ARROW, 100, 32, 0, 0, 27, 16, 27, 16);
+        guiGraphics.blit(PROGRESS_ARROW, 30, 4, 0, 0, 64, 31, 64, 31);
 
         int seconds = ExtractionRecipe.MAX_PROGRESS / 20;
         Component timeText = Component.translatable("gui.jei.category.smelting.time.seconds", seconds);
-        guiGraphics.drawString(minecraft.font, timeText, 10, 72, 0xFF808080, false);
+        guiGraphics.drawString(minecraft.font, timeText, 55, 12, 0xFF808080, false);
     }
 
     @Override
