@@ -1,0 +1,10 @@
+{
+  "type": "forge:add_features",
+  "biomes": [
+    "minecraft:grove",
+    "minecraft:stony_peaks",
+    "minecraft:meadow"
+  ],
+  "features": "meds_and_herbs:wild_opium",
+  "step": "vegetal_decoration"
+}

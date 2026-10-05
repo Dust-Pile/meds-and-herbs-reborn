@@ -1,16 +1,16 @@
 {
-  "feature": "meds_and_herbs:cotton_plant_badlands",
+  "feature": "meds_and_herbs:wild_chamomile",
   "placement": [
     {
       "type": "minecraft:rarity_filter",
-      "chance": 31
+      "chance": 32
     },
     {
       "type": "minecraft:in_square"
     },
     {
       "type": "minecraft:heightmap",
-      "heightmap": "MOTION_BLOCKING"
+      "heightmap": "WORLD_SURFACE_WG"
     },
     {
       "type": "minecraft:biome"

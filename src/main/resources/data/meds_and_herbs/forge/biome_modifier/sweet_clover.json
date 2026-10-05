@@ -1,0 +1,11 @@
+{
+  "type": "forge:add_features",
+  "biomes": [
+    "minecraft:plains",
+    "minecraft:snowy_plains",
+    "minecraft:meadow",
+    "minecraft:sunflower_plains"
+  ],
+  "features": "meds_and_herbs:sweet_clover",
+  "step": "vegetal_decoration"
+}
