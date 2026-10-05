@@ -73,7 +73,7 @@ public class Medicine extends Item {
     }
 
     public static ItemStack consume(ItemStack stack, Player player) {
-        if(player.isCreative()) return stack;
+        if (player.isCreative()) return stack;
         if (getUses(stack) <= 0) {
             return new ItemStack(MHItems.MEDICINE_BOTTLE.get());
         }
