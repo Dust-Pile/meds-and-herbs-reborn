@@ -1,7 +1,7 @@
 package com.plank.meds_and_herbs.block;
 
 import com.plank.meds_and_herbs.block.entity.IncubatorBlockEntity;
-import com.plank.meds_and_herbs.procedures.VoxelShapeHelper;
+import com.plank.meds_and_herbs.util.MHUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerPlayer;
@@ -62,7 +62,7 @@ public class IncubatorBlock extends Block implements EntityBlock {
     @Nonnull
     public VoxelShape getShape(BlockState state, @Nonnull BlockGetter level, @Nonnull BlockPos pos, @Nonnull CollisionContext context) {
         Direction facing = state.getValue(FACING);
-        return VoxelShapeHelper.rotateShape(Direction.NORTH, facing, BASE_SHAPE);
+        return MHUtils.rotateShape(Direction.NORTH, facing, BASE_SHAPE);
     }
 
     @Override

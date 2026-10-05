@@ -3,8 +3,8 @@ package com.plank.meds_and_herbs.block.entity;
 import com.plank.meds_and_herbs.init.MHBlockEntities;
 import com.plank.meds_and_herbs.init.MHRecipes;
 import com.plank.meds_and_herbs.init.MHSounds;
-import com.plank.meds_and_herbs.procedures.LoadItemList;
 import com.plank.meds_and_herbs.recipe.FermentationRecipe;
+import com.plank.meds_and_herbs.util.MHUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.RegistryAccess;
@@ -257,7 +257,7 @@ public class FermentationBarrelBlockEntity extends BlockEntity implements Contai
     public void load(@Nonnull CompoundTag tag) {
         super.load(tag);
         progress = tag.getInt("progress");
-        LoadItemList.loadItemsFromTag(itemHandler, tag);
+        MHUtils.loadItemsFromTag(itemHandler, tag);
 
         pendingSlots.clear();
         if (tag.contains("pendingSlots", Tag.TAG_LIST)) {

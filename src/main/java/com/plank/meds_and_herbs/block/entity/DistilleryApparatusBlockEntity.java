@@ -2,8 +2,8 @@ package com.plank.meds_and_herbs.block.entity;
 
 import com.plank.meds_and_herbs.client.gui.menu.DistilleryApparatusGUIMenu;
 import com.plank.meds_and_herbs.init.*;
-import com.plank.meds_and_herbs.procedures.LoadItemList;
 import com.plank.meds_and_herbs.recipe.DistillingRecipe;
+import com.plank.meds_and_herbs.util.MHUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -370,7 +370,7 @@ public class DistilleryApparatusBlockEntity extends BlockEntity implements MenuP
     public void load(@Nonnull CompoundTag tag) {
         super.load(tag);
         progress = tag.getInt("progress");
-        LoadItemList.loadItemsFromTag(internalHandler, tag);
+        MHUtils.loadItemsFromTag(internalHandler, tag);
 
         pendingSlots.clear();
         if (tag.contains("pendingSlots", Tag.TAG_LIST)) {

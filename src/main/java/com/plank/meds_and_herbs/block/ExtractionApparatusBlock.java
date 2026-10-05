@@ -1,17 +1,13 @@
 package com.plank.meds_and_herbs.block;
 
-import com.plank.meds_and_herbs.MedsAndHerbs;
 import com.plank.meds_and_herbs.block.entity.ExtractionApparatusBlockEntity;
 import com.plank.meds_and_herbs.init.MHTags;
-import com.plank.meds_and_herbs.procedures.VoxelShapeHelper;
+import com.plank.meds_and_herbs.util.MHUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.tags.BlockTags;
 import net.minecraft.world.*;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
@@ -27,18 +23,14 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.material.PushReaction;
-import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.ItemStackHandler;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.Collections;
-import java.util.List;
 import java.util.stream.IntStream;
 
 public class ExtractionApparatusBlock extends Block implements EntityBlock {
@@ -73,7 +65,7 @@ public class ExtractionApparatusBlock extends Block implements EntityBlock {
     @Nonnull
     public VoxelShape getShape(@Nonnull BlockState state, @Nonnull BlockGetter level, @Nonnull BlockPos pos, @Nonnull CollisionContext context) {
         Direction facing = state.getValue(FACING);
-        return VoxelShapeHelper.rotateShape(Direction.NORTH, facing, BASE_SHAPE);
+        return MHUtils.rotateShape(Direction.NORTH, facing, BASE_SHAPE);
     }
 
     @Override

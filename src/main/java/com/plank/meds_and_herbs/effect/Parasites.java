@@ -2,7 +2,6 @@ package com.plank.meds_and_herbs.effect;
 
 import com.plank.meds_and_herbs.init.MHDamageTypes;
 import com.plank.meds_and_herbs.init.MHEffects;
-import com.plank.meds_and_herbs.procedures.Kill;
 import com.plank.meds_and_herbs.util.MHUtils;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
@@ -38,7 +37,6 @@ public class Parasites extends MobEffect {
     }
 
     public static void onEffectExpired(LivingEntity entity) {
-        if (entity.level().isClientSide) return;
-        Kill.kill(entity, MHDamageTypes.PARASITES);
+        MHUtils.killWithDamageType(entity, MHDamageTypes.PARASITES);
     }
 }

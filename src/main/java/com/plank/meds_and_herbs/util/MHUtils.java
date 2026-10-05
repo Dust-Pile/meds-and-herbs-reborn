@@ -1,31 +1,40 @@
 package com.plank.meds_and_herbs.util;
 
 import com.plank.meds_and_herbs.init.MHItems;
+import net.minecraft.core.Direction;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.stats.Stats;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.DigDurabilityEnchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
-import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.List;
-import java.util.Random;
 
 public class MHUtils {
     public static boolean hurtWithCustomType(Entity entity, ResourceKey<DamageType> damageType, float amount) {
         return entity.hurt(new DamageSource(entity.level().registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(damageType)), amount);
+    }
+
+    public static void killWithDamageType(LivingEntity entity, ResourceKey<DamageType> type) {
+        if (!(entity instanceof Player player && player.isCreative()) && entity.getHealth() > 0) {
+            hurtWithCustomType(entity, type, entity.getHealth());
+        }
     }
 
     public static List<Item> getItemsFromTag(TagKey<Item> tag) {
@@ -90,5 +99,58 @@ public class MHUtils {
                 } else stack.setDamageValue(newDamage);
             }
         }
+    }
+
+    public static void loadItemsFromTag(ItemStackHandler itemHandler, CompoundTag tag) {
+        for (int i = 0; i < itemHandler.getSlots(); i++) {
+            itemHandler.setStackInSlot(i, ItemStack.EMPTY);
+        }
+
+        if (tag.contains("inventory", Tag.TAG_COMPOUND)) {
+            CompoundTag invTag = tag.getCompound("inventory");
+            if (invTag.contains("Items", Tag.TAG_LIST)) {
+                load(itemHandler, invTag.getList("Items", Tag.TAG_COMPOUND));
+                return;
+            }
+        }
+
+        if (tag.contains("Items", Tag.TAG_LIST)) {
+            load(itemHandler, tag.getList("Items", Tag.TAG_COMPOUND));
+        }
+    }
+
+    public static void load(ItemStackHandler itemHandler, ListTag list) {
+        for (int i = 0; i < list.size(); i++) {
+            CompoundTag itemTag = list.getCompound(i);
+            int slot = itemTag.getInt("Slot");
+            if (slot >= 0 && slot < itemHandler.getSlots()) {
+                ItemStack stack = ItemStack.of(itemTag);
+                itemHandler.setStackInSlot(slot, stack);
+            }
+        }
+    }
+
+    public static VoxelShape rotateShape(Direction from, Direction to, VoxelShape shape) {
+        if (from == to) return shape;
+        int rotations = (to.get2DDataValue() - from.get2DDataValue() + 4) % 4;
+        VoxelShape result = shape;
+        for (int i = 0; i < rotations; i++) {
+            result = rotateClockwise(result);
+        }
+        return result;
+    }
+
+    private static VoxelShape rotateClockwise(VoxelShape shape) {
+        var boxes = shape.toAabbs();
+        VoxelShape result = Shapes.empty();
+        for (var box : boxes) {
+            double minX = 1 - box.maxZ;
+            double minZ = box.minX;
+            double maxX = 1 - box.minZ;
+            double maxZ = box.maxX;
+            VoxelShape rotatedBox = Shapes.box(minX, box.minY, minZ, maxX, box.maxY, maxZ);
+            result = Shapes.or(result, rotatedBox);
+        }
+        return result;
     }
 }

@@ -4,7 +4,6 @@ package com.plank.meds_and_herbs.effect;
 import com.plank.meds_and_herbs.init.MHDamageTypes;
 import com.plank.meds_and_herbs.init.MHEffects;
 import com.plank.meds_and_herbs.init.MHTags;
-import com.plank.meds_and_herbs.procedures.Kill;
 import com.plank.meds_and_herbs.util.MHUtils;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
@@ -46,6 +45,6 @@ public class Bleeding extends MobEffect {
     }
 
     public static void onEffectExpired(LivingEntity entity) {
-        if (entity.hasEffect(MHEffects.BLOOD_LOSS.get())) Kill.kill(entity, MHDamageTypes.BLEEDING);
+        if (entity.hasEffect(MHEffects.BLOOD_LOSS.get())) MHUtils.killWithDamageType(entity, MHDamageTypes.BLEEDING);
     }
 }
