@@ -35,7 +35,7 @@ public class MedicineTypeLoader extends SimpleJsonResourceReloadListener {
                 var nameKey = json.get("name").getAsString();
                 MedicineDefinition.Type type = MedicineDefinition.Type.valueOf(json.get("type").getAsString().toUpperCase(Locale.ROOT));
                 var color = json.has("color") ? parseColor(json.get("color").getAsString()) : 0xFFFFFFFF;
-                var functionPath = ResourceLocation.parse(json.get("function").getAsString());
+                var functionPath = Optional.of(ResourceLocation.parse(json.get("function").getAsString()));
                 List<ResourceLocation> cures = parseCures(json.getAsJsonArray("cures"));
                 var def = new MedicineDefinition(id, nameKey, type, color, functionPath, cures);
                 definitions.put(id, def);

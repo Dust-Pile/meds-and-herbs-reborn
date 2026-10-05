@@ -124,12 +124,14 @@ public class Syringe extends Item {
 
             ResourceLocation typeId = Medicine.getType(otherHand);
             var def = MedicineTypeLoader.get(typeId);
-            if (def != null && !def.isInternal()) {
+            if (def == null) return;
+
+            if (!def.isInternal()) {
                 player.displayClientMessage(Component.translatable("message.meds_and_herbs.external_meds"), true);
                 return;
             }
 
-            UseMedicine.use(target, typeId);
+            UseMedicine.use(target, def);
             player.setItemInHand(hand == InteractionHand.MAIN_HAND ? InteractionHand.OFF_HAND : InteractionHand.MAIN_HAND,
                     Medicine.consume(otherHand, player));
             syringe.hurtAndBreak(1, player, item -> {});
@@ -173,7 +175,7 @@ public class Syringe extends Item {
             if (!canCure) continue;
 
             Component medicineName = Medicine.getTypeName(stack);
-            UseMedicine.use(target, typeId);
+            UseMedicine.use(target, def);
             items.set(i, Medicine.consume(stack, player));
 
             ListTag newContents = new ListTag();

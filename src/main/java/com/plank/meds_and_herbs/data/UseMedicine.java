@@ -11,7 +11,7 @@ public class UseMedicine {
         var server = target.level().getServer();
         if (server == null) return;
         var function = server.getFunctions().get(functionPath);
-        if(function.isPresent()) {
+        if (function.isPresent()) {
             var source = target.createCommandSourceStack()
                     .withSuppressedOutput()
                     .withPermission(server.getFunctionCompilationLevel());
@@ -19,19 +19,11 @@ public class UseMedicine {
         }
     }
 
-    public static boolean isInternalMedicine(ResourceLocation typeId) {
-        var def = MedicineTypeLoader.get(typeId);
-        return def != null && def.type() == MedicineDefinition.Type.INTERNAL;
-    }
+    public static void use(LivingEntity target, MedicineDefinition medicine) {
+        medicine.functionPath().ifPresent(functionPath -> executeFunction(target, functionPath));
 
-    public static void use(LivingEntity target, ResourceLocation typeId) {
-        var def = MedicineTypeLoader.get(typeId);
-        if (def == null) return;
-
-        executeFunction(target, def.functionPath());
-
-        if (def.cures() != null && !def.cures().isEmpty()) {
-            for (ResourceLocation effectId : def.cures()) {
+        if (medicine.cures() != null && !medicine.cures().isEmpty()) {
+            for (ResourceLocation effectId : medicine.cures()) {
                 MobEffect effect = BuiltInRegistries.MOB_EFFECT.get(effectId);
                 if (effect != null) {
                     target.removeEffect(effect);

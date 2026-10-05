@@ -97,7 +97,7 @@ public class Dressing extends Item {
                 return;
             }
 
-            UseMedicine.use(target, typeId);
+            UseMedicine.use(target, def);
             player.setItemInHand(hand == InteractionHand.MAIN_HAND ? InteractionHand.OFF_HAND : InteractionHand.MAIN_HAND,
                     Medicine.consume(otherHand, player));
             if (!player.isCreative()) dressing.shrink(1);
@@ -152,7 +152,7 @@ public class Dressing extends Item {
             if (!canCure) continue;
 
             Component medicineName = Medicine.getTypeName(stack);
-            UseMedicine.use(target, typeId);
+            UseMedicine.use(target, def);
             items.set(i, Medicine.consume(stack, player));
             ListTag newContents = new ListTag();
             for (ItemStack s : items) {
