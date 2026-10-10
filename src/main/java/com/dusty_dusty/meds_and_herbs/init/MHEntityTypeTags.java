@@ -7,7 +7,11 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EntityType;
 
 public class MHEntityTypeTags {
-    public static final TagKey<EntityType<?>> UNDEAD = create(ResourceLocation.withDefaultNamespace("undead"));
+    public static final TagKey<EntityType<?>> UNDEAD = create("undead");
+
+    public static final TagKey<EntityType<?>> MEDS_IMMUNE = create("meds_immune");
+    public static final TagKey<EntityType<?>> NO_BLOOD = create("no_blood");
+    public static final TagKey<EntityType<?>> SELF_TREATING = create("self_treating");
 
     private static TagKey<EntityType<?>> create(String name) {
         return TagKey.create(Registries.ENTITY_TYPE, MedsAndHerbs.id(name));

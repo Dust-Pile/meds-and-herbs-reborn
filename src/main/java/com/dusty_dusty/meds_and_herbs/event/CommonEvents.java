@@ -8,9 +8,12 @@ import com.dusty_dusty.meds_and_herbs.effect.*;
 import com.dusty_dusty.meds_and_herbs.init.*;
 import com.dusty_dusty.meds_and_herbs.util.MHUtils;
 import net.minecraft.core.Holder;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.damagesource.DamageTypes;
+import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
@@ -171,24 +174,55 @@ public class CommonEvents {
         @SubscribeEvent
         public static void onEffectAdded(MobEffectEvent.Added event) {
             MobEffectInstance instance = event.getEffectInstance();
+            MobEffect effect = instance.getEffect();
 
             // remove milk from cures
-            if (instance.getEffect().getCategory() == MobEffectCategory.HARMFUL) {
+            if (effect.getCategory() == MobEffectCategory.HARMFUL) {
                 List<ItemStack> cures = new ArrayList<>(instance.getCurativeItems());
                 cures.removeIf(stack -> stack.is(Items.MILK_BUCKET));
                 instance.setCurativeItems(cures);
             }
 
+            // on effect added
             var entity = event.getEntity();
             if (entity.level().isClientSide) return;
             if (!entity.isAlive()) return;
 
-            var id = ForgeRegistries.MOB_EFFECTS.getKey(instance.getEffect());
+            var id = ForgeRegistries.MOB_EFFECTS.getKey(effect);
 
             switch (id.toString()) {
                 case "meds_and_herbs:painkiller" -> Painkiller.onEffectAdded(entity);
             }
 
+            // self treating mobs
+            if (!entity.getType().is(MHEntityTypeTags.SELF_TREATING)) return;
+            if (!id.getNamespace().equals(MedsAndHerbs.MODID)) return;
+
+            int delay = entity.getRandom().nextIntBetweenInclusive(20, 100);
+            MHUtils.scheduleTask((ServerLevel) entity.level(), delay, () -> {
+                if (entity.isAlive() && entity.hasEffect(effect)) {
+                    entity.removeEffect(effect);
+
+                    //sounds
+                    if (effect == MHEffects.BLEEDING.get()
+                            || effect == MHEffects.BURNS.get()
+                            || effect == MHEffects.BONE_FRACTURE.get()) {
+                        entity.level().playSound(null, entity.blockPosition(), MHSounds.BANDAGE.get(), SoundSource.NEUTRAL);
+                    }
+
+                    if (effect == MHEffects.BLOOD_LOSS.get()
+                            || effect == MHEffects.INTERNAL_BLEEDING.get()
+                            || effect == MHEffects.THROMBOSIS.get()
+                            || effect == MHEffects.PARASITES.get()
+                            || effect == MHEffects.BACTERIAL_INFECTION.get()) {
+                        entity.level().playSound(null, entity.blockPosition(), MHSounds.INJECT.get(), SoundSource.NEUTRAL);
+                    }
+
+                    if (effect == MHEffects.LACERATION.get()) {
+                        entity.level().playSound(null, entity.blockPosition(), MHSounds.SEW.get(), SoundSource.NEUTRAL);
+                    }
+                }
+            });
         }
 
         @SubscribeEvent
@@ -213,6 +247,30 @@ public class CommonEvents {
             }
         }
 
+        @SubscribeEvent
+        public static void registerEfffectImmunity(MobEffectEvent.Applicable event) {
+            var effectInstance = event.getEffectInstance();
+            var effect = effectInstance.getEffect();
+            var entity = event.getEntity();
+
+            var id = ForgeRegistries.MOB_EFFECTS.getKey(effect);
+            if (id == null || !id.getNamespace().equals(MedsAndHerbs.MODID)) return;
+
+            if (entity.getType().is(MHEntityTypeTags.MEDS_IMMUNE)) {
+                event.setResult(MobEffectEvent.Applicable.Result.DENY);
+                return;
+            }
+
+            // doesn't have blood to lose
+            if (entity.getType().is(MHEntityTypeTags.NO_BLOOD) &&
+                    (effect == MHEffects.BLEEDING.get()
+                    || effect == MHEffects.BLOOD_LOSS.get()
+                    || effect == MHEffects.INTERNAL_BLEEDING.get()
+                    || effect == MHEffects.LACERATION.get()
+                    || effect == MHEffects.THROMBOSIS.get())) {
+                event.setResult(MobEffectEvent.Applicable.Result.DENY);
+            }
+        }
 
         @SubscribeEvent
         public static void addReloadListeners(AddReloadListenerEvent event) {

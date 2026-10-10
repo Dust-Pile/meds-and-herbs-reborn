@@ -1,0 +1,12 @@
+{
+  "values": [
+    "minecraft:creeper",
+    "minecraft:elder_guardian",
+    "minecraft:ender_dragon",
+    "minecraft:iron_golem",
+    "minecraft:magma_cube",
+    "minecraft:snow_golem",
+    "minecraft:warden",
+    "minecraft:wither"
+  ]
+}
