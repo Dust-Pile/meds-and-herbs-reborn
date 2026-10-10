@@ -43,7 +43,7 @@ public class MHVillagerProfessions {
                         poiPredicate,
                         ImmutableSet.of(),
                         ImmutableSet.of(),
-                        MHSounds.VILLAGER_WORK_HERBALIST.get()
+                        MHSounds.HERBALIST_WORKING.get()
                 );
             });
 }

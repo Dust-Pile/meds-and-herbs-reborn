@@ -196,8 +196,11 @@
   "subtitles.meds_and_herbs.grinder": "Grinder grinds",
   "subtitles.meds_and_herbs.extract_apparatus": "Extraction apparatus bubbles",
   "subtitles.meds_and_herbs.distillery_apparatus": "Distillery apparatus bubbles",
-  "subtitles.meds_and_herbs.villager_work_herbalist": "Herbalist works",
+  "subtitles.meds_and_herbs.herbalist_working": "Herbalist works",
   "subtitles.meds_and_herbs.fermentation_barrel": "Fermentation barrel bubbles",
+  "subtitles.meds_and_herbs.bandage": "Bandage used",
+  "subtitles.meds_and_herbs.inject": "Syringe injected",
+  "subtitles.meds_and_herbs.sew": "Wound sewn",
 
   "jei.recipe.requires": "Requires:",
   "jei.recipe.other": "…and other: %d%%",

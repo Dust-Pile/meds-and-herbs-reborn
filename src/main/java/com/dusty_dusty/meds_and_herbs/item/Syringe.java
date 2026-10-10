@@ -7,6 +7,7 @@ import com.dusty_dusty.meds_and_herbs.data.UseMedicine;
 import com.dusty_dusty.meds_and_herbs.init.MHDamageTypes;
 import com.dusty_dusty.meds_and_herbs.init.MHEffects;
 import com.dusty_dusty.meds_and_herbs.init.MHItems;
+import com.dusty_dusty.meds_and_herbs.init.MHSounds;
 import com.dusty_dusty.meds_and_herbs.util.MHUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -15,6 +16,7 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
@@ -112,6 +114,7 @@ public class Syringe extends Item {
 
             MHUtils.hurtWithCustomType(target, MHDamageTypes.BLEEDING, 6.0f);
             syringe.hurtAndBreak(1, player, item -> {});
+            target.level().playSound(null, player.blockPosition(), MHSounds.INJECT.get(), SoundSource.PLAYERS);
             return;
         }
 
@@ -135,6 +138,7 @@ public class Syringe extends Item {
             player.setItemInHand(hand == InteractionHand.MAIN_HAND ? InteractionHand.OFF_HAND : InteractionHand.MAIN_HAND,
                     Medicine.consume(otherHand, player));
             syringe.hurtAndBreak(1, player, item -> {});
+            target.level().playSound(null, player.blockPosition(), MHSounds.INJECT.get(), SoundSource.PLAYERS);
 
             var medicineName = Medicine.getTypeName(otherHand);
             player.displayClientMessage(Component.translatable("message.meds_and_herbs.injected",
@@ -185,6 +189,7 @@ public class Syringe extends Item {
             medkitStack.getOrCreateTag().put("MedkitContents", newContents);
 
             syringe.hurtAndBreak(1, player, item -> {});
+            target.level().playSound(null, player.blockPosition(), MHSounds.INJECT.get(), SoundSource.PLAYERS);
 
             player.displayClientMessage(Component.translatable("message.meds_and_herbs.auto_treat",
                     target.getDisplayName(), medicineName), true);

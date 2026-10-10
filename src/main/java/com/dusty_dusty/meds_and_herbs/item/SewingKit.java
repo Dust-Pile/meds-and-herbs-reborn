@@ -3,8 +3,11 @@ package com.dusty_dusty.meds_and_herbs.item;
 import com.dusty_dusty.meds_and_herbs.effect.EffectCures;
 import com.dusty_dusty.meds_and_herbs.init.MHEffects;
 import com.dusty_dusty.meds_and_herbs.init.MHItems;
+import com.dusty_dusty.meds_and_herbs.init.MHSounds;
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
@@ -86,6 +89,7 @@ public class SewingKit extends Item {
 
         EffectCures.cure(target, new ItemStack(MHItems.SEWING_KIT.get()));
         kit.hurtAndBreak(1, player, item -> {});
+        target.level().playSound(null, player.blockPosition(), MHSounds.SEW.get(), SoundSource.PLAYERS);
         player.swing(hand, true);
         player.displayClientMessage(Component.translatable("message.meds_and_herbs.laceration_healed"), true);
     }

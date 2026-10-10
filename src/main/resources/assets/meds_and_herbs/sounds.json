@@ -1,45 +1,65 @@
 {
-  "grinder": {
+  "block.grinder": {
     "subtitle": "subtitles.grinder",
     "sounds": [
       {
-        "name": "meds_and_herbs:grinder",
+        "name": "meds_and_herbs:block/grinder",
         "stream": false
       }
     ]
   },
-  "extract_apparatus": {
+  "block.extract_apparatus": {
     "subtitle": "subtitles.meds_and_herbs.extract_apparatus",
     "sounds": [
       {
-        "name": "meds_and_herbs:boiling",
+        "name": "meds_and_herbs:block/boiling",
         "stream": false
       }
     ]
   },
-  "distillery_apparatus": {
+  "block.distillery_apparatus": {
     "subtitle": "subtitles.meds_and_herbs.distillery_apparatus",
     "sounds": [
       {
-        "name": "meds_and_herbs:boiling",
+        "name": "meds_and_herbs:block/boiling",
         "stream": false
       }
     ]
   },
-  "villager_work_herbalist": {
-    "subtitle": "subtitles.meds_and_herbs.villager_work_herbalist",
-    "sounds": [
-      {
-        "name": "meds_and_herbs:boiling",
-        "stream": false
-      }
-    ]
-  },
-  "fermentation_barrel": {
+  "block.fermentation_barrel": {
     "subtitle": "subtitles.meds_and_herbs.fermentation_barrel",
     "sounds": [
       "block/brewing_stand/brew1",
       "block/brewing_stand/brew2"
+    ]
+  },
+  "item.bandage": {
+    "subtitle": "subtitles.meds_and_herbs.bandage",
+    "sounds": [
+      "meds_and_herbs:item/bandage1",
+      "meds_and_herbs:item/bandage2",
+      "meds_and_herbs:item/bandage3"
+    ]
+  },
+  "item.inject": {
+    "subtitle": "subtitles.meds_and_herbs.inject",
+    "sounds": [
+      "meds_and_herbs:item/inject"
+    ]
+  },
+  "item.sew": {
+    "subtitle": "subtitles.meds_and_herbs.sew",
+    "sounds": [
+      "meds_and_herbs:item/sew"
+    ]
+  },
+  "block.herbalist_working": {
+    "subtitle": "subtitles.meds_and_herbs.herbalist_working",
+    "sounds": [
+      {
+        "name": "meds_and_herbs:block/boiling",
+        "stream": false
+      }
     ]
   }
 }

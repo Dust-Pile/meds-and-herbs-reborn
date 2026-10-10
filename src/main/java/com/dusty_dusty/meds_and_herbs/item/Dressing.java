@@ -3,6 +3,7 @@ package com.dusty_dusty.meds_and_herbs.item;
 import com.dusty_dusty.meds_and_herbs.data.MedicineDefinition;
 import com.dusty_dusty.meds_and_herbs.data.MedicineTypeLoader;
 import com.dusty_dusty.meds_and_herbs.data.UseMedicine;
+import com.dusty_dusty.meds_and_herbs.init.MHSounds;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
@@ -10,6 +11,7 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
@@ -77,6 +79,7 @@ public class Dressing extends Item {
         if (otherHand.getItem() instanceof Medkit) {
             if (tryAutoTreatFromMedkit(player, target, otherHand)) {
                 if (!player.isCreative()) dressing.shrink(1);
+                target.level().playSound(null, player.blockPosition(), MHSounds.BANDAGE.get(), SoundSource.PLAYERS);
             } else {
                 player.displayClientMessage(Component.translatable("message.meds_and_herbs.no_medicine_in_kit"), true);
             }
@@ -101,6 +104,7 @@ public class Dressing extends Item {
             player.setItemInHand(hand == InteractionHand.MAIN_HAND ? InteractionHand.OFF_HAND : InteractionHand.MAIN_HAND,
                     Medicine.consume(otherHand, player));
             if (!player.isCreative()) dressing.shrink(1);
+            target.level().playSound(null, player.blockPosition(), MHSounds.BANDAGE.get(), SoundSource.PLAYERS);
 
             Component medicineName = Medicine.getTypeName(otherHand);
             player.displayClientMessage(Component.translatable("message.meds_and_herbs.dressing_apply_medicine",
@@ -112,6 +116,7 @@ public class Dressing extends Item {
             player.displayClientMessage(Component.translatable("message.meds_and_herbs.dressing_self",
                     target.getDisplayName()), true);
             if (!player.isCreative()) dressing.shrink(1);
+            target.level().playSound(null, player.blockPosition(), MHSounds.BANDAGE.get(), SoundSource.PLAYERS);
         } else {
             player.displayClientMessage(Component.translatable("message.meds_and_herbs.fail"), true);
         }
@@ -159,6 +164,7 @@ public class Dressing extends Item {
                 if (!s.isEmpty()) newContents.add(s.save(new CompoundTag()));
             }
             medkitStack.getOrCreateTag().put("MedkitContents", newContents);
+            target.level().playSound(null, player.blockPosition(), MHSounds.BANDAGE.get(), SoundSource.PLAYERS);
 
             player.displayClientMessage(Component.translatable("message.meds_and_herbs.auto_treat",
                     target.getDisplayName(), medicineName), true);

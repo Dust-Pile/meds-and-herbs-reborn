@@ -10,11 +10,15 @@ public class MHSounds {
     public static final DeferredRegister<SoundEvent> REGISTRY =
             DeferredRegister.create(Registries.SOUND_EVENT, MedsAndHerbs.MODID);
 
-    public static final RegistryObject<SoundEvent> GRINDER = register("grinder");
-    public static final RegistryObject<SoundEvent> EXTRACT_APPARATUS = register("extract_apparatus");
-    public static final RegistryObject<SoundEvent> DISTILLERY_APPARATUS = register("distillery_apparatus");
-    public static final RegistryObject<SoundEvent> FERMENTATION_BARREL = register("fermentation_barrel");
-    public static final RegistryObject<SoundEvent> VILLAGER_WORK_HERBALIST = register("villager_work_herbalist");
+    public static final RegistryObject<SoundEvent> GRINDER = register("block.grinder");
+    public static final RegistryObject<SoundEvent> EXTRACT_APPARATUS = register("block.extract_apparatus");
+    public static final RegistryObject<SoundEvent> DISTILLERY_APPARATUS = register("block.distillery_apparatus");
+    public static final RegistryObject<SoundEvent> FERMENTATION_BARREL = register("block.fermentation_barrel");
+    public static final RegistryObject<SoundEvent> HERBALIST_WORKING = register("block.herbalist_working");
+
+    public static final RegistryObject<SoundEvent> BANDAGE = register("item.bandage");
+    public static final RegistryObject<SoundEvent> INJECT = register("item.inject");
+    public static final RegistryObject<SoundEvent> SEW = register("item.sew");
 
     private static RegistryObject<SoundEvent> register(String name) {
         return REGISTRY.register(name, () -> SoundEvent.createVariableRangeEvent(
