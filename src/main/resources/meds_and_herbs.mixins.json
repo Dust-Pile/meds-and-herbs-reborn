@@ -1,7 +1,7 @@
 {
   "required": true,
   "minVersion": "0.8",
-  "package": "com.juiceybeans.meds_and_herbs.mixin",
+  "package": "com.dusty_dusty.meds_and_herbs.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
     "LivingEntityMixin"
