@@ -1,5 +1,6 @@
 package com.dusty_dusty.meds_and_herbs.util;
 
+import com.dusty_dusty.meds_and_herbs.core.ServerLevelRuns;
 import com.dusty_dusty.meds_and_herbs.init.MHItems;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.Registries;
@@ -7,6 +8,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.damagesource.DamageSource;
@@ -29,6 +31,10 @@ import org.antlr.v4.runtime.misc.NotNull;
 import java.util.List;
 
 public class MHUtils {
+    public static void scheduleTask(ServerLevel level, int time, Runnable runnable) {
+        ((ServerLevelRuns) level).medsAndHerbsAgain$addServerLevelRun(time, runnable);
+    }
+
     public static boolean hurtWithCustomType(Entity entity, ResourceKey<DamageType> damageType, float amount) {
         return entity.hurt(getDamageSourceFromType(entity.level(), damageType), amount);
     }

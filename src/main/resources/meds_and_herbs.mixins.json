@@ -4,7 +4,8 @@
   "package": "com.dusty_dusty.meds_and_herbs.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
-    "LivingEntityMixin"
+    "LivingEntityMixin",
+    "ServerLevelMixin"
   ],
   "client": [
   ],
